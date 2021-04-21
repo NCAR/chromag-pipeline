@@ -10,6 +10,14 @@ import os
 
 logger = logging.getLogger()
 
+LEVELS = {
+    "CRITICAL": logging.CRITICAL,
+    "ERROR": logging.ERROR,
+    "WARN": logging.WARN,
+    "WARNING": logging.WARNING,
+    "INFO": logging.INFO,
+    "DEBUG": logging.DEBUG}
+
 
 def rotate_logs(basename, max_version=None):
     """Rotate logs to allow a new log to be written as basename. If
@@ -53,13 +61,7 @@ def get_level(level_name):
        level_name : str
          case insensitive level name
     """
-    levels = {"CRITICAL": logging.CRITICAL,
-              "ERROR": logging.ERROR,
-              "WARN": logging.WARN,
-              "WARNING": logging.WARNING,
-              "INFO": logging.INFO,
-              "DEBUG": logging.DEBUG}
-    return levels[level_name.upper()]
+    return LEVELS[level_name.upper()]
 
 
 class WrappedFormatter(logging.Formatter):
