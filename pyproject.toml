@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "chromag"
+version = "0.1.0"
+description = "Calibrate, analyze, and browse ChroMag data"
+authors = ["Michael Galloy <mgalloy@ucar.com>"]
+license = "BSD-3"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+epochs = "^0.2.0"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+chromag = "chromag.cli:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
