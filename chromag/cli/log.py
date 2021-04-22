@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+
+"""Create and handle log sub-command.
+"""
+
 import os
 import re
 import time

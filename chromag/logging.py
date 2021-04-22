@@ -74,13 +74,17 @@ class WrappedFormatter(logging.Formatter):
         return super(WrappedFormatter, self).format(record)
 
 
-def setup_logging(filename,
-                  level=logging.DEBUG,
-                  rotate=False,
-                  max_version=None):
+def setup_logging(filename, level=logging.DEBUG, rotate=True,
+    max_version=None):
+
+    log_dirname = os.path.dirname(filename)
+    if not os.path.exists(log_dirname):
+        os.makedirs(log_dirname)
+
     if rotate:
         rotate_logs(filename, max_version=max_version)
 
+    logger.handlers = []
     handler = logging.FileHandler(filename)
     logger.addHandler(handler)
 

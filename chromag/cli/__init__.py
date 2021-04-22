@@ -7,6 +7,7 @@ import argparse
 
 from .. import __version__
 from .log import add_log_subcommand
+from  .eod import add_eod_subcommand
 
 
 def print_help(args):
@@ -35,6 +36,8 @@ def main():
     subparsers = parser.add_subparsers(help="sub-command help")
 
     add_log_subcommand(subparsers)
+
+    add_eod_subcommand(subparsers)
 
     # parse args and call appropriate sub-command
     args = parser.parse_args()

@@ -35,6 +35,7 @@ def step():
 
 class Run:
 
-    def __init__(self, mode="eod"):
+    def __init__(self, date, mode="eod"):
+        self.date = date
         self.mode = mode
 
