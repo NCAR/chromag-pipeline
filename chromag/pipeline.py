@@ -7,6 +7,11 @@ import datetime
 import functools
 import logging
 
+from .datetime import human_timedelta
+
+
+logger = logging.getLogger("ChroMag")
+
 
 def step():
     def actual_decorator(func):
@@ -35,7 +40,8 @@ def step():
 
 class Run:
 
-    def __init__(self, date, mode="eod"):
+    def __init__(self, date, mode, logger):
         self.date = date
         self.mode = mode
+        self.logger = logger
 

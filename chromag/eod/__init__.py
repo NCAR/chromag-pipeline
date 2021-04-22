@@ -11,11 +11,14 @@ from ..config import read_config, get_option
 from ..pipeline import Run
 from ..logging import setup_logging, get_level
 
+from .inventory import inventory
+from .l1_process import l1_process
+from .l2_process import l2_process
+
 
 def run(date, config_filename):
     """Run the end-of-day processing.
     """
-    run = Run(date, "eod")
     read_config(config_filename)
 
     log_basedir = get_option("logging", "basedir")
@@ -28,5 +31,12 @@ def run(date, config_filename):
     logger = setup_logging(log_filename, level=level, rotate=rotate,
         max_version=max_version)
 
+    run = Run(date, "eod", logger)
+
     logger.info(f"starting pipeline on {date}...")
+
+    inventory(run, skip=False)
+    l1_process(run, skip=not get_option("level1", "process"))
+    l2_process(run, skip=not get_option("level2", "process"))
+
     logger.info(f"done...")

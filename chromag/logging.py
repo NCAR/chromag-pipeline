@@ -8,7 +8,7 @@ import logging
 import os
 
 
-logger = logging.getLogger()
+logger = logging.getLogger("ChroMag")
 
 LEVELS = {
     "CRITICAL": logging.CRITICAL,
