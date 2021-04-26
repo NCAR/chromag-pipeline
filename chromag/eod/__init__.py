@@ -11,9 +11,9 @@ from ..config import read_config, get_option
 from ..pipeline import Run
 from ..logging import setup_logging, get_level
 
-from .inventory import inventory
-from .l1_process import l1_process
-from .l2_process import l2_process
+from .inventory import run_inventory
+from .l1_process import run_l1_process
+from .l2_process import run_l2_process
 
 
 def run(date, config_filename):
@@ -35,8 +35,9 @@ def run(date, config_filename):
 
     logger.info(f"starting pipeline on {date}...")
 
-    run.catalog = inventory(run, skip=False)
-    l1_process(run, skip=not get_option("level1", "process"))
-    l2_process(run, skip=not get_option("level2", "process"))
+    run.catalog = run_inventory(run, skip=False)
+
+    run_l1_process(run, skip=not get_option("level1", "process"))
+    run_l2_process(run, skip=not get_option("level2", "process"))
 
     logger.info(f"done...")

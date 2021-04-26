@@ -4,5 +4,5 @@ from ..pipeline import step
 
 
 @step()
-def l2_process(run):
+def run_l2_process(run):
     run.logger.debug("L2 processing stuff...")
