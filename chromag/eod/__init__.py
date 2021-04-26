@@ -35,7 +35,7 @@ def run(date, config_filename):
 
     logger.info(f"starting pipeline on {date}...")
 
-    inventory(run, skip=False)
+    run.catalog = inventory(run, skip=False)
     l1_process(run, skip=not get_option("level1", "process"))
     l2_process(run, skip=not get_option("level2", "process"))
 
