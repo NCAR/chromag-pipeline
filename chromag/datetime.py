@@ -7,6 +7,9 @@ import math
 
 
 def human_timedelta(timedelta):
+    """Create a human-readable string for a timedelta, for example, like
+       "2 days 4 hrs 10 mins 5 secs".
+    """
     secs = timedelta.total_seconds()
 
     units = [("day", 60 * 60 * 24),
@@ -20,6 +23,6 @@ def human_timedelta(timedelta):
                 n = int(math.floor(secs / mul))
                 secs -= n * mul
             else:
-                n = "%d" % secs
+                n = "%0.3f" % secs
             parts.append("%s %s%s" % (n, unit, "" if n == 1 else "s"))
     return " ".join(parts)
