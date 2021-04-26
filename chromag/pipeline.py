@@ -44,4 +44,12 @@ class Run:
         self.date = date
         self.mode = mode
         self.logger = logger
+        self._catalog = None
 
+    @property
+    def catalog(self):
+        return(self._catalog)
+
+    @catalog.setter
+    def catalog(self, catalog):
+        self._catalog = catalog
