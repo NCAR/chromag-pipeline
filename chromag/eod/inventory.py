@@ -41,6 +41,12 @@ class Catalog:
             new_catalog.add_file(f)
         return(new_catalog)
 
+    def __iter__(self):
+        return(self.catalog.__iter__())
+
+    def __next__(self):
+        return(self.catalog.__next__())
+
 
 @step()
 def run_inventory(run):

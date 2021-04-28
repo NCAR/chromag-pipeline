@@ -12,4 +12,4 @@ class ChroMagFile:
 
     def __str__(self):
         wave_region = f"{self.wave_region} nm" if self.wave_region is not None else "---"
-        return(f"{self.basename} ({wave_region} nm) [{self.type}]")
+        return(f"{self.basename} [{wave_region}] ({self.type})")
