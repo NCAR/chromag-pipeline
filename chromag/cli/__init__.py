@@ -7,7 +7,8 @@ import argparse
 
 from .. import __version__
 from .log import add_log_subcommand
-from  .eod import add_eod_subcommand
+from .ls import add_ls_subcommand
+from .eod import add_eod_subcommand
 
 
 def print_help(args):
@@ -26,7 +27,7 @@ def main():
     # show help if no sub-command given
     parser.set_defaults(func=print_help, parser=parser)
 
-    # TODO: it would be nice to grouop sub-commands into groups, but that is not
+    # TODO: it would be nice to group sub-commands into groups, but that is not
     # possible with argparse right now
     # helpers: list, ls, log, versions
     # processing: rt, eod, cal, reprocess
@@ -35,8 +36,8 @@ def main():
     # etc: script
     subparsers = parser.add_subparsers(help="sub-command help")
 
+    add_ls_subcommand(subparsers)
     add_log_subcommand(subparsers)
-
     add_eod_subcommand(subparsers)
 
     # parse args and call appropriate sub-command
