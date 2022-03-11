@@ -8,8 +8,8 @@ import epochs
 
 
 LINES_ROOT = os.path.dirname(os.path.abspath(__file__))
-LINES_CFG = os.path.join(LINES_ROOT, 'lines.cfg')
-LINES_SPEC = os.path.join(LINES_ROOT, 'lines.spec.cfg')
+LINES_CFG = os.path.join(LINES_ROOT, "lines.cfg")
+LINES_SPEC = os.path.join(LINES_ROOT, "lines.spec.cfg")
 
 
 cp = epochs.ConfigParser(LINES_SPEC)
