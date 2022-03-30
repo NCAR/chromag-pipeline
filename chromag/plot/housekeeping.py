@@ -41,13 +41,24 @@ def plot_time_series(plot_filename, date, section, df):
     ytitle = section.get("ytitle", fallback=None)
 
     yvalues_name = section.get("yvalues", fallback=None)
-    yvalues = df[yvalues_name].values
+
+    print(f"plotting time series '{yvalues_name}' to {plot_filename}")
+
+    try:
+        yvalues = df[yvalues_name].values
+    except KeyError as e:
+        print(f"column '{yvalues_name}' not found, skipping")
+        return
 
     xvalues_name = section.get("xvalues", fallback=None)
     if xvalues_name is None:
         xvalues = np.arange(len(yvalues))
     else:
-        xvalues = df[xvalues_name].values
+        try:
+            xvalues = df[xvalues_name].values
+        except KeyError as e:
+            print(f"column '{xvalues_name}' not found, skipping")
+            return
 
     title = section.get("title", fallback=None)
 
@@ -56,8 +67,6 @@ def plot_time_series(plot_filename, date, section, df):
     dpi = 150
     xsize_inches = xsize / dpi
     ysize_inches = ysize / dpi
-
-    print(f"plotting time series '{yvalues_name}' to {plot_filename}")
 
     fontsize = 6
 
@@ -76,6 +85,7 @@ def plot_time_series(plot_filename, date, section, df):
 
     ax.xaxis.set_tick_params(labelsize=fontsize)
     ax.yaxis.set_tick_params(labelsize=fontsize)
+    ax.yaxis.offsetText.set_fontsize(fontsize)
 
     ax.set_ylim(bottom=bottom, top=top)
 
@@ -86,6 +96,7 @@ def plot_time_series(plot_filename, date, section, df):
 
     fig.tight_layout()
     plt.savefig(plot_filename, dpi=dpi)
+    plt.close(fig)
 
 
 def plot_scatter(plot_filename, date, section, df):
