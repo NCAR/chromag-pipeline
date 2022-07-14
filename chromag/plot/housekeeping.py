@@ -120,13 +120,13 @@ def dispatch_plot(date:str, section, df):
         raise InvalidPlotType(f"invalid plot type '{type}' in '{section.name}' plot")
 
 
-def plot(date:str, housekeeping_filename:str):
+def plot(date:str, housekeeping_filename:str, skiprows:int=0):
     """Plot every column in a housekeeping file.
     """
     options = configparser.ConfigParser()
     options.read(HOUSEKEEPING_CFG)
 
-    df = pd.read_csv(housekeeping_filename, skiprows=6)
+    df = pd.read_csv(housekeeping_filename, skiprows=skiprows)
     for plot_name in options.sections():
         try:
             dispatch_plot(date, options[plot_name], df)
@@ -135,4 +135,5 @@ def plot(date:str, housekeeping_filename:str):
 
 
 if __name__ == "__main__":
-    plot("20211119", "20211119 ChroMag Housekeeping.csv")
+    #plot("20211119", "20211119 ChroMag Housekeeping.csv", skiprows=6)
+    plot("20220624", "20220624 ChroMag Housekeeping.csv")
