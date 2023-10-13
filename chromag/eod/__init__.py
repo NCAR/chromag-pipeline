@@ -3,11 +3,12 @@
 """Sub-package for end-of-day processing
 """
 
+import datetime
 import logging
 import os
 
 from ..config import read_config, get_option
-
+from ..datetime import human_timedelta
 from ..pipeline import Run
 from ..logging import setup_logging, get_level
 
@@ -34,10 +35,14 @@ def run(date, config_filename):
     run = Run(date, "eod", logger)
 
     logger.info(f"starting pipeline on {date}...")
+    start_dt = datetime.datetime.now()
 
     run.catalog = run_inventory(run, skip=False)
 
     run_l1_process(run, skip=not get_option("level1", "process"))
     run_l2_process(run, skip=not get_option("level2", "process"))
 
-    logger.info(f"done...")
+    end_dt = datetime.datetime.now()
+    time_interval = end_dt - start_dt
+    human_time = human_timedelta(time_interval)
+    logger.info(f"done: {human_time}")
