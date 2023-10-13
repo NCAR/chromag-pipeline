@@ -10,12 +10,10 @@ from ..eod import run
 
 
 def process_eod(args):
-    config_basename = f"chromag.{args.flags}.cfg"
-    # TODO: find config file
-    config_filename = os.path.join("/home/mgalloy/projects/chromag-pipeline/examples", config_basename)
+    config_basename = args.configure_filename
     dates = split_dates(",".join(args.dates), args.parser.error)
     for d in dates:
-        run(d, config_filename)
+        run(d, args.configure_filename)
 
 
 def add_eod_subcommand(subparsers):

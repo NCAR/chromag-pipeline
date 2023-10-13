@@ -1,23 +1,30 @@
-[tool.poetry]
+[project]
 name = "chromag"
 version = "0.1.0"
+authors = [
+  { name="Michael Galloy", email="mgalloy@ucar.edu" },
+]
 description = "Calibrate, analyze, and browse ChroMag data"
-authors = ["Michael Galloy <mgalloy@ucar.com>"]
-license = "BSD-3"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "numpy >= 1.20.2",
+  "astropy >= 3.2.2",
+  "epochs >= 0.2.0",
+  "python-dateutil >= 2.8.1",
+]
 
-[tool.poetry.dependencies]
-python = "^3.7"
-numpy = "^1.20.2"
-astropy = "^3.2.2"
-epochs = "^0.2.0"
-python-dateutil = "^2.8.1"
-
-[tool.poetry.dev-dependencies]
-
-[tool.poetry.scripts]
-chromag = "chromag.cli:main"
+[project.urls]
+"Homepage" = "https://github.com/NCAR/chromag-pipeline"
+"Bug Tracker" = "https://github.com/NCAR/chromag-pipeline/issues"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
+[project.scripts]
+chromag = "chromag.cli:main"

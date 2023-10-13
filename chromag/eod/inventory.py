@@ -17,12 +17,12 @@ class Catalog:
 
        new_catalog = catalog[catalog.is_flat & (catalog.line == "1083")]
     """
-    def __init__(self, n):
+    def __init__(self):
         self.n_files = 0
-        self.catalog = np.empty((n,), dtype=np.object)
+        self.catalog = []
 
     def add_file(self, file):
-        self.catalog[self.n_files] = file
+        self.catalog.append(file)
         self.n_files += 1
 
     def __str__(self):
@@ -36,7 +36,7 @@ class Catalog:
 
     def __getitem__(self, key):
         new_catalog_files = self.catalog[key]
-        new_catalog = Catalog(len(new_catalog_files))
+        new_catalog = Catalog()
         for f in new_catalog_files:
             new_catalog.add_file(f)
         return(new_catalog)
@@ -47,15 +47,24 @@ class Catalog:
     def __next__(self):
         return(self.catalog.__next__())
 
+    def __str__(self):
+        return(f"Catalog of {self.n_files} ChroMag files")
+
+
+def write_inventory_file(catalog, filename):
+    with open(filename, "w") as file:
+        for f in catalog:
+            file.write(f"{f.basename}   {f.datatype}   {f.wavelength:7.3f} nm\n")
+
 
 @step()
 def run_inventory(run):
     raw_basedir = get_basedir(run.date, "raw")
     raw_dir = os.path.join(raw_basedir, run.date)
 
-    filenames = glob.glob(os.path.join(raw_dir, "*.fts*"))
+    filenames = glob.glob(os.path.join(raw_dir, "*.fits*"))
 
-    catalog = Catalog(len(filenames))
+    catalog = Catalog()
 
     for f in filenames:
         file = ChroMagFile(f)
@@ -63,5 +72,18 @@ def run_inventory(run):
         catalog.add_file(file)
 
     run.logger.info(f"created catalog with {catalog.n_files} files")
+    run.logger.info("writing inventory files...")
+
+    process_dir = get_basedir(run.date, "process")
+    if not os.path.isdir(process_dir):
+        os.mkdir(process_dir)
+
+    date_dir = os.path.join(process_dir, run.date)
+    if not os.path.isdir(date_dir):
+        os.mkdir(date_dir)
+
+    inventory_filename = os.path.join(date_dir, f"{run.date}.chromag.inventory.txt")
+    write_inventory_file(catalog, inventory_filename)
+
     return(catalog)
  

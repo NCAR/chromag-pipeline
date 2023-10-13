@@ -42,7 +42,6 @@ def add_run_arguments(parser):
     parser.add_argument("dates", type=str, nargs="*", help=date_help,
         metavar="date-expr")
 
-    flags_help = """FLAGS section of config filename, i.e., file in config/
-        directory matching chromag.FLAGS.cfg will be used"""
-    parser.add_argument("-f", "--flags", type=str, help=flags_help,
+    flags_help = """Configuration filename"""
+    parser.add_argument("-f", "--configure-filename", type=str, help=flags_help,
         default=None)

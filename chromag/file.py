@@ -2,14 +2,18 @@
 
 import os
 
+from astropy.io import fits
+
 
 class ChroMagFile:
     def __init__(self, filename):
         self.filename = filename
         self.basename = os.path.basename(self.filename)
-        self.type = None   # sci, cal
-        self.wave_region = None
+        with fits.open(filename) as f:
+            primary_header = f[0].header
+            self.datatype = primary_header["DATATYPE"]
+            self.wavelength = primary_header["WAVELNTH"]
 
     def __str__(self):
-        wave_region = f"{self.wave_region} nm" if self.wave_region is not None else "---"
-        return(f"{self.basename} [{wave_region}] ({self.type})")
+        wavelength = f"{self.wavelength} nm" if self.wavelength is not None else "---"
+        return(f"{self.basename} [{wavelength}] ({self.datatype})")
