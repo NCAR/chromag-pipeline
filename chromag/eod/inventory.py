@@ -54,7 +54,7 @@ class Catalog:
 def write_inventory_file(catalog, filename):
     with open(filename, "w") as file:
         for f in catalog:
-            file.write(f"{f.basename}   {f.datatype}   {f.wavelength:7.3f} nm\n")
+            file.write(f"{f.basename}   {f.datatype}   {f.wavelength:7.3f} nm   {f.scan_i:5d}   {f.scan_n:5d}\n")
 
 
 @step()
