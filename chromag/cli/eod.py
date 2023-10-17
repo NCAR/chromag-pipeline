@@ -10,10 +10,10 @@ from ..eod import run
 
 
 def process_eod(args):
-    config_basename = args.configure_filename
+    config_basename = args.configuration_filename
     dates = split_dates(",".join(args.dates), args.parser.error)
     for d in dates:
-        run(d, args.configure_filename)
+        run(d, args.configuration_filename)
 
 
 def add_eod_subcommand(subparsers):
