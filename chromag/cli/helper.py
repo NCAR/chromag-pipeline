@@ -43,5 +43,5 @@ def add_run_arguments(parser):
         metavar="date-expr")
 
     flags_help = """Configuration filename"""
-    parser.add_argument("-f", "--configure-filename", type=str, help=flags_help,
+    parser.add_argument("-f", "--configuration-filename", type=str, help=flags_help,
         default=None)
