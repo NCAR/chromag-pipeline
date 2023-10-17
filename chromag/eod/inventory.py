@@ -35,11 +35,17 @@ class Catalog:
         return(np.array([f.__getattribute__(name) for f in self.catalog]))
 
     def __getitem__(self, key):
-        new_catalog_files = self.catalog[key]
         new_catalog = Catalog()
-        for f in new_catalog_files:
-            new_catalog.add_file(f)
+        for f, k in zip(self.catalog, key):
+            if k:
+                new_catalog.add_file(f)
         return(new_catalog)
+
+        # new_catalog_files = self.catalog[key]
+        # new_catalog = Catalog()
+        # for f in new_catalog_files:
+        #     new_catalog.add_file(f)
+        # return(new_catalog)
 
     def __iter__(self):
         return(self.catalog.__iter__())
