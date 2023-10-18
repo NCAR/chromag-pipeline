@@ -41,12 +41,6 @@ class Catalog:
                 new_catalog.add_file(f)
         return(new_catalog)
 
-        # new_catalog_files = self.catalog[key]
-        # new_catalog = Catalog()
-        # for f in new_catalog_files:
-        #     new_catalog.add_file(f)
-        # return(new_catalog)
-
     def __iter__(self):
         return(self.catalog.__iter__())
 
