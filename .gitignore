@@ -1,5 +1,6 @@
+.coverage
 __pycache__
-20211119*.csv
-20211119*.png
-20220624*.csv
-20220624*.png
+/chromag/plot/20211119*.csv
+/chromag/plot/20211119*.png
+/chromag/plot/20220624*.csv
+/chromag/plot/20220624*.png
