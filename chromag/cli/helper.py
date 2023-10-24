@@ -8,7 +8,7 @@ def increment_date(date):
     format = "%Y%m%d"
     d = datetime.datetime.strptime(date, format)
     d += datetime.timedelta(days=1)
-    return(d.strftime(format))
+    return d.strftime(format)
 
 
 def split_dates(date_expr, error):
@@ -30,18 +30,19 @@ def split_dates(date_expr, error):
         else:
             error(f"invalid date expression: {d}")
 
-    return(dates)
+    return dates
 
 
 def add_run_arguments(parser):
-    """Helper routine to add dates and flags arguments for a subcommand.
-    """
+    """Helper routine to add dates and flags arguments for a subcommand."""
     date_help = """dates to run on in the form YYYYMMDD including lists (using
            commas) and ranges (using hyphens where end date is not
            included)"""
-    parser.add_argument("dates", type=str, nargs="*", help=date_help,
-        metavar="date-expr")
+    parser.add_argument(
+        "dates", type=str, nargs="*", help=date_help, metavar="date-expr"
+    )
 
     flags_help = """Configuration filename"""
-    parser.add_argument("-f", "--configuration-filename", type=str, help=flags_help,
-        default=None)
+    parser.add_argument(
+        "-f", "--configuration-filename", type=str, help=flags_help, default=None
+    )

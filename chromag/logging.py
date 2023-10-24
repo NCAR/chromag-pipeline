@@ -16,22 +16,23 @@ LEVELS = {
     "WARN": logging.WARN,
     "WARNING": logging.WARNING,
     "INFO": logging.INFO,
-    "DEBUG": logging.DEBUG}
+    "DEBUG": logging.DEBUG,
+}
 
 DATE_FORMAT = "%Y%m%d.%H%M%S"
 
 
 def rotate_logs(basename, max_version=None):
     """Rotate logs to allow a new log to be written as basename. If
-       max_version is given, delete logs with given basename and versions
-       beyond the max_version.
+    max_version is given, delete logs with given basename and versions
+    beyond the max_version.
 
-       Note: no rotating or pruning done if basename doesn't already exist.
+    Note: no rotating or pruning done if basename doesn't already exist.
 
-       basename : str
-         log base filename, i.e., without a ".x"
-       max_version : int
-         largest allowable version, set to 0 not keep any versions
+    basename : str
+      log base filename, i.e., without a ".x"
+    max_version : int
+      largest allowable version, set to 0 not keep any versions
     """
 
     # nothing to do if the basename doesn't already exist
@@ -41,7 +42,7 @@ def rotate_logs(basename, max_version=None):
     files = glob.glob(f"{basename}.*")
     n = len(basename)
 
-    versions = [int(f[n + 1:]) for f in files if f[n + 1:].isdigit()]
+    versions = [int(f[n + 1 :]) for f in files if f[n + 1 :].isdigit()]
     sorted_versions = sorted(versions, reverse=True)
 
     for v in sorted_versions:
@@ -60,25 +61,24 @@ def rotate_logs(basename, max_version=None):
 def get_level(level_name):
     """Convert a string name to a logging level constant value.
 
-       level_name : str
-         case insensitive level name
+    level_name : str
+      case insensitive level name
     """
     return LEVELS[level_name.upper()]
 
 
 class WrappedFormatter(logging.Formatter):
     """Custom formatter, overrides funcName with value of funcName_override if
-       it exists.
+    it exists.
     """
+
     def format(self, record):
         if hasattr(record, "func"):
             record.funcName = record.func.__name__
         return super(WrappedFormatter, self).format(record)
 
 
-def setup_logging(filename, level=logging.DEBUG, rotate=True,
-    max_version=None):
-
+def setup_logging(filename, level=logging.DEBUG, rotate=True, max_version=None):
     log_dirname = os.path.dirname(filename)
     if not os.path.exists(log_dirname):
         os.makedirs(log_dirname)
@@ -96,4 +96,4 @@ def setup_logging(filename, level=logging.DEBUG, rotate=True,
 
     logger.setLevel(level)
 
-    return(logger)
+    return logger

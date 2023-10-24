@@ -8,14 +8,11 @@ import math
 
 def human_timedelta(timedelta):
     """Create a human-readable string for a timedelta, for example, like
-       "2 days 4 hrs 10 mins 5 secs".
+    "2 days 4 hrs 10 mins 5 secs".
     """
     secs = timedelta.total_seconds()
 
-    units = [("day", 60 * 60 * 24),
-             ("hr", 60 * 60),
-             ("min", 60),
-             ("sec", 1)]
+    units = [("day", 60 * 60 * 24), ("hr", 60 * 60), ("min", 60), ("sec", 1)]
     parts = []
     for unit, mul in units:
         if secs / mul >= 1 or mul == 1:

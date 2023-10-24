@@ -18,9 +18,9 @@ cp.read(LINES_CFG)
 
 def list():
     """List the available spectral lines. Returns an array of string names."""
-    return(cp.specification.sections())
+    return cp.specification.sections()
 
 
 def property(line_name, property_name):
     """Retrieve a property of a given spectral line."""
-    return(cp.get(line_name, property_name))
+    return cp.get(line_name, property_name)

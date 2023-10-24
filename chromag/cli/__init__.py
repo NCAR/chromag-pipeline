@@ -22,10 +22,8 @@ def main():
     parser = argparse.ArgumentParser(description=name)
 
     # top-level options
-    parser.add_argument("-v", "--version",
-                        action="version",
-                        version=name)
-    
+    parser.add_argument("-v", "--version", action="version", version=name)
+
     # show help if no sub-command given
     parser.set_defaults(func=print_help, parser=parser)
 

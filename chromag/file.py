@@ -27,4 +27,4 @@ class ChroMagFile:
     def __str__(self):
         wavelength = f"{self.wavelength} nm" if self.wavelength is not None else "---"
         datatype = self.datatype[0:3]
-        return(f"{self.basename} [{wavelength}] ({datatype} scan: {self.scan_i}/{self.scan_n})")
+        return f"{self.basename} [{wavelength}] ({datatype} scan: {self.scan_i}/{self.scan_n})"

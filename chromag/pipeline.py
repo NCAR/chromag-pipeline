@@ -31,16 +31,15 @@ def step():
                     end_dt = datetime.datetime.now()
                     time_interval = end_dt - start_dt
                     human_time = human_timedelta(time_interval)
-                    logger.info(f"done with {func.__name__}: {human_time}",
-                                extra=e)
-                return(value)
+                    logger.info(f"done with {func.__name__}: {human_time}", extra=e)
+                return value
 
         return func_wrapper
+
     return actual_decorator
 
 
 class Run:
-
     def __init__(self, date, mode, logger):
         self.date = date
         self.mode = mode
@@ -49,7 +48,7 @@ class Run:
 
     @property
     def catalog(self):
-        return(self._catalog)
+        return self._catalog
 
     @catalog.setter
     def catalog(self, catalog):

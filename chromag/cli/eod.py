@@ -17,7 +17,8 @@ def process_eod(args):
 
 
 def add_eod_subcommand(subparsers):
-    parser = subparsers.add_parser("end-of-day", aliases=["eod"],
-        help="run end-of-day pipeline")
+    parser = subparsers.add_parser(
+        "end-of-day", aliases=["eod"], help="run end-of-day pipeline"
+    )
     add_run_arguments(parser)
     parser.set_defaults(func=process_eod, parser=parser)

@@ -9,45 +9,43 @@ import os
 try:
     from astropy.io import fits
     from astropy.utils.exceptions import AstropyUserWarning
+
     ls_requirements = True
 except ModuleNotFoundError as e:
     ls_requirements = False
 
 
 def file_lines(filename):
-    """ Returns the number of lines in a text file.
-    """
+    """Returns the number of lines in a text file."""
     n_lines = 0
-    
+
     with open(filename, "r") as f:
         for line in f.readlines():
             n_lines += 1
-    return(n_lines)
+    return n_lines
 
 
 def value2str(v, format=None):
-    """ Convert a given value to a string with the given format, if present.
-    """
+    """Convert a given value to a string with the given format, if present."""
     if format is not None:
-        return(f"{v:{format}}")
+        return f"{v:{format}}"
 
     if type(v) == str:
-        return(f"{v:10s}")
+        return f"{v:10s}"
     elif type(v) == float:
-        return(f"{v:8.3f}")
+        return f"{v:8.3f}"
     elif type(v) == int:
-        return(f"{v:8d}")
+        return f"{v:8d}"
     elif type(v) == bool:
-        return(f"{v!s:5s}")
+        return f"{v!s:5s}"
     elif v is None:
         return 5 * "-"
 
-    return(f"{v}")
+    return f"{v}"
 
 
 def list_fits_file_default(f):
-    """ Display a listing for a file with the default columns.
-    """
+    """Display a listing for a file with the default columns."""
     basename = os.path.basename(f)
     try:
         with fits.open(f) as fits_file:
@@ -77,11 +75,10 @@ def list_fits_file_default(f):
         print(f"{basename:30s}  {datatype:10s}  {wavelength:10s}  {exptime:10s}")
     except FileNotFoundError:
         print(f"{basename} not found")
-    
-    
+
+
 def list_fits_file(f, columns):
-    """ Display a listing for a file with the given FITS keywords as columns.
-    """
+    """Display a listing for a file with the given FITS keywords as columns."""
     basename = os.path.basename(f)
     line = f"{basename:30s}"
     try:
@@ -97,8 +94,8 @@ def list_fits_file(f, columns):
 
 
 def list_files(files, columns=None):
-    """ Display listing for a list of files. Use `columns` list as FITS
-        keywords to display, if present.
+    """Display listing for a list of files. Use `columns` list as FITS
+    keywords to display, if present.
     """
     for f in files:
         basename = os.path.basename(f)
@@ -131,8 +128,7 @@ def list_files(files, columns=None):
 
 
 def ls_subcommand(args):
-    """ Main routine to handle keyword arguments and dispatch the work.
-    """
+    """Main routine to handle keyword arguments and dispatch the work."""
     if not ls_requirements:
         args.parser.error("missing Python packages required for listing FITS files")
 
@@ -157,15 +153,14 @@ def ls_subcommand(args):
 
 
 def add_ls_subcommand(subparsers):
-    """ Add ls subcommand to the argparse subparsers.
-    """
-    ls_parser = subparsers.add_parser("ls",
-        help="list files with extra ChroMag-specific info")
-    ls_parser.add_argument("files", nargs="*",
-        default=".",
-        help="ChroMag files(s)",
-        metavar="file(s)")
-    ls_parser.add_argument("-k", "--keywords", type=str,
-        help="FITS keyword names to display",
-        default=None)
+    """Add ls subcommand to the argparse subparsers."""
+    ls_parser = subparsers.add_parser(
+        "ls", help="list files with extra ChroMag-specific info"
+    )
+    ls_parser.add_argument(
+        "files", nargs="*", default=".", help="ChroMag files(s)", metavar="file(s)"
+    )
+    ls_parser.add_argument(
+        "-k", "--keywords", type=str, help="FITS keyword names to display", default=None
+    )
     ls_parser.set_defaults(func=ls_subcommand, parser=ls_parser)

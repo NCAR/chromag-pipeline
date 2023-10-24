@@ -7,25 +7,26 @@ import glob
 import os
 import warnings
 
-    
+
 try:
     from astropy.io import fits
     from astropy.utils.exceptions import AstropyUserWarning
+
     cat_requirements = True
 except ModuleNotFoundError as e:
     cat_requirements = False
-    
-    
+
+
 def cat_header(files, validate=False):
-    """ Display the contents of a header for a list of files.
-    """
+    """Display the contents of a header for a list of files."""
     with warnings.catch_warnings():
         if not validate:
             warnings.simplefilter("ignore", AstropyUserWarning)
 
         for i, file in enumerate(files):
             if len(files) > 1:
-                if i != 0: print()
+                if i != 0:
+                    print()
 
                 print(file)
                 print("-" * len(file))
@@ -40,24 +41,20 @@ def cat_header(files, validate=False):
 
 
 def cat_subcommand(args):
-    """ Main routine to handle keyword arguments and dispatch the work.
-    """
+    """Main routine to handle keyword arguments and dispatch the work."""
     if not cat_requirements:
-        args.parser.error("missing Python packages required for listing contents of FITS files")
+        args.parser.error(
+            "missing Python packages required for listing contents of FITS files"
+        )
 
     cat_header(args.files, args.validate)
 
 
 def add_cat_subcommand(subparsers):
-    """ Add cat subcommand to the argparse subparsers.
-    """
-    cat_parser = subparsers.add_parser("cat",
-        help="display file header")
-    cat_parser.add_argument("files", nargs="+",
-        default=".",
-        help="ChroMag files(s)",
-        metavar="file(s)")
-    cat_parser.add_argument("--validate",
-        help="validate header",
-        action="store_true")
+    """Add cat subcommand to the argparse subparsers."""
+    cat_parser = subparsers.add_parser("cat", help="display file header")
+    cat_parser.add_argument(
+        "files", nargs="+", default=".", help="ChroMag files(s)", metavar="file(s)"
+    )
+    cat_parser.add_argument("--validate", help="validate header", action="store_true")
     cat_parser.set_defaults(func=cat_subcommand, parser=cat_parser)

@@ -18,8 +18,7 @@ from .l2_process import run_l2_process
 
 
 def run(date, config_filename):
-    """Run the end-of-day processing.
-    """
+    """Run the end-of-day processing."""
     read_config(config_filename)
 
     log_basedir = get_option("logging", "basedir")
@@ -29,8 +28,9 @@ def run(date, config_filename):
     rotate = get_option("logging", "rotate")
     max_version = get_option("logging", "max_version")
 
-    logger = setup_logging(log_filename, level=level, rotate=rotate,
-        max_version=max_version)
+    logger = setup_logging(
+        log_filename, level=level, rotate=rotate, max_version=max_version
+    )
 
     run = Run(date, "eod", logger)
 

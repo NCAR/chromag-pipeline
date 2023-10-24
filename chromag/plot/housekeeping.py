@@ -21,7 +21,7 @@ class InvalidPlotType(Exception):
 def secs2time(secs, pos):
     hrs = math.floor(secs / 60.0 / 60.0)
     mins = math.floor((secs - hrs * 60 * 60) / 60.0)
-    return(f"{hrs:02d}:{mins:02d}")
+    return f"{hrs:02d}:{mins:02d}"
 
 
 def get_formatter(formatter_name):
@@ -30,12 +30,12 @@ def get_formatter(formatter_name):
     else:
         formatter = None
 
-    return(formatter)
+    return formatter
 
 
 def plot_time_series(plot_filename, date, section, df):
     bottom = section.getfloat("min", fallback=None)
-    top    = section.getfloat("max", fallback=None)
+    top = section.getfloat("max", fallback=None)
 
     xtitle = section.get("xtitle", fallback=None)
     ytitle = section.get("ytitle", fallback=None)
@@ -70,7 +70,7 @@ def plot_time_series(plot_filename, date, section, df):
 
     fontsize = 6
 
-    fig, ax = plt.subplots(nrows=1, ncols=1)#, constrained_layout=True)
+    fig, ax = plt.subplots(nrows=1, ncols=1)  # , constrained_layout=True)
     fig.set_size_inches(xsize_inches, ysize_inches)
 
     ax.plot(xvalues, yvalues)
@@ -103,8 +103,9 @@ def plot_scatter(plot_filename, date, section, df):
     pass
 
 
-def dispatch_plot(date:str, section, df):
-    if "filename" not in section: return
+def dispatch_plot(date: str, section, df):
+    if "filename" not in section:
+        return
 
     type = section.get("type", fallback="timeseries")
     type = type.lower()
@@ -120,9 +121,8 @@ def dispatch_plot(date:str, section, df):
         raise InvalidPlotType(f"invalid plot type '{type}' in '{section.name}' plot")
 
 
-def plot(date:str, housekeeping_filename:str, skiprows:int=0):
-    """Plot every column in a housekeeping file.
-    """
+def plot(date: str, housekeeping_filename: str, skiprows: int = 0):
+    """Plot every column in a housekeeping file."""
     options = configparser.ConfigParser()
     options.read(HOUSEKEEPING_CFG)
 
@@ -135,5 +135,5 @@ def plot(date:str, housekeeping_filename:str, skiprows:int=0):
 
 
 if __name__ == "__main__":
-    #plot("20211119", "20211119 ChroMag Housekeeping.csv", skiprows=6)
+    # plot("20211119", "20211119 ChroMag Housekeeping.csv", skiprows=6)
     plot("20220624", "20220624 ChroMag Housekeeping.csv")

@@ -18,6 +18,7 @@ class Catalog:
 
        new_catalog = catalog[catalog.is_flat & (catalog.line == "1083")]
     """
+
     def __init__(self):
         self.n_files = 0
         self.catalog = []
@@ -27,41 +28,43 @@ class Catalog:
         self.n_files += 1
 
     def __str__(self):
-        return("\n".join([str(f) for f in self.catalog]))
+        return "\n".join([str(f) for f in self.catalog])
 
     def __len__(self):
-        return(len(self.catalog))
+        return len(self.catalog)
 
     def __getattr__(self, name):
-        return(np.array([f.__getattribute__(name) for f in self.catalog]))
+        return np.array([f.__getattribute__(name) for f in self.catalog])
 
     def __getitem__(self, key):
         new_catalog = Catalog()
         for f, k in zip(self.catalog, key):
             if k:
                 new_catalog.add_file(f)
-        return(new_catalog)
+        return new_catalog
 
     def __iter__(self):
-        return(self.catalog.__iter__())
+        return self.catalog.__iter__()
 
     def __next__(self):
-        return(self.catalog.__next__())
+        return self.catalog.__next__()
 
     def __str__(self):
-        return(f"Catalog of {self.n_files} ChroMag files")
+        return f"Catalog of {self.n_files} ChroMag files"
 
 
 def write_inventory_file(catalog, filename):
     with open(filename, "w") as file:
         for f in catalog:
-            components = [f"{f.basename}",
-                          f"{f.datatype[0:3].lower()}",
-                          f"{f.object}",
-                          f"{f.wavelength:7.3f} nm",
-                          f"{f.scan_i:5d}",
-                          f"{f.scan_n:5d}",
-                          f"{truncate_string(f.obs_description, 25, padding=True)}"]
+            components = [
+                f"{f.basename}",
+                f"{f.datatype[0:3].lower()}",
+                f"{f.object}",
+                f"{f.wavelength:7.3f} nm",
+                f"{f.scan_i:5d}",
+                f"{f.scan_n:5d}",
+                f"{truncate_string(f.obs_description, 25, padding=True)}",
+            ]
             file.write("   ".join(components) + "\n")
 
 
@@ -95,5 +98,4 @@ def run_inventory(run):
     inventory_filename = os.path.join(date_dir, f"{run.date}.chromag.inventory.txt")
     write_inventory_file(catalog, inventory_filename)
 
-    return(catalog)
- 
+    return catalog
