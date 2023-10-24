@@ -141,34 +141,34 @@ def log_subcommand(args):
 def add_log_subcommand(subparsers):
     """ Add log subcommand to the argparse subparsers.
     """
-    parser = subparsers.add_parser("log",
+    log_parser = subparsers.add_parser("log",
         help="display, and optionally filter, log output")
-    parser.add_argument("logfiles", nargs="+",
+    log_parser.add_argument("logfiles", nargs="+",
         help="UCoMP log filename or date",
         metavar="logfile")
     level_help = "filter level: DEBUG INFO WARN ERROR CRITICAL (default DEBUG)"
-    parser.add_argument("-l", "--level",
+    log_parser.add_argument("-l", "--level",
         help=level_help)
     prune_help = "delete rotated logs with versions higher than MAX_VERSION"
-    parser.add_argument("-p", "--prune",
+    log_parser.add_argument("-p", "--prune",
         help=prune_help,
         metavar="MAX_VERSION")
-    parser.add_argument("-f", "--follow",
+    log_parser.add_argument("-f", "--follow",
         help="output appended data as file grows",
         action="store_true")
-    parser.add_argument("-d", "--debug",
+    log_parser.add_argument("-d", "--debug",
         help="DEBUG filter level",
         action="store_true")
-    parser.add_argument("-i", "--info",
+    log_parser.add_argument("-i", "--info",
         help="INFO filter level",
         action="store_true")
-    parser.add_argument("-w", "--warn",
+    log_parser.add_argument("-w", "--warn",
         help="WARN filter level",
         action="store_true")
-    parser.add_argument("-e", "--error",
+    log_parser.add_argument("-e", "--error",
         help="ERROR filter level",
         action="store_true")
-    parser.add_argument("-c", "--critical",
+    log_parser.add_argument("-c", "--critical",
         help="CRITICAL filter level",
         action="store_true")
-    parser.set_defaults(func=log_subcommand, parser=parser)
+    log_parser.set_defaults(func=log_subcommand, parser=log_parser)
