@@ -18,6 +18,15 @@ dependencies = [
   "python-dateutil >= 2.8.1",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pylint ~=2.14.0",
+    "pre-commit ~= 3.4.0"
+]
+test = [
+    "pytest-cov ~=3.0.0",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/NCAR/chromag-pipeline"
 "Bug Tracker" = "https://github.com/NCAR/chromag-pipeline/issues"
@@ -28,3 +37,10 @@ build-backend = "hatchling.build"
 
 [project.scripts]
 chromag = "chromag.cli:main"
+
+[tool.pytest.ini_options]
+# increment the --cov-fail-under as we increase test coverage
+addopts = "--cov --cov-report html:coverage_html --cov-report term-missing --cov-fail-under 1"
+
+[tool.coverage.run]
+source = ["chromag"]
