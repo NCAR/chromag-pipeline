@@ -8,6 +8,7 @@ import numpy as np
 from ..config import get_option, get_basedir
 from ..file import ChroMagFile
 from ..pipeline import step
+from ..string_helpers import truncate as truncate_string
 
 
 class Catalog:
@@ -54,7 +55,14 @@ class Catalog:
 def write_inventory_file(catalog, filename):
     with open(filename, "w") as file:
         for f in catalog:
-            file.write(f"{f.basename}   {f.datatype}   {f.wavelength:7.3f} nm   {f.scan_i:5d}   {f.scan_n:5d}\n")
+            components = [f"{f.basename}",
+                          f"{f.datatype[0:3].lower()}",
+                          f"{f.object}",
+                          f"{f.wavelength:7.3f} nm",
+                          f"{f.scan_i:5d}",
+                          f"{f.scan_n:5d}",
+                          f"{truncate_string(f.obs_description, 25, padding=True)}"]
+            file.write("   ".join(components) + "\n")
 
 
 @step()
@@ -63,6 +71,8 @@ def run_inventory(run):
     raw_dir = os.path.join(raw_basedir, run.date)
 
     filenames = glob.glob(os.path.join(raw_dir, "*.fits*"))
+    # glob doesn't sort the filenames
+    filenames = sorted(filenames, key=os.path.basename)
 
     catalog = Catalog()
 

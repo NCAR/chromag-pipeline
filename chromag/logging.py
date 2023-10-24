@@ -18,6 +18,8 @@ LEVELS = {
     "INFO": logging.INFO,
     "DEBUG": logging.DEBUG}
 
+DATE_FORMAT = "%Y%m%d.%H%M%S"
+
 
 def rotate_logs(basename, max_version=None):
     """Rotate logs to allow a new log to be written as basename. If
@@ -89,8 +91,7 @@ def setup_logging(filename, level=logging.DEBUG, rotate=True,
     logger.addHandler(handler)
 
     fmt = "%(asctime)s %(funcName)s: %(levelname)s: %(message)s"
-    datefmt = "%Y-%m-%d %H:%M:%S"
-    formatter = WrappedFormatter(fmt, datefmt=datefmt)
+    formatter = WrappedFormatter(fmt, datefmt=DATE_FORMAT)
     handler.setFormatter(formatter)
 
     logger.setLevel(level)

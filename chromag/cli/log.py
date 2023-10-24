@@ -1,18 +1,24 @@
 # -*- coding: utf-8 -*-
 
 
-"""Create and handle log sub-command.
+""" Create and handle log sub-command.
 """
 
+import datetime
 import os
 import re
 import time
+
+from ..logging import DATE_FORMAT as LOG_DATE_FORMAT
 
 POLL_SECS = 0.1
 LEVELS = ["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"]
 
 
 def prune_logfiles(files, max_version):
+    """ Delete files with a version after them that is larger than max_version.
+        For example, `test.log.10` would be deleted if `max_version` is 9.
+    """
     version_re = re.compile("\d+")
     for f in files:
         versions = glob.glob("%s.*" % f)
@@ -21,19 +27,36 @@ def prune_logfiles(files, max_version):
             if version_re.match(n):
                 if int(n) > max_version:
                     file_to_delete = f"{f}.{n}"
-                    print(f"rm {file_to_delete}")
                     os.remove(file_to_delete)
 
 
+def begins_with_date(line, fmt):
+    """ Determine if a line starts with a date of the given format.
+    """
+    # use current date/time to determine the length of a date/time with the
+    # given format
+    dt_length = len(datetime.datetime.now().strftime(fmt))
+
+    try:
+        dt = datetime.datetime.strptime(line[0:dt_length], fmt)
+        return(dt is not None)
+    except ValueError:
+        return(False)
+
+
 def filter_file(logfile, level_index, follow):
+    """ Filter a given log file at the given level (DEBUG, INFO, WARN, ERROR,
+        or CRITICAL). Optionally, "follow" the log file, i.e., continuously
+        wait for new lines to be added to the log file and filter them.
+    """
     loglevel_filter = "|".join(LEVELS[level_index:])
     loglevel_prog = re.compile(".*(%s):.*" % loglevel_filter)
-    logstart_prog = re.compile("(\[\d+\] )?\d{8}.\d{6}")
+    logstart_prog = re.compile("\d{4}\d{2}\d{2}\.\d{2}\d{2}\d{2}")
 
     matched_last_line = False
 
     line = "not empty"
-
+    
     try:
         with open(logfile, "r") as f:
             try:
@@ -54,7 +77,7 @@ def filter_file(logfile, level_index, follow):
                             return
                     else:
                         if matched_last_line:
-                            if logstart_prog.match(line):
+                            if begins_with_date(line, LOG_DATE_FORMAT):
                                 matched_last_line = False
                             else:
                                 try:
@@ -67,7 +90,9 @@ def filter_file(logfile, level_index, follow):
         print("Problem reading %s" % logfile)
 
 
-def filter_log(args):
+def log_subcommand(args):
+    """ Main routine to handle keyword arguments and dispatch the work.
+    """
     date_re = "^\d{8}$"
     date_prog = re.compile(date_re)
 
@@ -114,6 +139,8 @@ def filter_log(args):
 
 
 def add_log_subcommand(subparsers):
+    """ Add log subcommand to the argparse subparsers.
+    """
     parser = subparsers.add_parser("log",
         help="display, and optionally filter, log output")
     parser.add_argument("logfiles", nargs="+",
@@ -144,4 +171,4 @@ def add_log_subcommand(subparsers):
     parser.add_argument("-c", "--critical",
         help="CRITICAL filter level",
         action="store_true")
-    parser.set_defaults(func=filter_log, parser=parser)
+    parser.set_defaults(func=log_subcommand, parser=parser)
