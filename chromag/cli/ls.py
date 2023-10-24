@@ -15,15 +15,39 @@ except ModuleNotFoundError as e:
 
 
 def file_lines(filename):
+    """ Returns the number of lines in a text file.
+    """
     n_lines = 0
-
+    
     with open(filename, "r") as f:
         for line in f.readlines():
             n_lines += 1
     return(n_lines)
 
 
+def value2str(v, format=None):
+    """ Convert a given value to a string with the given format, if present.
+    """
+    if format is not None:
+        return(f"{v:{format}}")
+
+    if type(v) == str:
+        return(f"{v:10s}")
+    elif type(v) == float:
+        return(f"{v:8.3f}")
+    elif type(v) == int:
+        return(f"{v:8d}")
+    elif type(v) == bool:
+        return(f"{v!s:5s}")
+    elif v is None:
+        return 5 * "-"
+
+    return(f"{v}")
+
+
 def list_fits_file_default(f):
+    """ Display a listing for a file with the default columns.
+    """
     basename = os.path.basename(f)
     try:
         with fits.open(f) as fits_file:
@@ -53,26 +77,11 @@ def list_fits_file_default(f):
         print(f"{basename:30s}  {datatype:10s}  {wavelength:10s}  {exptime:10s}")
     except FileNotFoundError:
         print(f"{basename} not found")
-
-
-def value2str(v, format=None):
-    if format is not None:
-        template = f"{{v{format}}}"
-        return(template.format(v=v))
-    if type(v) == str:
-        return(f"{v:10s}")
-    elif type(v) == float:
-        return(f"{v:8.3f}")
-    elif type(v) == int:
-        return(f"{v:8d}")
-    elif type(v) == bool:
-        return(f"{v!s:5s}")
-    elif v is None:
-        return 5 * "-"
-    return(f"{v}")
     
     
 def list_fits_file(f, columns):
+    """ Display a listing for a file with the given FITS keywords as columns.
+    """
     basename = os.path.basename(f)
     line = f"{basename:30s}"
     try:
@@ -88,6 +97,9 @@ def list_fits_file(f, columns):
 
 
 def list_files(files, columns=None):
+    """ Display listing for a list of files. Use `columns` list as FITS
+        keywords to display, if present.
+    """
     for f in files:
         basename = os.path.basename(f)
         if os.path.isdir(f):
@@ -118,7 +130,9 @@ def list_files(files, columns=None):
             print(f"{f} - unknown item")
 
 
-def ls(args):
+def ls_subcommand(args):
+    """ Main routine to handle keyword arguments and dispatch the work.
+    """
     if not ls_requirements:
         args.parser.error("missing Python packages required for listing FITS files")
 
@@ -143,13 +157,15 @@ def ls(args):
 
 
 def add_ls_subcommand(subparsers):
-    parser = subparsers.add_parser("ls",
+    """ Add ls subcommand to the argparse subparsers.
+    """
+    ls_parser = subparsers.add_parser("ls",
         help="list files with extra ChroMag-specific info")
-    parser.add_argument("files", nargs="*",
+    ls_parser.add_argument("files", nargs="*",
         default=".",
         help="ChroMag files(s)",
         metavar="file(s)")
-    parser.add_argument("-k", "--keywords", type=str,
+    ls_parser.add_argument("-k", "--keywords", type=str,
         help="FITS keyword names to display",
         default=None)
-    parser.set_defaults(func=ls, parser=parser)
+    ls_parser.set_defaults(func=ls_subcommand, parser=ls_parser)
