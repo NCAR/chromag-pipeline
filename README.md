@@ -69,9 +69,13 @@ options:
 
 ### Testing
 
+To run the unit tests, use `pytest`:
+
 ``` bash
 pytest tests
 ```
+
+The unit tests will automatically be run before a commit is allowed.
 
 ### Linting
 
