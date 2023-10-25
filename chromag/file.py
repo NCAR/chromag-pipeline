@@ -8,6 +8,10 @@ from astropy.io import fits
 
 
 class ChroMagFile:
+    """Class representing a ChroMag file, starting from raw and potentially
+    progresssing to a level 1 file.
+    """
+
     def __init__(self, filename):
         self.filename = filename
         self.basename = os.path.basename(self.filename)

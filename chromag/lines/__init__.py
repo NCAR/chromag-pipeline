@@ -16,8 +16,8 @@ cp = epochs.ConfigParser(LINES_SPEC)
 cp.read(LINES_CFG)
 
 
-def list():
-    """List the available spectral lines. Returns an array of string names."""
+def available_lines():
+    """List the available spectral lines. Returns a list of string names."""
     return cp.specification.sections()
 
 

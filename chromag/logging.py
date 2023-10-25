@@ -78,7 +78,10 @@ class WrappedFormatter(logging.Formatter):
         return super(WrappedFormatter, self).format(record)
 
 
-def setup_logging(filename, level=logging.DEBUG, rotate=True, max_version=None):
+def setup_logging(
+    filename: str, level=logging.DEBUG, rotate: bool = True, max_version=None
+):
+    """Configure the logging system."""
     log_dirname = os.path.dirname(filename)
     if not os.path.exists(log_dirname):
         os.makedirs(log_dirname)

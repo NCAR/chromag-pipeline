@@ -3,7 +3,6 @@
 """Create and handle cat sub-command.
 """
 
-import glob
 import warnings
 
 

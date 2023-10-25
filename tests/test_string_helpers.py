@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Tests for `chromag` package.
+"""Tests for `string_helpers` package.
 """
 
 import pytest

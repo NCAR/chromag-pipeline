@@ -20,10 +20,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pylint ~=2.14.0",
+    "pylint",
     "black",
-    "pre-commit ~= 3.4.0",
-    "pytest-cov ~=3.0.0",
+    "pre-commit",
+    "pytest-cov",
     "Sphinx",
     "sphinx_rtd_theme",
 ]
@@ -41,7 +41,19 @@ chromag = "chromag.cli:main"
 
 [tool.pytest.ini_options]
 # increment the --cov-fail-under as we increase test coverage
-addopts = "--cov --cov-report html:coverage_html --cov-report term-missing --cov-fail-under 1"
+addopts = "--cov --cov-report html:coverage_html --cov-report term-missing --cov-fail-under 3"
 
 [tool.coverage.run]
 source = ["chromag"]
+
+[tool.pylint]
+max-line-length = 90
+# disable = [
+#     "C0103", # (invalid-name)
+#     "C0114", # (missing-module-docstring)
+#     "C0115", # (missing-class-docstring)
+#     "C0116", # (missing-function-docstring)
+#     "R0903", # (too-few-public-methods)
+#     "R0913", # (too-many-arguments)
+#     "W0105", # (pointless-string-statement)
+# ]

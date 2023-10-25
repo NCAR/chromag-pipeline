@@ -5,6 +5,7 @@
 
 import glob
 import os
+import warnings
 
 try:
     from astropy.io import fits
@@ -19,7 +20,7 @@ def file_lines(filename):
     """Returns the number of lines in a text file."""
     n_lines = 0
 
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="utf-8") as f:
         for line in f.readlines():
             n_lines += 1
     return n_lines
@@ -47,50 +48,55 @@ def value2str(v, format=None):
 def list_fits_file_default(f):
     """Display a listing for a file with the default columns."""
     basename = os.path.basename(f)
-    try:
-        with fits.open(f) as fits_file:
-            primary_header = fits_file[0].header
-            s = "s" if len(fits_file) != 2 else ""
-            n_exts = f"{len(fits_file) - 1} ext{s}"
-            if "DATATYPE" in primary_header:
-                datatype = primary_header["DATATYPE"]
-            else:
-                datatype = 10 * "-"
-            if "WAVELNTH" in primary_header:
-                wavelength = primary_header["WAVELNTH"]
-                if type(wavelength) == float:
-                    wavelength = f"{wavelength:7.3f} nm"
-                elif len(wavelength) > 0:
-                    wavelength = f"{wavelength:>7s} nm"
-            else:
-                wavelength = 7 * "-"
-            if "EXPTIME" in primary_header:
-                exptime = primary_header["EXPTIME"]
-                if type(exptime) == float:
-                    exptime = f"{exptime:7.5f} ms"
-                elif len(exptime) > 0:
-                    exptime = f"{exptime:>7s} ms"
-            else:
-                exptime = 7 * "-"
-        print(f"{basename:30s}  {datatype:10s}  {wavelength:10s}  {exptime:10s}")
-    except FileNotFoundError:
-        print(f"{basename} not found")
+    with warnings.catch_warnings():
+        try:
+            with fits.open(f) as fits_file:
+                primary_header = fits_file[0].header
+                s = "s" if len(fits_file) != 2 else ""
+
+                if "DATATYPE" in primary_header:
+                    datatype = primary_header["DATATYPE"]
+                else:
+                    datatype = 10 * "-"
+
+                if "WAVELNTH" in primary_header:
+                    wavelength = primary_header["WAVELNTH"]
+                    if type(wavelength) == float:
+                        wavelength = f"{wavelength:7.3f} nm"
+                    elif len(wavelength) > 0:
+                        wavelength = f"{wavelength:>7s} nm"
+                else:
+                    wavelength = 7 * "-"
+
+                if "EXPTIME" in primary_header:
+                    exptime = primary_header["EXPTIME"]
+                    if type(exptime) == float:
+                        exptime = f"{exptime:7.5f} ms"
+                    elif len(exptime) > 0:
+                        exptime = f"{exptime:>7s} ms"
+                else:
+                    exptime = 7 * "-"
+            print(f"{basename:30s}  {datatype:10s}  {wavelength:10s}  {exptime:10s}")
+        except FileNotFoundError:
+            print(f"{basename} not found")
 
 
 def list_fits_file(f, columns):
     """Display a listing for a file with the given FITS keywords as columns."""
     basename = os.path.basename(f)
     line = f"{basename:30s}"
-    try:
-        with fits.open(f) as fits_file:
-            primary_header = fits_file[0].header
-            for c in columns:
-                v = primary_header[c] if c in primary_header else None
-                v = value2str(v)
-                line += f"  {v}"
-        print(line)
-    except FileNotFoundError:
-        print(f"{basename} not found")
+
+    with warnings.catch_warnings():
+        try:
+            with fits.open(f) as fits_file:
+                primary_header = fits_file[0].header
+                for c in columns:
+                    v = primary_header[c] if c in primary_header else None
+                    v = value2str(v)
+                    line += f"  {v}"
+            print(line)
+        except FileNotFoundError:
+            print(f"{basename} not found")
 
 
 def list_files(files, columns=None):
