@@ -6,34 +6,7 @@
 
 ## Installation
 
-The ChroMag pipeline software can be installed via `pip`:
-
-``` bash
-pip install chromag
-```
-
-Or from source:
-
-``` bash
-pip install /path/to/chromag-pipeline
-```
-
-If you intend to make changes to the code, you should install the development
-dependencies with:
-
-``` bash
-pip install -e /path/to/chromag-pipeline[dev]
-```
-
-Changes in the source code will immediately be used in subsequent running of the
-code.
-
-To handle changes you make in the build system, e.g., new dependencies, you
-might have to reinstall:
-
-``` bash
-pip install --upgrade -e .[dev]
-```
+See the [Installation guide].
 
 ## Running
 
@@ -93,3 +66,5 @@ of the repository:
 ``` bash
 pylint chromag tests
 ```
+
+[Installation guide]: INSTALLATION.rst

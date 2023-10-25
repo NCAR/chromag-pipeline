@@ -10,7 +10,10 @@ Welcome to chromag's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
+   usage
    api
+   contributing
 
 Indices and tables
 ==================
