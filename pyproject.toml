@@ -24,6 +24,8 @@ dev = [
     "black",
     "pre-commit ~= 3.4.0",
     "pytest-cov ~=3.0.0",
+    "Sphinx",
+    "sphinx_rtd_theme",
 ]
 
 [project.urls]
