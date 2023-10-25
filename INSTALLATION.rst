@@ -8,7 +8,8 @@ Installation
 Stable release
 --------------
 
-To install the ChroMag pipeline, run this command in your terminal:
+To install the latest stable version of the ChroMag pipeline, run this command
+in your terminal:
 
 .. code-block:: console
 
@@ -29,7 +30,8 @@ From sources
 
 The sources for the ChroMag pipeline can be downloaded from the `Github repo`_.
 
-You can clone the public repository using HTTPS or SSH:
+You can clone the public repository using your choice of HTTPS (password) or
+SSH (key):
 
 .. code-block:: console
 
