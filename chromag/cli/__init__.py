@@ -14,10 +14,12 @@ from .ls import add_ls_subcommand
 
 
 def print_help(args):
+    """ "Print the CLI help."""
     args.parser.print_help()
 
 
 def main():
+    """Entry point for chromag CLI."""
     name = f"ChroMag pipeline {__version__}"
     parser = argparse.ArgumentParser(description=name)
 
@@ -27,19 +29,21 @@ def main():
     # show help if no sub-command given
     parser.set_defaults(func=print_help, parser=parser)
 
-    # TODO: it would be nice to group sub-commands into groups, but that is not
-    # possible with argparse right now
-    # helpers: list, ls, log, versions
-    # processing: rt, eod, cal, reprocess
-    # clearday, archive
-    # testing: regress, simulate, validate
-    # etc: script
     subparsers = parser.add_subparsers(help="sub-command help")
 
+    # helpers: cat, list, ls, log, versions
     add_cat_subcommand(subparsers)
-    add_eod_subcommand(subparsers)
     add_log_subcommand(subparsers)
     add_ls_subcommand(subparsers)
+
+    # processing: rt, eod, cal, reprocess
+    add_eod_subcommand(subparsers)
+
+    # clearday, archive
+
+    # testing: regress, simulate, validate
+
+    # etc: script
 
     # parse args and call appropriate sub-command
     args = parser.parse_args()

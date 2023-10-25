@@ -32,15 +32,15 @@ def run(date, config_filename):
         log_filename, level=level, rotate=rotate, max_version=max_version
     )
 
-    run = Run(date, "eod", logger)
+    date_run = Run(date, "eod", logger)
 
     logger.info(f"starting pipeline on {date}...")
     start_dt = datetime.datetime.now()
 
-    run.catalog = run_inventory(run, skip=False)
+    date_run.catalog = run_inventory(date_run, skip=False)
 
-    run_l1_process(run, skip=not get_option("level1", "process"))
-    run_l2_process(run, skip=not get_option("level2", "process"))
+    run_l1_process(date_run, skip=not get_option("level1", "process"))
+    run_l2_process(date_run, skip=not get_option("level2", "process"))
 
     end_dt = datetime.datetime.now()
     time_interval = end_dt - start_dt

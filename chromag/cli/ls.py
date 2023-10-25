@@ -10,9 +10,9 @@ try:
     from astropy.io import fits
     from astropy.utils.exceptions import AstropyUserWarning
 
-    ls_requirements = True
+    LS_REQUIREMENTS = True
 except ModuleNotFoundError as e:
-    ls_requirements = False
+    LS_REQUIREMENTS = False
 
 
 def file_lines(filename):
@@ -30,13 +30,13 @@ def value2str(v, format=None):
     if format is not None:
         return f"{v:{format}}"
 
-    if type(v) == str:
+    if isinstance(v, str):
         return f"{v:10s}"
-    elif type(v) == float:
+    elif isinstance(v, float):
         return f"{v:8.3f}"
-    elif type(v) == int:
+    elif isinstance(v, int):
         return f"{v:8d}"
-    elif type(v) == bool:
+    elif isinstance(v, bool):
         return f"{v!s:5s}"
     elif v is None:
         return 5 * "-"
@@ -129,7 +129,7 @@ def list_files(files, columns=None):
 
 def ls_subcommand(args):
     """Main routine to handle keyword arguments and dispatch the work."""
-    if not ls_requirements:
+    if not LS_REQUIREMENTS:
         args.parser.error("missing Python packages required for listing FITS files")
 
     try:
@@ -137,7 +137,7 @@ def ls_subcommand(args):
         dirs = [d for d in args.files if os.path.isdir(d)]
 
         if len(files) == 0 and len(dirs) == 1:
-            items = [f for f in glob.glob(os.path.join(dirs[0], "*"))]
+            items = list(glob.glob(os.path.join(dirs[0], "*")))
             files = [f for f in items if os.path.isfile(f)]
             dirs = [d for d in items if os.path.isdir(d)]
 

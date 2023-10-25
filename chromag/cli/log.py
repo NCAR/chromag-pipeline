@@ -5,6 +5,7 @@
 """
 
 import datetime
+import glob
 import os
 import re
 import time
@@ -19,9 +20,9 @@ def prune_logfiles(files, max_version):
     """Delete files with a version after them that is larger than max_version.
     For example, `test.log.10` would be deleted if `max_version` is 9.
     """
-    version_re = re.compile("\d+")
+    version_re = re.compile(r"\d+")
     for f in files:
-        versions = glob.glob("%s.*" % f)
+        versions = glob.glob(f"{f}.*")
         for v in versions:
             n = v[len(f) + 1 :]
             if version_re.match(n):
@@ -49,8 +50,7 @@ def filter_file(logfile, level_index, follow):
     wait for new lines to be added to the log file and filter them.
     """
     loglevel_filter = "|".join(LEVELS[level_index:])
-    loglevel_prog = re.compile(".*(%s):.*" % loglevel_filter)
-    logstart_prog = re.compile("\d{4}\d{2}\d{2}\.\d{2}\d{2}\d{2}")
+    loglevel_prog = re.compile(f".*({loglevel_filter}):.*")
 
     matched_last_line = False
 
@@ -91,8 +91,7 @@ def filter_file(logfile, level_index, follow):
 
 def log_subcommand(args):
     """Main routine to handle keyword arguments and dispatch the work."""
-    date_re = "^\d{8}$"
-    date_prog = re.compile(date_re)
+    date_prog = re.compile(r"^\d{8}$")
 
     logfiles = []
     for f in args.logfiles:

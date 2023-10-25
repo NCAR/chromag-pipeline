@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
+"""Module for making inventory/catalog of ChroMag data."""
+
 import glob
 import os
 
 import numpy as np
 
-from ..config import get_option, get_basedir
+from ..config import get_basedir
 from ..file import ChroMagFile
 from ..pipeline import step
 from ..string_helpers import truncate as truncate_string
@@ -23,22 +25,20 @@ class Catalog:
         self.n_files = 0
         self.catalog = []
 
-    def add_file(self, file):
+    def add_file(self, file: ChroMagFile):
+        """Add a ChroMagFile to the catalog."""
         self.catalog.append(file)
         self.n_files += 1
-
-    def __str__(self):
-        return "\n".join([str(f) for f in self.catalog])
 
     def __len__(self):
         return len(self.catalog)
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str):
         return np.array([f.__getattribute__(name) for f in self.catalog])
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str):
         new_catalog = Catalog()
-        for f, k in zip(self.catalog, key):
+        for f, k in zip(self.catalog, key):  # pylint: disable=invalid-name
             if k:
                 new_catalog.add_file(f)
         return new_catalog
@@ -46,16 +46,17 @@ class Catalog:
     def __iter__(self):
         return self.catalog.__iter__()
 
-    def __next__(self):
-        return self.catalog.__next__()
+    def __repr__(self):
+        return "\n".join([str(f) for f in self.catalog])
 
     def __str__(self):
         return f"Catalog of {self.n_files} ChroMag files"
 
 
-def write_inventory_file(catalog, filename):
-    with open(filename, "w") as file:
-        for f in catalog:
+def write_inventory_file(catalog: Catalog, filename: str):
+    """Write a single inventory file from the given catalog."""
+    with open(filename, "w", encoding="utf-8") as file:
+        for f in catalog:  # pylint: disable=invalid-name
             components = [
                 f"{f.basename}",
                 f"{f.datatype[0:3].lower()}",
@@ -70,6 +71,7 @@ def write_inventory_file(catalog, filename):
 
 @step()
 def run_inventory(run):
+    """Generate inventory files."""
     raw_basedir = get_basedir(run.date, "raw")
     raw_dir = os.path.join(raw_basedir, run.date)
 
@@ -79,7 +81,7 @@ def run_inventory(run):
 
     catalog = Catalog()
 
-    for f in filenames:
+    for f in filenames:  # pylint: disable=invalid-name
         file = ChroMagFile(f)
         run.logger.info(str(file))
         catalog.add_file(file)

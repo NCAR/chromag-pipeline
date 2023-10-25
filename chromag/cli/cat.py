@@ -4,7 +4,6 @@
 """
 
 import glob
-import os
 import warnings
 
 
@@ -12,9 +11,9 @@ try:
     from astropy.io import fits
     from astropy.utils.exceptions import AstropyUserWarning
 
-    cat_requirements = True
+    CAT_REQUIREMENTS = True
 except ModuleNotFoundError as e:
-    cat_requirements = False
+    CAT_REQUIREMENTS = False
 
 
 def cat_header(files, validate=False):
@@ -30,7 +29,6 @@ def cat_header(files, validate=False):
 
                 print(file)
                 print("-" * len(file))
-                first_file = False
 
             try:
                 with fits.open(file) as f:
@@ -42,7 +40,7 @@ def cat_header(files, validate=False):
 
 def cat_subcommand(args):
     """Main routine to handle keyword arguments and dispatch the work."""
-    if not cat_requirements:
+    if not CAT_REQUIREMENTS:
         args.parser.error(
             "missing Python packages required for listing contents of FITS files"
         )
