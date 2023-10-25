@@ -21,9 +21,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pylint ~=2.14.0",
-    "pre-commit ~= 3.4.0"
-]
-test = [
+    "pre-commit ~= 3.4.0",
     "pytest-cov ~=3.0.0",
 ]
 
