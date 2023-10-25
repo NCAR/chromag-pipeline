@@ -1,5 +1,7 @@
 # ChroMag calibration pipeline
 
+[![Documentation Status](https://readthedocs.org/projects/chromag/badge/?version=latest)](https://chromag.readthedocs.io/en/latest/?badge=latest)
+
 ## Requirements
 
 - Python 3.7 or later
