@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+"""Module to plot housekeeping engineering data.
+"""
+
 import configparser
 import math
 import os
@@ -15,16 +18,20 @@ HOUSEKEEPING_CFG = os.path.join(PLOT_ROOT, "housekeeping.cfg")
 
 
 class InvalidPlotType(Exception):
-    pass
+    """Exception subclass to indicate an invalid plot type."""
 
 
-def secs2time(secs, pos):
+def secs2time(secs: float, pos: int):  # pylint: disable=unused-argument
+    """matplotlib.ticker formatter to convert seconds to a string displaying
+    hours and minutes.
+    """
     hrs = math.floor(secs / 60.0 / 60.0)
     mins = math.floor((secs - hrs * 60 * 60) / 60.0)
     return f"{hrs:02d}:{mins:02d}"
 
 
 def get_formatter(formatter_name):
+    """Create a formatter identified by name."""
     if formatter_name == "secs2time":
         formatter = matplotlib.ticker.FuncFormatter(secs2time)
     else:
@@ -33,7 +40,10 @@ def get_formatter(formatter_name):
     return formatter
 
 
-def plot_time_series(plot_filename, date, section, df):
+def plot_time_series(
+    plot_filename, date, section, df
+):  # pylint: disable=unused-argument
+    """Render a time series plot into the given filename."""
     bottom = section.getfloat("min", fallback=None)
     top = section.getfloat("max", fallback=None)
 
@@ -100,25 +110,30 @@ def plot_time_series(plot_filename, date, section, df):
 
 
 def plot_scatter(plot_filename, date, section, df):
-    pass
+    """Render a scatter plot into the given filename.
+
+    Not implemented yet.
+    """
 
 
 def dispatch_plot(date: str, section, df):
+    """Send the given data to the correct renderer."""
     if "filename" not in section:
         return
 
-    type = section.get("type", fallback="timeseries")
-    type = type.lower()
+    plot_type = section.get("type", fallback="timeseries").lower()
 
     plot_filename = section.get("filename")
     plot_filename = plot_filename.format(date=date)
 
-    if type == "timeseries":
+    if plot_type == "timeseries":
         plot_time_series(plot_filename, date, section, df)
-    elif type == "scatter":
+    elif plot_type == "scatter":
         plot_scatter(plot_filename, date, section, df)
     else:
-        raise InvalidPlotType(f"invalid plot type '{type}' in '{section.name}' plot")
+        raise InvalidPlotType(
+            f"invalid plot type '{plot_type}' in '{section.name}' plot"
+        )
 
 
 def plot(date: str, housekeeping_filename: str, skiprows: int = 0):

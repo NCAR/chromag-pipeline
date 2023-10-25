@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""Module handling ChroMag files."""
+
 import os
 
 from astropy.io import fits
