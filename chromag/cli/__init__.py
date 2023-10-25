@@ -14,7 +14,7 @@ from .ls import add_ls_subcommand
 
 
 def print_help(args):
-    """ "Print the CLI help."""
+    """Print the CLI help."""
     args.parser.print_help()
 
 
