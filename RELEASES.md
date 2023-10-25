@@ -2,5 +2,6 @@
 
 ## 0.1.0
 
-- basic infrastructure of the pipeline
 - chromag command line tool
+- basic infrastructure of the pipeline
+- create inventory files
