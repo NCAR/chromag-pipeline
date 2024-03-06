@@ -55,7 +55,7 @@ geared for those who want to make changes to the source code:
 
 .. code-block:: console
 
-    $ pip install -e /path/to/chromag-pipeline[dev]
+    $ pip install -e '/path/to/chromag-pipeline[dev]'
 
 The ``-e`` will install `chromag` in "develop mode" so the changes in the
 source code are immediately reflected in behavior without a re-install. The
@@ -67,7 +67,7 @@ might have to reinstall:
 
 .. code-block:: console
 
-    $ pip install --upgrade -e /path/to/chromag-pipeline[dev]
+    $ pip install --upgrade -e '/path/to/chromag-pipeline[dev]'
 
 .. _Github repo: https://github.com/NCAR/chromag-pipeline
 .. _tarball: https://github.com/NCAR/chromag-pipeline/tarball/master
