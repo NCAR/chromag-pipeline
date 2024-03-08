@@ -4,6 +4,13 @@
 Installation
 ============
 
+Download and install a recent `Anaconda`_ distribution, following the
+installation instructions from the distribution. Make sure to update your shell
+path environment variable to include the `bin` directory of the Anaconda
+installation.
+
+.. _Anaconda: https://www.anaconda.com/download/
+
 
 Stable release
 --------------
