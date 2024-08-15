@@ -50,25 +50,11 @@ def plot_time_series(
     xtitle = section.get("xtitle", fallback=None)
     ytitle = section.get("ytitle", fallback=None)
 
-    yvalues_name = section.get("yvalues", fallback=None)
+    yvalues_names = section.get("yvalues", fallback=None)
+    yvalues_names = [s.strip() for s in yvalues_names.split(",")]
 
-    print(f"plotting time series '{yvalues_name}' to {plot_filename}")
-
-    try:
-        yvalues = df[yvalues_name].values
-    except KeyError as e:
-        print(f"column '{yvalues_name}' not found, skipping")
-        return
-
-    xvalues_name = section.get("xvalues", fallback=None)
-    if xvalues_name is None:
-        xvalues = np.arange(len(yvalues))
-    else:
-        try:
-            xvalues = df[xvalues_name].values
-        except KeyError as e:
-            print(f"column '{xvalues_name}' not found, skipping")
-            return
+    n = "" if len(yvalues_names) == 1 else f" {len(yvalues_names)}"
+    print(f"plotting{n} time series '{', '.join(yvalues_names)}' to {plot_filename}")
 
     title = section.get("title", fallback=None)
 
@@ -83,7 +69,27 @@ def plot_time_series(
     fig, ax = plt.subplots(nrows=1, ncols=1)  # , constrained_layout=True)
     fig.set_size_inches(xsize_inches, ysize_inches)
 
-    ax.plot(xvalues, yvalues)
+    for yvalues_name in yvalues_names:
+        try:
+            yvalues = df[yvalues_name].values
+        except KeyError as e:
+            print(f"column '{yvalues_name}' not found, skipping")
+            return
+
+        xvalues_name = section.get("xvalues", fallback=None)
+        if xvalues_name is None:
+            xvalues = np.arange(len(yvalues))
+        else:
+            try:
+                xvalues = df[xvalues_name].values
+            except KeyError as e:
+                print(f"column '{xvalues_name}' not found, skipping")
+                return
+
+        ax.plot(xvalues, yvalues, label=yvalues_name)
+
+    if len(yvalues_names) > 1:
+        ax.legend(fontsize=fontsize)
 
     if title is not None:
         ax.set_title(title, fontdict={"fontsize": 8})
@@ -151,4 +157,5 @@ def plot(date: str, housekeeping_filename: str, skiprows: int = 0):
 
 if __name__ == "__main__":
     # plot("20211119", "20211119 ChroMag Housekeeping.csv", skiprows=6)
-    plot("20220624", "20220624 ChroMag Housekeeping.csv")
+    # plot("20220624", "20220624 ChroMag Housekeeping.csv")
+    plot("20230308", "20230308 ChroMag Housekeeping.csv")
