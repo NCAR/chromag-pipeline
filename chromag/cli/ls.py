@@ -79,6 +79,8 @@ def list_fits_file_default(f):
             print(f"{basename:30s}  {datatype:10s}  {wavelength:10s}  {exptime:10s}")
         except FileNotFoundError:
             print(f"{basename} not found")
+        except OSError as e:
+            print(f"{basename:30s}  empty FITS file")
 
 
 def list_fits_file(f, columns):
@@ -97,6 +99,8 @@ def list_fits_file(f, columns):
             print(line)
         except FileNotFoundError:
             print(f"{basename} not found")
+        except OSError as e:
+            print(f"{basename:30s}  empty FITS file")
 
 
 def list_files(files, columns=None):

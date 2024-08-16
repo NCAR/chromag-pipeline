@@ -15,7 +15,7 @@ except ModuleNotFoundError as e:
     CAT_REQUIREMENTS = False
 
 
-def cat_header(files, validate=False):
+def cat_header(files, validate=False, parser=None):
     """Display the contents of a header for a list of files."""
     with warnings.catch_warnings():
         if not validate:
@@ -33,8 +33,12 @@ def cat_header(files, validate=False):
                 with fits.open(file) as f:
                     header = f[0].header
                     print(repr(header))
-            except FileNotFoundError:
-                print(f"{file} not found")
+            except FileNotFoundError as e:
+                parser.exit(status=2, message=f"{e}")
+            except OSError as e:
+                parser.exit(status=3, message=f"{file}: {e}")
+            except KeyboardInterrupt:
+                parser.exit(status=1, message="<interrupted>")
 
 
 def cat_subcommand(args):
@@ -43,8 +47,7 @@ def cat_subcommand(args):
         args.parser.error(
             "missing Python packages required for listing contents of FITS files"
         )
-
-    cat_header(args.files, args.validate)
+    cat_header(args.files, args.validate, args.parser)
 
 
 def add_cat_subcommand(subparsers):
