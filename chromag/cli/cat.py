@@ -15,10 +15,10 @@ except ModuleNotFoundError as e:
     CAT_REQUIREMENTS = False
 
 
-def cat_header(files, validate=False, parser=None):
+def cat_header(files, quiet, parser):
     """Display the contents of a header for a list of files."""
     with warnings.catch_warnings():
-        if not validate:
+        if quiet:
             warnings.simplefilter("ignore", AstropyUserWarning)
 
         for i, file in enumerate(files):
@@ -47,7 +47,7 @@ def cat_subcommand(args):
         args.parser.error(
             "missing Python packages required for listing contents of FITS files"
         )
-    cat_header(args.files, args.validate, args.parser)
+    cat_header(args.files, args.quiet, args.parser)
 
 
 def add_cat_subcommand(subparsers):
@@ -56,5 +56,5 @@ def add_cat_subcommand(subparsers):
     cat_parser.add_argument(
         "files", nargs="+", default=".", help="ChroMag files(s)", metavar="file(s)"
     )
-    cat_parser.add_argument("--validate", help="validate header", action="store_true")
+    cat_parser.add_argument("--quiet", help="suppress warnings", action="store_true")
     cat_parser.set_defaults(func=cat_subcommand, parser=cat_parser)

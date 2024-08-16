@@ -142,24 +142,28 @@ def ls_subcommand(args):
     if not LS_REQUIREMENTS:
         args.parser.error("missing Python packages required for listing FITS files")
 
-    try:
-        files = [f for f in args.files if os.path.isfile(f)]
-        dirs = [d for d in args.files if os.path.isdir(d)]
+    with warnings.catch_warnings():
+        if args.quiet:
+            warnings.simplefilter("ignore", AstropyUserWarning)
 
-        if len(files) == 0 and len(dirs) == 1:
-            items = list(glob.glob(os.path.join(dirs[0], "*")))
-            files = [f for f in items if os.path.isfile(f)]
-            dirs = [d for d in items if os.path.isdir(d)]
+        try:
+            files = [f for f in args.files if os.path.isfile(f)]
+            dirs = [d for d in args.files if os.path.isdir(d)]
 
-        if args.keywords is None:
-            columns = None
-        else:
-            columns = args.keywords.split(",")
+            if len(files) == 0 and len(dirs) == 1:
+                items = list(glob.glob(os.path.join(dirs[0], "*")))
+                files = [f for f in items if os.path.isfile(f)]
+                dirs = [d for d in items if os.path.isdir(d)]
 
-        list_files(sorted(dirs))
-        list_files(sorted(files), columns=columns)
-    except KeyboardInterrupt:
-        pass
+            if args.keywords is None:
+                columns = None
+            else:
+                columns = args.keywords.split(",")
+
+            list_files(sorted(dirs))
+            list_files(sorted(files), columns=columns)
+        except KeyboardInterrupt:
+            pass
 
 
 def add_ls_subcommand(subparsers):
@@ -173,4 +177,5 @@ def add_ls_subcommand(subparsers):
     ls_parser.add_argument(
         "-k", "--keywords", type=str, help="FITS keyword names to display", default=None
     )
+    ls_parser.add_argument("--quiet", help="suppress warnings", action="store_true")
     ls_parser.set_defaults(func=ls_subcommand, parser=ls_parser)
