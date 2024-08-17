@@ -3,6 +3,7 @@
 """Utilities for handling dates/times.
 """
 
+import datetime
 import math
 
 
@@ -27,3 +28,20 @@ def human_timedelta(timedelta):
                 n = secs_format % secs
             parts.append("%s %s%s" % (n, unit, "" if n == 1 else "s"))
     return " ".join(parts)
+
+
+def dateobs2datetime(date_obs: str) -> datetime.datetime:
+    """Convert DATE-OBS format string representing date/time to a Python
+    datetime object.
+    """
+    return datetime.datetime.fromisoformat(date_obs)
+
+
+def datetime2dateobs(dt: datetime.datetime, no_milliseconds=False) -> str:
+    """Convert a Python datetime object to a string in DATE-OBS format, with
+    milliseconds, or optionally without the milliseconds.
+    """
+    if no_milliseconds:
+        return dt.isoformat(sep="T", timespec="seconds")
+    else:
+        return dt.isoformat(sep="T", timespec="milliseconds")

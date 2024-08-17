@@ -7,7 +7,7 @@ import datetime
 
 import pytest
 
-from chromag.datetime import human_timedelta
+from chromag.datetime import human_timedelta, dateobs2datetime, datetime2dateobs
 
 
 def test_human_timedelta():
@@ -28,3 +28,15 @@ def test_human_timedelta():
     assert human_timedelta(d7 - d1) == "1 day 1 hr 5 mins 10 secs"
     assert human_timedelta(d8 - d1) == "32 days 1 hr 5 mins 10 secs"
     assert human_timedelta(d9 - d1) == "398 days 1 hr 5 mins 10 secs"
+
+
+def test_dateobs2datetime():
+    d1 = datetime.datetime(2023, 10, 25, 10, 20, 35)
+    assert d1 == dateobs2datetime("2023-10-25T10:20:35.000")
+    assert d1 == dateobs2datetime("2023-10-25T10:20:35")
+
+
+def test_datetime2dateobs():
+    d1 = datetime.datetime(2023, 10, 25, 10, 20, 35)
+    assert datetime2dateobs(d1) == "2023-10-25T10:20:35.000"
+    assert datetime2dateobs(d1, no_milliseconds=True) == "2023-10-25T10:20:35"
