@@ -45,6 +45,7 @@ class Run:
         self.mode = mode
         self.logger = logger
         self._catalog = None
+        self._photometric_calibration = None
 
     @property
     def catalog(self):
@@ -53,3 +54,11 @@ class Run:
     @catalog.setter
     def catalog(self, catalog):
         self._catalog = catalog
+
+    @property
+    def photometric_calibration(self):
+        return self._photometric_calibration
+
+    @photometric_calibration.setter
+    def photometric_calibration(self, photometric_calibration):
+        self._photometric_calibration = photometric_calibration

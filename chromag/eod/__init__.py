@@ -13,6 +13,7 @@ from ..pipeline import Run
 from ..logging import setup_logging, get_level
 
 from .inventory import run_inventory
+from ..calibration import make_photometric_calibration
 from .l1_process import run_l1_process
 from .l2_process import run_l2_process
 
@@ -38,6 +39,8 @@ def run(date, config_filename):
     start_dt = datetime.datetime.now()
 
     date_run.catalog = run_inventory(date_run, skip=False)
+
+    date_run.photometric_calibration = make_photometric_calibration(date_run.catalog)
 
     run_l1_process(date_run, skip=not get_option("level1", "process"))
     run_l2_process(date_run, skip=not get_option("level2", "process"))
