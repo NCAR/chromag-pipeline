@@ -6,6 +6,7 @@
 import glob
 import logging
 import os
+from typing import Optional
 
 
 logger = logging.getLogger("ChroMag")
@@ -22,7 +23,7 @@ LEVELS = {
 DATE_FORMAT = "%Y%m%d.%H%M%S"
 
 
-def rotate_logs(basename, max_version=None):
+def rotate_logs(basename: str, max_version: Optional[int] = None):
     """Rotate logs to allow a new log to be written as basename. If
     max_version is given, delete logs with given basename and versions
     beyond the max_version.
@@ -58,11 +59,11 @@ def rotate_logs(basename, max_version=None):
         os.rename(basename, f"{basename}.1")
 
 
-def get_level(level_name):
+def get_level(level_name: str):
     """Convert a string name to a logging level constant value.
 
     level_name : str
-      case insensitive level name
+      case insensitive level name: CRITICAL, ERROR, WARN, WARNING, INFO, DEBUG
     """
     return LEVELS[level_name.upper()]
 
@@ -72,15 +73,19 @@ class WrappedFormatter(logging.Formatter):
     it exists.
     """
 
-    def format(self, record):
+    def format(self, record: logging.LogRecord):
+        print(type(record))
         if hasattr(record, "func"):
             record.funcName = record.func.__name__
         return super(WrappedFormatter, self).format(record)
 
 
 def setup_logging(
-    filename: str, level=logging.DEBUG, rotate: bool = True, max_version=None
-):
+    filename: str,
+    level: int = logging.DEBUG,
+    rotate: bool = True,
+    max_version: Optional[int] = None,
+) -> logging.Logger:
     """Configure the logging system."""
     log_dirname = os.path.dirname(filename)
     if not os.path.exists(log_dirname):
