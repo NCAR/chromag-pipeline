@@ -16,7 +16,7 @@ logger = logging.getLogger("ChroMag")
 def step():
     def actual_decorator(func):
         @functools.wraps(func)
-        def func_wrapper(*args, skip=False, **kwargs):
+        def func_wrapper(*args, skip: bool = False, **kwargs):
             e = {"func": func}
 
             if skip:
@@ -40,7 +40,7 @@ def step():
 
 
 class Run:
-    def __init__(self, date, mode, logger):
+    def __init__(self, date: str, mode: str, logger: logging.Logger):
         self.date = date
         self.mode = mode
         self.logger = logger
@@ -60,5 +60,7 @@ class Run:
         return self._photometric_calibration
 
     @photometric_calibration.setter
-    def photometric_calibration(self, photometric_calibration):
+    def photometric_calibration(
+        self, photometric_calibration: calibration.photometric_calibration
+    ):
         self._photometric_calibration = photometric_calibration
