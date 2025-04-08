@@ -7,6 +7,7 @@ import datetime
 import functools
 import logging
 
+from .calibration.photometric import photometric_calibration
 from .datetime import human_timedelta
 
 
@@ -60,7 +61,5 @@ class Run:
         return self._photometric_calibration
 
     @photometric_calibration.setter
-    def photometric_calibration(
-        self, photometric_calibration: calibration.photometric_calibration
-    ):
+    def photometric_calibration(self, photometric_calibration: photometric_calibration):
         self._photometric_calibration = photometric_calibration
