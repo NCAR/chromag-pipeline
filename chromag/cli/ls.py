@@ -62,21 +62,36 @@ def list_fits_file_default(f):
                 if "WAVELNTH" in primary_header:
                     wavelength = primary_header["WAVELNTH"]
                     if type(wavelength) == float:
-                        wavelength = f"{wavelength:7.3f} nm"
+                        wavelength = f"{wavelength:8.3f} nm"
+                    elif wavelength is None:
+                        wavelength = "--------"
                     elif len(wavelength) > 0:
-                        wavelength = f"{wavelength:>7s} nm"
+                        wavelength = f"{wavelength:>8s} nm"
                 else:
-                    wavelength = 7 * "-"
+                    wavelength = 8 * "-"
 
                 if "EXPTIME" in primary_header:
                     exptime = primary_header["EXPTIME"]
                     if type(exptime) == float:
-                        exptime = f"{exptime:7.5f} ms"
+                        exptime = f"{exptime:5.3f} ms"
                     elif len(exptime) > 0:
-                        exptime = f"{exptime:>7s} ms"
+                        exptime = f"{exptime:>5s} ms"
                 else:
                     exptime = 7 * "-"
-            print(f"{basename:30s}  {datatype:10s}  {wavelength:10s}  {exptime:10s}")
+
+                if "SCAN_I" in primary_header:
+                    scan_i = primary_header["SCAN_I"]
+                else:
+                    scan_i = 1 * "-"
+
+                if "SCAN_N" in primary_header:
+                    scan_n = primary_header["SCAN_N"]
+                else:
+                    scan_n = 1 * "-"
+
+            print(
+                f"{basename:30s}  {datatype:10s}  {wavelength:11s}  {exptime:8s} {scan_i}/{scan_n}"
+            )
         except FileNotFoundError:
             print(f"{basename} not found")
         except OSError as e:
