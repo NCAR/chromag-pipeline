@@ -6,6 +6,7 @@
 import datetime
 import logging
 import os
+import sys
 
 from ..config import read_config, get_option
 from ..datetime import human_timedelta
@@ -20,6 +21,10 @@ from .l2_process import run_l2_process
 
 def run(date, config_filename):
     """Run the end-of-day processing."""
+    if not os.path.isfile(config_filename):
+        print(f"configuration file not found: {config_filename}")
+        sys.exit(1)
+
     read_config(config_filename)
 
     log_basedir = get_option("logging", "basedir")
