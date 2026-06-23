@@ -19,7 +19,7 @@ def print_help(args):
 
 
 def main():
-    """Entry point for chromag CLI."""
+    """Entry point for chromag command-line interface (CLI)."""
     name = f"ChroMag pipeline {__version__}"
     parser = argparse.ArgumentParser(description=name)
 

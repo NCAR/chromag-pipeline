@@ -6,7 +6,6 @@
 import datetime
 import logging
 import os
-import sys
 
 from ..config import read_config, get_option
 from ..datetime import human_timedelta
@@ -20,10 +19,13 @@ from .l2_process import run_l2_process
 
 
 def run(date, config_filename):
-    """Run the end-of-day processing."""
+    """Run the end-of-day processing.
+
+    Returns 0 for a valid run, 1 if `config_filename` is not found.
+    """
     if not os.path.isfile(config_filename):
         print(f"configuration file not found: {config_filename}")
-        sys.exit(1)
+        return 1
 
     read_config(config_filename)
 
@@ -55,3 +57,5 @@ def run(date, config_filename):
     time_interval = end_dt - start_dt
     human_time = human_timedelta(time_interval)
     logger.info(f"done: {human_time}")
+
+    return 0

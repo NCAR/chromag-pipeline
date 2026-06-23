@@ -4,17 +4,24 @@
 """
 
 import os
+import sys
 
 from .helper import add_run_arguments, split_dates
 from ..eod import run
 
 
 def process_eod(args):
-    """Main routine to handle keyword arguments and dispatch the work."""
-    config_basename = args.configuration_filename
+    """Main routine to handle keyword arguments and dispatch the work.
+
+    System status code is 0 for a valid run, 1 if configuration file is not
+    found.
+    """
     dates = split_dates(",".join(args.dates), args.parser.error)
+
+    status = 0
     for d in dates:
-        run(d, args.configuration_filename)
+        status |= run(d, args.configuration_filename)
+    sys.exit(status)
 
 
 def add_eod_subcommand(subparsers):
