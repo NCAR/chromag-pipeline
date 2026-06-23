@@ -13,7 +13,7 @@ from ..pipeline import Run
 from ..logging import setup_logging, get_level
 
 from .inventory import run_inventory
-from ..calibration import make_photometric_calibration
+from ..calibration import make_calibration
 from .l1_process import run_l1_process
 from .l2_process import run_l2_process
 
@@ -23,6 +23,7 @@ def run(date, config_filename):
     read_config(config_filename)
 
     log_basedir = get_option("logging", "basedir")
+
     log_filename = os.path.join(log_basedir, f"{date}.chromag.eod.log")
 
     level = get_level(get_option("logging", "level"))
@@ -40,7 +41,7 @@ def run(date, config_filename):
 
     date_run.catalog = run_inventory(date_run, skip=False)
 
-    date_run.photometric_calibration = make_photometric_calibration(date_run.catalog)
+    date_run.calibration = make_calibration(date_run.catalog)
 
     run_l1_process(date_run, skip=not get_option("level1", "process"))
     run_l2_process(date_run, skip=not get_option("level2", "process"))

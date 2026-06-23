@@ -7,7 +7,7 @@ import datetime
 import functools
 import logging
 
-from .calibration.photometric import photometric_calibration
+from .calibration import calibration
 from .datetime import human_timedelta
 
 
@@ -46,7 +46,7 @@ class Run:
         self.mode = mode
         self.logger = logger
         self._catalog = None
-        self._photometric_calibration = None
+        self._calibration = None
 
     @property
     def catalog(self):
@@ -57,9 +57,9 @@ class Run:
         self._catalog = catalog
 
     @property
-    def photometric_calibration(self):
-        return self._photometric_calibration
+    def calibration(self):
+        return self._calibration
 
-    @photometric_calibration.setter
-    def photometric_calibration(self, photometric_calibration: photometric_calibration):
-        self._photometric_calibration = photometric_calibration
+    @calibration.setter
+    def calibration(self, calibration: calibration):
+        self._calibration = calibration
