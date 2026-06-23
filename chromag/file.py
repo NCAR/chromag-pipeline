@@ -8,6 +8,9 @@ from astropy.io import fits
 
 from .datetime import dateobs2datetime
 
+# 20250813T215541.869Z.fits
+l0_basename_format = "{year:04d}{month:02d}{day:02d}T{hour:02d}{minute:02d}{second:02d}.{milliseconds}Z.fits"
+
 
 class ChroMagFile:
     """Class representing a ChroMag file, starting from raw and potentially
@@ -42,6 +45,9 @@ class ChroMagFile:
     def is_flat(self):
         # TODO: is this the right way to tell if a file is a flat?
         return self.datatype == "Calibration" and self.object == "Diffuser"
+
+    def is_science(self):
+        return self.datatype == "Science"
 
     def __str__(self):
         wavelength = f"{self.wavelength} nm" if self.wavelength is not None else "---"
