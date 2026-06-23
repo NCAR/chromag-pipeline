@@ -74,7 +74,6 @@ class WrappedFormatter(logging.Formatter):
     """
 
     def format(self, record: logging.LogRecord):
-        print(type(record))
         if hasattr(record, "func"):
             record.funcName = record.func.__name__
         return super(WrappedFormatter, self).format(record)
