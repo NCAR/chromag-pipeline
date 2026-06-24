@@ -42,6 +42,7 @@ chromag = "chromag.cli:main"
 [tool.pytest.ini_options]
 # increment the --cov-fail-under as we increase test coverage
 addopts = "--cov --cov-report html:coverage_html --cov-report term-missing --cov-fail-under 3"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 source = ["chromag"]
