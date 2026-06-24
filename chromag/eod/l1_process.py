@@ -14,7 +14,8 @@ def run_l1_process(run):
     run.logger.debug("L1 processing...")
 
     # loop through science files and perform the following steps:
-    for f in run.catalog[run.catalog.is_science]:
+    for file in run.catalog[run.catalog.is_science]:
+        run.logger.info(f"processing {file}")
         # apply non-linearity camera correction (if necessary)
         # initial quality check
         #   discard really bad data

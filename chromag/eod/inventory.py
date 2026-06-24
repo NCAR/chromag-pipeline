@@ -83,7 +83,7 @@ def run_inventory(run):
 
     for f in filenames:  # pylint: disable=invalid-name
         file = ChroMagFile(f)
-        run.logger.info(str(file))
+        run.logger.debug(str(file))
         catalog.add_file(file)
 
     run.logger.info(f"created catalog with {catalog.n_files} files")
