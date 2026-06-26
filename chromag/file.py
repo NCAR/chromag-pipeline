@@ -25,19 +25,32 @@ class ChroMagFile:
 
             self.date_obs = dateobs2datetime(primary_header["DATE-OBS"])
 
+            # [TODO]: what should be done if required FITS keywords are
+            # missing? Probably should fail in some way instead of just giving
+            # a default value. Maybe there should be a validation before
+            # attempting to process?
+
             # possible values Scientific, Engineering, or Calibration
-            self.datatype = primary_header["DATATYPE"]
+            self.datatype = (
+                primary_header["DATATYPE"] if "DATATYPE" in primary_header else ""
+            )
 
-            self.wavelength = primary_header["WAVELNTH"]
-            self.exposure = primary_header["EXPTIME"]
+            self.wavelength = (
+                primary_header["WAVELNTH"] if "WAVELNTH" in primary_header else 0.0
+            )
+            self.exposure = (
+                primary_header["EXPTIME"] if "EXPTIME" in primary_header else 0.0
+            )
 
-            self.scan_i = primary_header["SCAN_I"]
-            self.scan_n = primary_header["SCAN_N"]
+            self.scan_i = primary_header["SCAN_I"] if "SCAN_I" in primary_header else 0
+            self.scan_n = primary_header["SCAN_N"] if "SCAN_N" in primary_header else 0
 
-            self.obs_description = primary_header["OBS_DESC"]
+            self.obs_description = (
+                primary_header["OBS_DESC"] if "OBS_DESC" in primary_header else ""
+            )
 
             # possible values Sun, Diffuser, Dark, or Lamp
-            self.object = primary_header["OBJECT"]
+            self.object = primary_header["OBJECT"] if "OBJECT" in primary_header else ""
 
     def is_dark(self):
         return self.datatype == "Calibration" and self.object == "Dark"

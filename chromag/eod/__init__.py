@@ -19,14 +19,7 @@ from .l2_process import run_l2_process
 
 
 def run(date, config_filename):
-    """Run the end-of-day processing.
-
-    Returns 0 for a valid run, 1 if `config_filename` is not found.
-    """
-    if not os.path.isfile(config_filename):
-        print(f"configuration file not found: {config_filename}")
-        return 1
-
+    """Run the end-of-day processing."""
     read_config(config_filename)
 
     log_basedir = get_option("logging", "basedir")
@@ -57,5 +50,3 @@ def run(date, config_filename):
     time_interval = end_dt - start_dt
     human_time = human_timedelta(time_interval)
     logger.info(f"done: {human_time}")
-
-    return 0
