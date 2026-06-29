@@ -18,8 +18,10 @@ def process_eod(args):
     """
     dates = split_dates(",".join(args.dates), args.parser.error)
 
-    if not os.path.isfile(config_filename):
-        args.parser.error(f"configuration file not found: {config_filename}")
+    if not os.path.isfile(args.configuration_filename):
+        args.parser.error(
+            f"configuration file not found: {args.configuration_filename}"
+        )
         sys.exit(1)
 
     for d in dates:
