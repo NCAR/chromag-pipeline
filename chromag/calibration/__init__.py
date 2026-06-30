@@ -69,9 +69,16 @@ class calibration:
     def save_calibration_file(self, exposure): 
         """Save calibration file with master dark, should this be for one exposure time or contain multiple master darks?"""
         # master_dark = self.get_master_dark(exposure)
-        # ds = xr.Dataset()
-        # ds['master_dark'] = xr.DataArray(master_dark, dims=('y','x'), attrs={'units': 'DN'})
-        # ds.to_netcdf('calibration_file.nc')
+        # dark_ds = xr.Dataset() 
+        # dark_ds['MASTER_DARK'] = xr.DataArray(master_dark, dims=('y','x'), attrs={'units': 'DN'})
+        # dark_ds['EXPTIME'] = xr.DataArray(exposure, attrs={'units': 's'})
+        # dark_ds['DARK_FILES'] = xr.DataArray(darks_matching_exps)
+        # flat_ds = xr.Dataset() 
+        # outfile = 'calibration_file.nc' # probably need to have exp in name and the date? cal_file_exp_date.nc
+        # dark_ds.to_netcdf(outfile, group='master_dark', mode='w')
+        # flat_ds.to_netcdf(outfile, group='flats', mode='a')
+        # do we need to include anything else? should be able to pull metadata out of files
+        # then to read out specific group: dark_ds = xr.open_dataset(outfile, group='master_dark') 
 
 
 def make_calibration(catalog):
