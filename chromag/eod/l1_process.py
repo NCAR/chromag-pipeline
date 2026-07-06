@@ -20,7 +20,13 @@ def run_l1_process(run):
         # initial quality check
         #   discard really bad data
         # apply camera corrections, i.e., hot pixels, etc.
-        # [TODO]: apply dark subtraction
+        # [TODO]: apply dark subtraction --------------------------------------
+        # get master dark of same exp 
+        master_dark = date_run.calibration.get_master_dark(file.exposure)
+        data = file.data.copy()
+        for i in range(4): 
+            data[i,:,:] = data[i,:,:] - master_dark 
+        # end of dark subtraction ---------------------------------------------
         # apply gain
         # demodulation
         # off-band leakage subtraction

@@ -30,8 +30,10 @@ class calibration:
 
     def get_dark(self, time, exposure):
         """Get closest dark to the given time matching the exposure."""
-        # first generate list of matching exposures
-        matching_exps = np.where(self.dark_exps == exposure)[0]
+        # first generate list of matching exposures for a specificed tolerance 
+        tol = 1e-8
+        exp_diffs = np.array([e - exposure for e in self.dark_exps])
+        matching_exps = np.where(exp_diffs < tol)[0]
         matching_exps = np.array([int(i) for i in matching_exps])
         darks_matching_exps = np.array(self.darks)[matching_exps]
         
@@ -54,7 +56,9 @@ class calibration:
     def get_master_dark(self, exposure): 
         """Get master dark for the day given an exposure time."""
         # average darks of same exposure across first dimension (4 polarization states)
-        matching_exps = np.where(self.dark_exps == exposure)[0]
+        tol = 1e-8
+        exp_diffs = np.array([e - exposure for e in self.dark_exps])
+        matching_exps = np.where(exp_diffs < tol)[0]
         matching_exps = np.array([int(i) for i in matching_exps])
         dark_data_matching_exps = np.array(self.dark_data)[matching_exps]
         polavg_darks = []  
@@ -71,7 +75,7 @@ class calibration:
         # master_dark = self.get_master_dark(exposure)
         # dark_ds = xr.Dataset() 
         # dark_ds['MASTER_DARK'] = xr.DataArray(master_dark, dims=('y','x'), attrs={'units': 'DN'})
-        # dark_ds['EXPTIME'] = xr.DataArray(exposure, attrs={'units': 's'})
+        # dark_ds['EXPTIME'] = xr.DataArray(exposure, attrs={'units': 'ms'}) # per frame, so each polarization state 
         # dark_ds['DARK_FILES'] = xr.DataArray(darks_matching_exps)
         # flat_ds = xr.Dataset() 
         # outfile = 'calibration_file.nc' # probably need to have exp in name and the date? cal_file_exp_date.nc
