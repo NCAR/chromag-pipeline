@@ -13,6 +13,10 @@ from ..pipeline import step
 from ..string_helpers import truncate as truncate_string
 
 
+class MissingRawData(Exception):
+    """Exception subclass to indicate a missing raw data."""
+
+
 class Catalog:
     """Catalog representing the files in a run. You can create a new catalog for
     a subset of files from the catalog using any attributes of ChroMag file
@@ -74,6 +78,9 @@ def run_inventory(run):
     """Generate inventory files."""
     raw_basedir = get_basedir(run.date, "raw")
     raw_dir = os.path.join(raw_basedir, run.date)
+
+    if not os.path.isdir(raw_dir):
+        raise MissingRawData(f"raw directory does not exist: {raw_dir}")
 
     filenames = glob.glob(os.path.join(raw_dir, "*.fits*"))
     # glob doesn't sort the filenames
