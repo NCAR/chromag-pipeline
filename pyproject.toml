@@ -1,6 +1,6 @@
 [project]
 name = "chromag"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   { name="Michael Galloy", email="mgalloy@ucar.edu" },
 ]
@@ -15,6 +15,7 @@ dependencies = [
   "numpy >= 1.20.2",
   "astropy >= 3.2.2",
   "epochs >= 0.2.0",
+  "netCDF4",
   "python-dateutil >= 2.8.1",
 ]
 
@@ -35,6 +36,9 @@ dev = [
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["chromag"]
 
 [project.scripts]
 chromag = "chromag.cli:main"
