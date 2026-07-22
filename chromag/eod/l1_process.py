@@ -21,11 +21,11 @@ def run_l1_process(run):
         #   discard really bad data
         # apply camera corrections, i.e., hot pixels, etc.
         # [TODO]: apply dark subtraction --------------------------------------
-        # get master dark of same exp 
-        master_dark = date_run.calibration.get_master_dark(file.exposure)
+        # get master dark of same exp
+        dark = run.calibration.get_dark(file.exposure)
         data = file.data.copy()
-        for i in range(4): 
-            data[i,:,:] = data[i,:,:] - master_dark 
+        for i in range(4):
+            data[i, :, :] = data[i, :, :] - dark
         # end of dark subtraction ---------------------------------------------
         # apply gain
         # demodulation
@@ -40,4 +40,3 @@ def run_l1_process(run):
         #   possibly use data from Tip/Tilt system
         #   more sophisticated metrics from Level1B data that may reject data
         #     for some higher-level uses but not others
-        pass

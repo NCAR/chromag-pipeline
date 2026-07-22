@@ -1,59 +1,67 @@
 # -*- coding: utf-8 -*-
-import numpy as np 
-import xarray as xr 
-"""Routines for handling photometric/ polarimetric calibration."""
+
+"""Routines for handling photometric/polarimetric calibration."""
+
+import datetime
+
+from .. import __version__
+
+from netCDF4 import Dataset
+import numpy as np
 
 
-class calibration:
+class Calibration:
+    """Class representing the photometric/polarimetric calibration artifacts
+    needed to calibrate the science images.
+    """
+
     def __init__(self, catalog):
         self.catalog = catalog
 
+        self.exposure_tolerance = 1.0e-8
+
+        self.dark_files = None
         self.dark_images = None
-        self.dark_times = None
         self.dark_exposures = None
 
+        self.flat_files = None
         self.flat_images = None
-        self.flat_times = None
         self.flat_exposures = None
         self.flat_wavelengths = None
 
         self.add_catalog(catalog)
 
     def add_catalog(self, catalog):
-        #darks = [f for f in catalog if f.is_dark()]
-        #dark_times = [d.date_obs for d in darks]
-        self.darks = np.array([f for f in catalog if f.is_dark()])
-        self.dark_times = np.array([d.date_obs for d in self.darks])
-        self.dark_exps = np.array([d.exposure for d in self.darks])
-        self.dark_data = np.array([d.data for d in self.darks])
-        # TODO: extract info into NumPy arrays for quick access
+        self.dark_files = [f for f in catalog if f.is_dark()]
+        self.dark_images = [np.mean(d.data, axis=0) for d in self.dark_files]
+        self.dark_exposures = np.array([d.exposure for d in self.dark_files])
 
-    def get_dark(self, time, exposure):
+        self.flat_files = [f for f in catalog if f.is_flat()]
+        self.flat_images = [f.data for f in self.flat_files]
+        self.flat_exposures = np.array([d.exposure for d in self.flat_files])
+        self.flat_wavelengths = np.array([d.wavelength for d in self.flat_files])
+
+    def get_dark(self, exposure: float):
         """Get closest dark to the given time matching the exposure."""
-        # first generate list of matching exposures for a specificed tolerance 
-        tol = 1e-8
-        exp_diffs = np.array([e - exposure for e in self.dark_exps])
-        matching_exps = np.where(exp_diffs < tol)[0]
+
+        # first generate list of matching exposures for a specified tolerance
+        exp_diffs = np.array([e - exposure for e in self.dark_exposures])
+        matching_exps = np.where(exp_diffs < self.exposure_tolerance)[0]
         matching_exps = np.array([int(i) for i in matching_exps])
-        darks_matching_exps = np.array(self.darks)[matching_exps]
-        
-        # then find closest dark timestamp 
-        dark_times_matching_exps = self.dark_times[matching_exps]
-        closest_time = np.abs(dark_times_matching_exps - time).argmin()
-        closest_dark = darks_matching_exps[closest_time]
-        return closest_dark # returns closest file, do we want it to return the closest dataset? can do closest_dark.data
-        #pass
+        dark = np.array(self.dark_images)[matching_exps[0]]
+
+        return dark
 
     def get_flat(self, time, exposure, wavelength):
         """Get closest flat to the given time matching the exposure and wavelength."""
         pass
 
     def __str__(self):
-        n_darks = 0 if self.dark_times is None else len(self.dark_times)
-        n_flats = 0 if self.flat_times is None else len(self.flat_times)
+        n_darks = 0 if self.dark_files is None else len(self.dark_files)
+        n_flats = 0 if self.flat_times is None else len(self.flat_files)
         return f"calibration <{n_darks} darks, {n_flats} flats>"
 
-    def get_master_dark(self, exposure): 
+    def get_master_dark(self, exposure):
         """Get master dark for the day given an exposure time."""
         # average darks of same exposure across first dimension (4 polarization states)
         tol = 1e-8
@@ -61,29 +69,72 @@ class calibration:
         matching_exps = np.where(exp_diffs < tol)[0]
         matching_exps = np.array([int(i) for i in matching_exps])
         dark_data_matching_exps = np.array(self.dark_data)[matching_exps]
-        polavg_darks = []  
-        for data in dark_data_matching_exps: 
+        polavg_darks = []
+        for data in dark_data_matching_exps:
             polavg_data = np.mean(data, axis=0)
             polavg_darks.append(polavg_data)
-    
-        # then average all into one master dark 
+
+        # then average all into one master dark
         master_dark = np.mean(polavg_darks, axis=0)
-        return master_dark 
-    
-    def save_calibration_file(self, exposure): 
+        return master_dark
+
+    def save_calibration_file(self, filename: str):
         """Save calibration file with master dark, should this be for one exposure time or contain multiple master darks?"""
-        # master_dark = self.get_master_dark(exposure)
-        # dark_ds = xr.Dataset() 
-        # dark_ds['MASTER_DARK'] = xr.DataArray(master_dark, dims=('y','x'), attrs={'units': 'DN'})
-        # dark_ds['EXPTIME'] = xr.DataArray(exposure, attrs={'units': 'ms'}) # per frame, so each polarization state 
-        # dark_ds['DARK_FILES'] = xr.DataArray(darks_matching_exps)
-        # flat_ds = xr.Dataset() 
-        # outfile = 'calibration_file.nc' # probably need to have exp in name and the date? cal_file_exp_date.nc
-        # dark_ds.to_netcdf(outfile, group='master_dark', mode='w')
-        # flat_ds.to_netcdf(outfile, group='flats', mode='a')
-        # do we need to include anything else? should be able to pull metadata out of files
-        # then to read out specific group: dark_ds = xr.open_dataset(outfile, group='master_dark') 
+
+        if self.dark_files is None or self.flat_files is None:
+            return
+
+        root_group = Dataset(filename, "w")
+
+        now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        root_group.Created = now
+        root_group.Version = __version__
+
+        # [TODO]: set other metadata
+
+        # [TODO]: find these sizes out from the data
+        xsize = root_group.createDimension("xsize", 2560)
+        ysize = root_group.createDimension("ysize", 2160)
+
+        dark_group = root_group.createGroup("Darks")
+        n_darks = dark_group.createDimension("n_darks", len(self.dark_files))
+
+        dark_images = dark_group.createVariable(
+            "images",
+            "f4",
+            (
+                "n_darks",
+                "ysize",
+                "xsize",
+            ),
+        )
+        for i, d in enumerate(self.dark_images):
+            dark_images[i, :, :] = d
+
+        dark_exposures = dark_group.createVariable("exposures", "f4", ("n_darks",))
+        dark_exposures[:] = self.dark_exposures
+
+        flat_group = root_group.createGroup("Flats")
+        n_flats = flat_group.createDimension("n_flats", len(self.flat_files))
+        flat_images = flat_group.createVariable(
+            "images",
+            "f4",
+            (
+                "n_flats",
+                "ysize",
+                "xsize",
+            ),
+        )
+        for f, i in enumerate(self.flat_images):
+            flat_images[:, :, i] = f
+
+        flat_exposures = flat_group.createVariable("exposures", "f4", ("n_flats",))
+        flat_exposures[:] = self.flat_exposures
+
+        demod_group = root_group.createGroup("Demodulation")
+
+        root_group.close()
 
 
 def make_calibration(catalog):
-    return calibration(catalog)
+    return Calibration(catalog)

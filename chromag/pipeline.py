@@ -7,7 +7,7 @@ import datetime
 import functools
 import logging
 
-from .calibration import calibration
+from .calibration import Calibration
 from .datetime import human_timedelta
 
 
@@ -61,5 +61,5 @@ class Run:
         return self._calibration
 
     @calibration.setter
-    def calibration(self, calibration: calibration):
+    def calibration(self, calibration: Calibration):
         self._calibration = calibration

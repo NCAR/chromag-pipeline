@@ -18,7 +18,7 @@ from .l1_process import run_l1_process
 from .l2_process import run_l2_process
 
 
-def run(date, config_filename):
+def run(date: str, config_filename: str):
     """Run the end-of-day processing."""
     read_config(config_filename)
 
@@ -42,6 +42,17 @@ def run(date, config_filename):
     date_run.catalog = run_inventory(date_run, skip=False)
 
     date_run.calibration = make_calibration(date_run.catalog)
+
+    cal_dir = get_option("process", "caldir")
+    if cal_dir is not None:
+        if not os.path.isdir(cal_dir):
+            os.mkdir(cal_dir)
+        cal_basename = f"{date}.calibration.nc"
+        cal_filename = os.path.join(cal_dir, cal_basename)
+        date_run.calibration.save_calibration_file(cal_filename)
+        logger.info(f"wrote {cal_basename}")
+    else:
+        logger.info("process/caldir not set, not writing cal file")
 
     run_l1_process(date_run, skip=not get_option("level1", "process"))
     run_l2_process(date_run, skip=not get_option("level2", "process"))
