@@ -49,7 +49,7 @@ def run(date: str, config_filename: str):
             os.mkdir(cal_dir)
         cal_basename = f"{date}.calibration.nc"
         cal_filename = os.path.join(cal_dir, cal_basename)
-        date_run.calibration.save_calibration_file(cal_filename)
+        date_run.calibration.save_file(cal_filename)
         logger.info(f"wrote {cal_basename}")
     else:
         logger.info("process/caldir not set, not writing cal file")

@@ -36,10 +36,17 @@ class Calibration:
         self.dark_images = [np.mean(d.data, axis=0) for d in self.dark_files]
         self.dark_exposures = np.array([d.exposure for d in self.dark_files])
 
+        # [TODO]: consolidate darks by exposure time, camera gain, camera bit
+        # depth, and camera temperature
+
         self.flat_files = [f for f in catalog if f.is_flat()]
         self.flat_images = [f.data for f in self.flat_files]
         self.flat_exposures = np.array([d.exposure for d in self.flat_files])
         self.flat_wavelengths = np.array([d.wavelength for d in self.flat_files])
+
+        # [TODO]: consolidate flats by exposure time, camera gain, camera bit
+        # depth, and camera temperature, then perform Kuhn-Lin to get a single
+        # flat for each combination
 
     def get_dark(self, exposure: float):
         """Get closest dark to the given time matching the exposure."""
@@ -57,6 +64,7 @@ class Calibration:
         pass
 
     def __str__(self):
+        """Provide a string representation of the object for debugging."""
         n_darks = 0 if self.dark_files is None else len(self.dark_files)
         n_flats = 0 if self.flat_times is None else len(self.flat_files)
         return f"calibration <{n_darks} darks, {n_flats} flats>"
@@ -65,10 +73,10 @@ class Calibration:
         """Get master dark for the day given an exposure time."""
         # average darks of same exposure across first dimension (4 polarization states)
         tol = 1e-8
-        exp_diffs = np.array([e - exposure for e in self.dark_exps])
+        exp_diffs = np.array([e - exposure for e in self.dark_exposures])
         matching_exps = np.where(exp_diffs < tol)[0]
         matching_exps = np.array([int(i) for i in matching_exps])
-        dark_data_matching_exps = np.array(self.dark_data)[matching_exps]
+        dark_data_matching_exps = np.array(self.dark_images)[matching_exps]
         polavg_darks = []
         for data in dark_data_matching_exps:
             polavg_data = np.mean(data, axis=0)
@@ -78,8 +86,8 @@ class Calibration:
         master_dark = np.mean(polavg_darks, axis=0)
         return master_dark
 
-    def save_calibration_file(self, filename: str):
-        """Save calibration file with master dark, should this be for one exposure time or contain multiple master darks?"""
+    def save_file(self, filename: str):
+        """Save calibration file with darks, flats, and demodulation matrics."""
 
         if self.dark_files is None or self.flat_files is None:
             return
@@ -134,6 +142,10 @@ class Calibration:
         demod_group = root_group.createGroup("Demodulation")
 
         root_group.close()
+
+    def restore_file(self, filename: str):
+        """Restore a netCDF calibration file into a Calibration object."""
+        pass
 
 
 def make_calibration(catalog):
