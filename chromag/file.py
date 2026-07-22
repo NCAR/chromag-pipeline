@@ -66,3 +66,9 @@ class ChroMagFile:
         wavelength = f"{self.wavelength} nm" if self.wavelength is not None else "---"
         datatype = self.datatype[0:3]
         return f"{self.basename} [{wavelength}] ({datatype} scan: {self.scan_i}/{self.scan_n})"
+
+    @property
+    def data(self):
+        with fits.open(self.filename) as f:
+            data = f[0].data
+        return data
