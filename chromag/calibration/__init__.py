@@ -73,7 +73,7 @@ class Calibration:
         """Get master dark for the day given an exposure time."""
         # average darks of same exposure across first dimension (4 polarization states)
         tol = 1e-8
-        exp_diffs = np.array([e - exposure for e in self.dark_exposures])
+        exp_diffs = np.array([np.abs(e - exposure) for e in self.dark_exposures])
         matching_exps = np.where(exp_diffs < tol)[0]
         matching_exps = np.array([int(i) for i in matching_exps])
         dark_data_matching_exps = np.array(self.dark_images)[matching_exps]
