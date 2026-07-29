@@ -64,7 +64,7 @@ def write_inventory_file(catalog: Catalog, filename: str):
             components = [
                 f"{f.basename}",
                 f"{f.datatype[0:3].lower()}",
-                f"{f.object}",
+                f"{f.object:4s}",
                 f"{f.wavelength:7.3f} nm",
                 f"{f.scan_i:5d}",
                 f"{f.scan_n:5d}",
