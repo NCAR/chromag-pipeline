@@ -124,7 +124,7 @@ def log_subcommand(args):
         level_index = LEVELS.index(level)
     except ValueError:
         print(f"invalid level: {level}")
-        parser.print_help()
+        args.parser.print_help()
         return
 
     for i, f in enumerate(args.logfiles):
