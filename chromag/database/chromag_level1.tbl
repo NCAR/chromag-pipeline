@@ -1,0 +1,19 @@
+-- one per level 1 ChroMag file
+
+create table chromag_level1 (
+  file_id                               int (10) auto_increment primary key,
+  dt_created                            timestamp default current_timestamp,
+  filename                              char (80) not null,
+  l0_filename                           char (80) not null,
+  filesize                              int,   -- bytes
+
+  date_obs                              datetime not null,
+  obsday_id                             mediumint (5) not null,
+
+  -- [TODO]: level 1 specific information
+
+  index (date_obs),
+  index (obsday_id),
+
+  foreign key (obsday_id) references mlso_numfiles(day_id)
+);

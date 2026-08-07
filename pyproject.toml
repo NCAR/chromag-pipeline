@@ -17,6 +17,7 @@ dependencies = [
   "epochs >= 0.2.0",
   "netCDF4",
   "python-dateutil >= 2.8.1",
+  "mysql-connector-python",
 ]
 
 [project.optional-dependencies]
