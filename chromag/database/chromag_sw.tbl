@@ -1,0 +1,12 @@
+-- database table listing software versions
+
+create table chromag_sw (
+  sw_id            int(10) auto_increment primary key,
+
+  -- release date of version, i.e., first day new version is used
+  release_date     datetime not null,
+
+  -- release version and git hash
+  sw_version       char(24),
+  sw_revision      varchar(20)
+);

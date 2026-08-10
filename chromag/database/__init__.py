@@ -3,15 +3,19 @@
 """Utilities for communicating with the database.
 """
 
+import datetime
 import configparser
 import os
 
 import mysql
 import mysql.connector
 
+from .. import __version__
+from .. import __revision__
+
 
 DATABASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TABLE_NAMES = ["chromag_level0", "chromag_level1", "chromag_web"]
+TABLE_NAMES = ["chromag_sw", "chromag_level0", "chromag_level1", "chromag_web"]
 
 
 def get_table_definition(table_name: str):
@@ -37,21 +41,53 @@ def create_table(cursor: mysql.connector.cursor_cext.CMySQLCursor, table_name: s
     cursor.execute(table_definition)
 
 
+def get_obsday_id(cursor: mysql.connector.cursor_cext.CMySQLCursor, obs_date: str):
+    """Retrieve the observing day identifier given the "observing day", i.e.,
+    the HST date of the observations.
+    """
+    cmd = f'select day_id from mlso_numfiles where obs_day = "{obs_date}" limit 1;'
+    cursor.execute(cmd)
+    result = cursor.fetchone()
+    obsday_id = result[0]
+    return obsday_id
+
+
+def update_sw(cursor: mysql.connector.cursor_cext.CMySQLCursor):
+    """Update the versions table with the version of the this code."""
+
+    # check to see if version is already present
+    query = 'select count(sw_id) from ucomp_sw where sw_version="{__version__}" and sw_revision="{__revision__}"'
+    cursor.execute(query)
+    n_matching_rows = cursor.fetchone()[0]
+
+    if n_matching_rows == 0:
+        # "release date" is first use
+        release_date = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+
+        cmd = f'insert into chromag_sw (release_date, version, revision) values ("{release_date}", "{__version__}", "{__revision__}");'
+        cursor.execute(cmd)
+
+
 def get_connection(config_filename: str, config_section: str):
+    """Make connection to database."""
     cp = configparser.ConfigParser()
     cp.read(config_filename)
+
     host = cp.get(config_section, "host")
     user = cp.get(config_section, "user")
     password = cp.get(config_section, "password")
     port = cp.get(config_section, "port")
     database = cp.get(config_section, "database")
+
     connection = mysql.connector.connect(
         host=host, user=user, password=password, database=database
     )
+
     return connection
 
 
 def initialize_tables(config_filename: str, config_section: str):
+    """Delete any existing tables and then re-create new tables."""
     connection = get_connection(config_filename, config_section)
     cursor = connection.cursor()
 
