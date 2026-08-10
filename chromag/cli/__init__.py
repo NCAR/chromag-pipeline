@@ -9,6 +9,7 @@ from .. import __version__
 from .. import __revision__
 
 from .cat import add_cat_subcommand
+from .createdb import add_createdb_subcommand
 from .eod import add_eod_subcommand
 from .log import add_log_subcommand
 from .ls import add_ls_subcommand
@@ -34,6 +35,7 @@ def main():
 
     # helpers: cat, list, ls, log, versions
     add_cat_subcommand(subparsers)
+    add_createdb_subcommand(subparsers)
     add_log_subcommand(subparsers)
     add_ls_subcommand(subparsers)
 

@@ -80,22 +80,28 @@ class WrappedFormatter(logging.Formatter):
 
 
 def setup_logging(
-    filename: str,
+    filename: str | None,
     level: int = logging.DEBUG,
     rotate: bool = True,
     max_version: Optional[int] = None,
 ) -> logging.Logger:
     """Configure the logging system."""
-    log_dirname = os.path.dirname(filename)
-    if not os.path.exists(log_dirname):
-        os.makedirs(log_dirname)
+    if filename is not None:
+        log_dirname = os.path.dirname(filename)
+        if not os.path.exists(log_dirname):
+            os.makedirs(log_dirname)
 
-    if rotate:
-        rotate_logs(filename, max_version=max_version)
+        if rotate:
+            rotate_logs(filename, max_version=max_version)
 
     logger.handlers = []
-    handler = logging.FileHandler(filename)
-    logger.addHandler(handler)
+
+    if filename is None:
+        handler = logging.StreamHandler()
+        logger.addHandler(handler)
+    else:
+        handler = logging.FileHandler(filename)
+        logger.addHandler(handler)
 
     fmt = "%(asctime)s %(funcName)s: %(levelname)s: %(message)s"
     formatter = WrappedFormatter(fmt, datefmt=DATE_FORMAT)
