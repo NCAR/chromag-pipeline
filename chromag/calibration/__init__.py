@@ -19,6 +19,7 @@ class Calibration:
         self.catalog = catalog
 
         self.exposure_tolerance = 1.0e-8
+        self.wavelength_tolerance = 1.0e-8 
 
         self.dark_files = None
         self.dark_images = None
@@ -51,34 +52,38 @@ class Calibration:
     def get_dark(self, exposure: float):
         """Get closest dark to the given time matching the exposure."""
 
-        # first generate list of matching exposures for a specified tolerance
-        exp_diffs = np.array([e - exposure for e in self.dark_exposures])
+        # generate list of matching exposures for a specified tolerance
+        exp_diffs = np.array([np.abs(e - exposure) for e in self.dark_exposures])
         matching_exps = np.where(exp_diffs < self.exposure_tolerance)[0]
         matching_exps = np.array([int(i) for i in matching_exps])
-        dark = np.array(self.dark_images)[matching_exps[0]]
+        dark = np.array(self.dark_images)[matching_exps]
 
         return dark
 
     def get_flat(self, time, exposure, wavelength):
         """Get closest flat to the given time matching the exposure and wavelength."""
-        pass
+        
+        # generate list of matching exposures and wavelengths for a specified tolerance
+        exp_diffs = np.array([np.abs(e - exposure) for e in self.flat_exposures])
+        wv_diffs = np.array([np.abs(w - wavelength) for w in self.flat_wavelengths])
+        matching_idxs = np.where((exp_diffs < self.exposure_tolerance) & (wv_diffs < self.wavelength_tolerance))[0]
+        matching_idxs = np.array([int(i) for i in matching_idxs])
+        flat = np.array(self.flat_images)[matching_idxs]
+
+        return flat 
 
     def __str__(self):
         """Provide a string representation of the object for debugging."""
         n_darks = 0 if self.dark_files is None else len(self.dark_files)
-        n_flats = 0 if self.flat_times is None else len(self.flat_files)
+        n_flats = 0 if self.flat_files is None else len(self.flat_files)
         return f"calibration <{n_darks} darks, {n_flats} flats>"
 
     def get_master_dark(self, exposure):
         """Get master dark for the day given an exposure time."""
         # average darks of same exposure across first dimension (4 polarization states)
-        tol = 1e-8
-        exp_diffs = np.array([np.abs(e - exposure) for e in self.dark_exposures])
-        matching_exps = np.where(exp_diffs < tol)[0]
-        matching_exps = np.array([int(i) for i in matching_exps])
-        dark_data_matching_exps = np.array(self.dark_images)[matching_exps]
+        darks = self.get_dark(exposure)
         polavg_darks = []
-        for data in dark_data_matching_exps:
+        for data in darks:
             polavg_data = np.mean(data, axis=0)
             polavg_darks.append(polavg_data)
 
