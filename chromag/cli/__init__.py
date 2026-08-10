@@ -6,6 +6,7 @@
 import argparse
 
 from .. import __version__
+from .. import __revision__
 
 from .cat import add_cat_subcommand
 from .eod import add_eod_subcommand
@@ -20,7 +21,7 @@ def print_help(args):
 
 def main():
     """Entry point for chromag command-line interface (CLI)."""
-    name = f"ChroMag pipeline {__version__}"
+    name = f"ChroMag pipeline {__version__} [{__revision__}]"
     parser = argparse.ArgumentParser(description=name)
 
     # top-level options
