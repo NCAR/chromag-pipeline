@@ -47,7 +47,7 @@ def run(date: str, config_filename: str):
     if cal_dir is not None:
         if not os.path.isdir(cal_dir):
             os.mkdir(cal_dir)
-        cal_basename = f"{date}.calibration.nc"
+        cal_basename = f"{date}.chromag.calibration.nc"
         cal_filename = os.path.join(cal_dir, cal_basename)
         date_run.calibration.save_file(cal_filename)
         logger.info(f"wrote {cal_basename}")

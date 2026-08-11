@@ -19,7 +19,7 @@ class Calibration:
         self.catalog = catalog
 
         self.exposure_tolerance = 1.0e-8
-        self.wavelength_tolerance = 1.0e-8 
+        self.wavelength_tolerance = 1.0e-8
 
         self.dark_files = None
         self.dark_images = None
@@ -33,12 +33,32 @@ class Calibration:
         self.add_catalog(catalog)
 
     def add_catalog(self, catalog):
-        self.dark_files = [f for f in catalog if f.is_dark()]
-        self.dark_images = [np.mean(d.data, axis=0) for d in self.dark_files]
-        self.dark_exposures = np.array([d.exposure for d in self.dark_files])
+        dark_files = [f for f in catalog if f.is_dark()]
+        dark_images = np.array([np.mean(d.data, axis=0) for d in dark_files])
+        dark_exposures = np.array([d.exposure for d in dark_files])
 
-        # [TODO]: consolidate darks by exposure time, camera gain, camera bit
-        # depth, and camera temperature
+        # consolidate darks by exposure time, camera gain, camera bit depth,
+        # and camera temperature
+
+        # [TODO]: add camera gain, camera bit depth, and camera temperature to
+        # dark identifiers and save them in the class/netCDF file
+        dark_identifiers = np.array([f"{e:0.6f}" for e in dark_exposures])
+        unique_ids = np.unique(dark_identifiers)
+
+        n_unique_darks = len(unique_ids)
+        dims = dark_files[0].data.shape
+        dtype = dark_files[0].data.dtype
+
+        self.dark_images = np.zeros((n_unique_darks, dims[1], dims[2]), dtype=dtype)
+        self.dark_exposures = np.zeros(n_unique_darks, dtype=np.float32)
+
+        for i, u in enumerate(unique_ids):
+            mask = dark_identifiers == u
+            self.dark_images[i, :, :] = np.mean(dark_images[mask, :, :], axis=0)
+            self.dark_exposures[i] = dark_exposures[np.where(mask)[0]][0]
+
+        # this is not grouped, it's the original list of dark files
+        self.dark_files = dark_files
 
         self.flat_files = [f for f in catalog if f.is_flat()]
         self.flat_images = [f.data for f in self.flat_files]
@@ -62,15 +82,18 @@ class Calibration:
 
     def get_flat(self, time, exposure, wavelength):
         """Get closest flat to the given time matching the exposure and wavelength."""
-        
+
         # generate list of matching exposures and wavelengths for a specified tolerance
         exp_diffs = np.array([np.abs(e - exposure) for e in self.flat_exposures])
         wv_diffs = np.array([np.abs(w - wavelength) for w in self.flat_wavelengths])
-        matching_idxs = np.where((exp_diffs < self.exposure_tolerance) & (wv_diffs < self.wavelength_tolerance))[0]
+        matching_idxs = np.where(
+            (exp_diffs < self.exposure_tolerance)
+            & (wv_diffs < self.wavelength_tolerance)
+        )[0]
         matching_idxs = np.array([int(i) for i in matching_idxs])
         flat = np.array(self.flat_images)[matching_idxs]
 
-        return flat 
+        return flat
 
     def __str__(self):
         """Provide a string representation of the object for debugging."""
@@ -110,7 +133,7 @@ class Calibration:
         ysize = root_group.createDimension("ysize", 2160)
 
         dark_group = root_group.createGroup("Darks")
-        n_darks = dark_group.createDimension("n_darks", len(self.dark_files))
+        n_darks = dark_group.createDimension("n_darks", len(self.dark_exposures))
 
         dark_images = dark_group.createVariable(
             "images",
