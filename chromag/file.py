@@ -12,7 +12,7 @@ from .datetime import dateobs2datetime
 l0_basename_format = "{year:04d}{month:02d}{day:02d}T{hour:02d}{minute:02d}{second:02d}.{milliseconds}Z.fits"
 
 
-class ChroMagFile:
+class ChroMagRawFile:
     """Class representing a ChroMag file, starting from raw and potentially
     progresssing to a level 1 file.
     """

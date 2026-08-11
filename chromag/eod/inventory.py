@@ -8,7 +8,7 @@ import os
 import numpy as np
 
 from ..config import get_basedir
-from ..file import ChroMagFile
+from ..file import ChroMagRawFile
 from ..pipeline import step
 from ..string_helpers import truncate as truncate_string
 
@@ -29,8 +29,8 @@ class Catalog:
         self.n_files = 0
         self.catalog = []
 
-    def add_file(self, file: ChroMagFile):
-        """Add a ChroMagFile to the catalog."""
+    def add_file(self, file: ChroMagRawFile):
+        """Add a ChroMagRawFile to the catalog."""
         self.catalog.append(file)
         self.n_files += 1
 
@@ -89,7 +89,7 @@ def run_inventory(run):
     catalog = Catalog()
 
     for f in filenames:  # pylint: disable=invalid-name
-        file = ChroMagFile(f)
+        file = ChroMagRawFile(f)
         run.logger.debug(str(file))
         catalog.add_file(file)
 
