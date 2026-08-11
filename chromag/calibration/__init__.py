@@ -84,7 +84,7 @@ class Calibration:
         # depth, and camera temperature, then perform Kuhn-Lin to get a single
         # flat for each combination
 
-    def get_dark(self, exposure: float):
+    def get_dark(self, exposure: float) -> np.ndarray:
         """Get dark matching the exposure."""
 
         # generate list of matching exposures for a specified tolerance
@@ -95,7 +95,7 @@ class Calibration:
 
         return dark
 
-    def get_flat(self, time, exposure, wavelength):
+    def get_flat(self, time, exposure, wavelength) -> np.ndarray:
         """Get closest flat to the given time matching the exposure and wavelength."""
 
         # generate list of matching exposures and wavelengths for a specified tolerance
@@ -110,7 +110,7 @@ class Calibration:
 
         return flat
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Provide a string representation of the object for debugging."""
         n_darks = 0 if self.dark_files is None else len(self.dark_files)
         n_flats = 0 if self.flat_files is None else len(self.flat_files)
@@ -178,5 +178,5 @@ class Calibration:
         pass
 
 
-def make_calibration(catalog):
+def make_calibration(catalog) -> Calibration:
     return Calibration(catalog)

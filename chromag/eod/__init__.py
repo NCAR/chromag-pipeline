@@ -12,19 +12,22 @@ from ..datetime import human_timedelta
 from ..pipeline import Run
 from ..logging import setup_logging, get_level
 
-from .inventory import run_inventory
+from .inventory import run_inventory, Catalog
 from ..calibration import make_calibration
 from .l1_process import run_l1_process
 from .l2_process import run_l2_process
 
+# set umask for process: rwxrwxr-x for directories, rw-rw-r--- for files
+os.umask(0o002)
 
-def run(date: str, config_filename: str):
+
+def run(observing_day: str, config_filename: str):
     """Run the end-of-day processing."""
     read_config(config_filename)
 
     log_basedir = get_option("logging", "basedir")
 
-    log_filename = os.path.join(log_basedir, f"{date}.chromag.eod.log")
+    log_filename = os.path.join(log_basedir, f"{observing_day}.chromag.eod.log")
 
     level = get_level(get_option("logging", "level"))
     rotate = get_option("logging", "rotate")
@@ -34,9 +37,9 @@ def run(date: str, config_filename: str):
         log_filename, level=level, rotate=rotate, max_version=max_version
     )
 
-    date_run = Run(date, "eod", logger)
+    date_run = Run(observing_day, "eod", logger)
 
-    logger.info(f"starting pipeline on {date}...")
+    logger.info(f"starting pipeline on {observing_day}...")
     start_dt = datetime.datetime.now()
 
     date_run.catalog = run_inventory(date_run, skip=False)
@@ -47,7 +50,7 @@ def run(date: str, config_filename: str):
     if cal_dir is not None:
         if not os.path.isdir(cal_dir):
             os.mkdir(cal_dir)
-        cal_basename = f"{date}.chromag.calibration.nc"
+        cal_basename = f"{observing_day}.chromag.calibration.nc"
         cal_filename = os.path.join(cal_dir, cal_basename)
         date_run.calibration.save_file(cal_filename)
         logger.info(f"wrote {cal_basename}")

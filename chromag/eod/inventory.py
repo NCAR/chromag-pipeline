@@ -76,8 +76,8 @@ def write_inventory_file(catalog: Catalog, filename: str):
 @step()
 def run_inventory(run):
     """Generate inventory files."""
-    raw_basedir = get_basedir(run.date, "raw")
-    raw_dir = os.path.join(raw_basedir, run.date)
+    raw_basedir = get_basedir(run.observing_day, "raw")
+    raw_dir = os.path.join(raw_basedir, run.observing_day)
 
     if not os.path.isdir(raw_dir):
         raise MissingRawData(f"raw directory does not exist: {raw_dir}")
@@ -89,22 +89,24 @@ def run_inventory(run):
     catalog = Catalog()
 
     for f in filenames:  # pylint: disable=invalid-name
-        file = ChroMagRawFile(f)
+        file = ChroMagRawFile(f, run.observing_day)
         run.logger.debug(str(file))
         catalog.add_file(file)
 
     run.logger.info(f"created catalog with {catalog.n_files} files")
     run.logger.info("writing inventory files...")
 
-    process_dir = get_basedir(run.date, "process")
+    process_dir = get_basedir(run.observing_day, "process")
     if not os.path.isdir(process_dir):
         os.mkdir(process_dir)
 
-    date_dir = os.path.join(process_dir, run.date)
+    date_dir = os.path.join(process_dir, run.observing_day)
     if not os.path.isdir(date_dir):
         os.mkdir(date_dir)
 
-    inventory_filename = os.path.join(date_dir, f"{run.date}.chromag.inventory.txt")
+    inventory_filename = os.path.join(
+        date_dir, f"{run.observing_day}.chromag.inventory.txt"
+    )
     write_inventory_file(catalog, inventory_filename)
 
     return catalog

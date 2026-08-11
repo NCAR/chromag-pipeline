@@ -41,8 +41,8 @@ def step():
 
 
 class Run:
-    def __init__(self, date: str, mode: str, logger: logging.Logger):
-        self.date = date
+    def __init__(self, observing_day: str, mode: str, logger: logging.Logger):
+        self.observing_day = observing_day
         self.mode = mode
         self.logger = logger
         self._catalog = None
