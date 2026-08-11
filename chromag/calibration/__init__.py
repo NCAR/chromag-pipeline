@@ -3,11 +3,14 @@
 """Routines for handling photometric/polarimetric calibration."""
 
 import datetime
-
-from .. import __version__
+import os
 
 from netCDF4 import Dataset
 import numpy as np
+
+from .. import __version__
+from .. import __revision__
+from ..logging import logger
 
 
 class Calibration:
@@ -22,6 +25,7 @@ class Calibration:
         self.wavelength_tolerance = 1.0e-8
 
         self.dark_files = None
+        self.darks_used = []
         self.dark_images = None
         self.dark_exposures = None
 
@@ -33,32 +37,43 @@ class Calibration:
         self.add_catalog(catalog)
 
     def add_catalog(self, catalog):
-        dark_files = [f for f in catalog if f.is_dark()]
-        dark_images = np.array([np.mean(d.data, axis=0) for d in dark_files])
-        dark_exposures = np.array([d.exposure for d in dark_files])
+        self.dark_files = [f for f in catalog if f.is_dark()]
+
+        dark_images = np.array([np.mean(d.data, axis=0) for d in self.dark_files])
+        dark_exposures = np.array([d.exposure for d in self.dark_files])
+
+        n_darks = len(self.dark_files)
+        logger.info(f"found {n_darks} dark files")
+        for i, (f, e) in enumerate(zip(self.dark_files, dark_exposures)):
+            logger.debug(f"{i}/{n_darks}: {os.path.basename(f.filename)} [{e:0.6f} ms]")
 
         # consolidate darks by exposure time, camera gain, camera bit depth,
         # and camera temperature
 
         # [TODO]: add camera gain, camera bit depth, and camera temperature to
-        # dark identifiers and save them in the class/netCDF file
+        # dark identifiers and save them in the class/netCDF file -- this
+        # information is not in the FITS headers yet, though
         dark_identifiers = np.array([f"{e:0.6f}" for e in dark_exposures])
         unique_ids = np.unique(dark_identifiers)
 
         n_unique_darks = len(unique_ids)
-        dims = dark_files[0].data.shape
-        dtype = dark_files[0].data.dtype
+        dims = self.dark_files[0].data.shape
+        dtype = self.dark_files[0].data.dtype
+
+        logger.info(f"creating {n_unique_darks} master darks")
 
         self.dark_images = np.zeros((n_unique_darks, dims[1], dims[2]), dtype=dtype)
         self.dark_exposures = np.zeros(n_unique_darks, dtype=np.float32)
-
         for i, u in enumerate(unique_ids):
             mask = dark_identifiers == u
+            indices = np.nonzero(mask)[0]
+            indices_str = ", ".join(str(i) for i in indices.tolist())
+            logger.debug(
+                f"producing master dark {i}/{n_unique_darks} from files {indices_str}"
+            )
+            self.darks_used.append(indices)
             self.dark_images[i, :, :] = np.mean(dark_images[mask, :, :], axis=0)
-            self.dark_exposures[i] = dark_exposures[np.nonzero(mask)[0][0]]
-
-        # this is not grouped, it's the original list of dark files
-        self.dark_files = dark_files
+            self.dark_exposures[i] = dark_exposures[indices[0]]
 
         self.flat_files = [f for f in catalog if f.is_flat()]
         self.flat_images = [f.data for f in self.flat_files]
@@ -112,12 +127,13 @@ class Calibration:
         now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
         root_group.Created = now
         root_group.Version = __version__
+        root_group.Revision = __revision__
 
         # [TODO]: set other metadata
 
-        # [TODO]: find these sizes out from the data
-        xsize = root_group.createDimension("xsize", 2560)
-        ysize = root_group.createDimension("ysize", 2160)
+        dims = self.dark_images.shape
+        xsize = root_group.createDimension("xsize", dims[2])
+        ysize = root_group.createDimension("ysize", dims[1])
 
         dark_group = root_group.createGroup("Darks")
         n_darks = dark_group.createDimension("n_darks", len(self.dark_exposures))
@@ -131,8 +147,7 @@ class Calibration:
                 "xsize",
             ),
         )
-        for i, d in enumerate(self.dark_images):
-            dark_images[i, :, :] = d
+        dark_images[:, :, :] = self.dark_images
 
         dark_exposures = dark_group.createVariable("exposures", "f4", ("n_darks",))
         dark_exposures[:] = self.dark_exposures
