@@ -24,9 +24,11 @@ def human_timedelta(timedelta):
             if mul > 1:
                 n = int(math.floor(secs / mul))
                 secs -= n * mul
+                n = str(n)
             else:
                 n = secs_format % secs
-            parts.append("%s %s%s" % (n, unit, "" if n == 1 else "s"))
+            if n != "0":
+                parts.append("%s %s%s" % (n, unit, "" if n == "1" else "s"))
     return " ".join(parts)
 
 

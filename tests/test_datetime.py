@@ -30,6 +30,10 @@ def test_human_timedelta():
     assert human_timedelta(d9 - d1) == "398 days 1 hr 5 mins 10 secs"
 
 
+def test_no_seconds():
+    assert human_timedelta(datetime.timedelta(days=1, hours=5)) == "1 day 5 hrs"
+
+
 def test_dateobs2datetime():
     d1 = datetime.datetime(2023, 10, 25, 10, 20, 35)
     assert d1 == dateobs2datetime("2023-10-25T10:20:35.000")
