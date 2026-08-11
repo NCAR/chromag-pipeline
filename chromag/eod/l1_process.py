@@ -11,7 +11,7 @@ def run_l1_process(run):
 
     # [TODO]: need to do this by line?
 
-    run.logger.debug("L1 processing...")
+    run.logger.info("L1 processing...")
 
     # loop through science files and perform the following steps:
     for file in run.catalog[run.catalog.is_science]:
