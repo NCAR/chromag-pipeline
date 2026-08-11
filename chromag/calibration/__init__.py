@@ -54,10 +54,8 @@ class Calibration:
 
         for i, u in enumerate(unique_ids):
             mask = dark_identifiers == u
-            # where returns a tuple, an index array per dimension
-            indices = np.nonzero(mask)[0]
             self.dark_images[i, :, :] = np.mean(dark_images[mask, :, :], axis=0)
-            self.dark_exposures[i] = dark_exposures[indices[0]]
+            self.dark_exposures[i] = dark_exposures[np.nonzero(mask)[0][0]]
 
         # this is not grouped, it's the original list of dark files
         self.dark_files = dark_files
