@@ -54,8 +54,10 @@ class Calibration:
 
         for i, u in enumerate(unique_ids):
             mask = dark_identifiers == u
+            # where returns a tuple, an index array per dimension
+            indices = np.nonzero(mask)[0]
             self.dark_images[i, :, :] = np.mean(dark_images[mask, :, :], axis=0)
-            self.dark_exposures[i] = dark_exposures[np.where(mask)[0]][0]
+            self.dark_exposures[i] = dark_exposures[indices[0]]
 
         # this is not grouped, it's the original list of dark files
         self.dark_files = dark_files
@@ -70,7 +72,7 @@ class Calibration:
         # flat for each combination
 
     def get_dark(self, exposure: float):
-        """Get closest dark to the given time matching the exposure."""
+        """Get dark matching the exposure."""
 
         # generate list of matching exposures for a specified tolerance
         exp_diffs = np.array([np.abs(e - exposure) for e in self.dark_exposures])
@@ -100,19 +102,6 @@ class Calibration:
         n_darks = 0 if self.dark_files is None else len(self.dark_files)
         n_flats = 0 if self.flat_files is None else len(self.flat_files)
         return f"calibration <{n_darks} darks, {n_flats} flats>"
-
-    def get_master_dark(self, exposure):
-        """Get master dark for the day given an exposure time."""
-        # average darks of same exposure across first dimension (4 polarization states)
-        darks = self.get_dark(exposure)
-        polavg_darks = []
-        for data in darks:
-            polavg_data = np.mean(data, axis=0)
-            polavg_darks.append(polavg_data)
-
-        # then average all into one master dark
-        master_dark = np.mean(polavg_darks, axis=0)
-        return master_dark
 
     def save_file(self, filename: str):
         """Save calibration file with darks, flats, and demodulation matrics."""
