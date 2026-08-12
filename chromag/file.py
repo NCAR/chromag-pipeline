@@ -10,10 +10,12 @@ import numpy as np
 from .config import get_basedir
 from .datetime import dateobs2datetime
 
-
 # 20250813T215541.869Z.fits
 l0_basename_format = "{year:04d}{month:02d}{day:02d}T{hour:02d}{minute:02d}{second:02d}.{milliseconds}Z.fits"
 l1_basename_format = "{year:04d}{month:02d}{day:02d}T{hour:02d}{minute:02d}{second:02d}.{milliseconds}Z.chromag.l1.fits"
+
+with open(os.path.join(os.path.dirname(__file__), "header_template.txt"), "r") as f:
+    header_template = f.read()
 
 
 class ChroMagRawFile:
@@ -28,6 +30,7 @@ class ChroMagRawFile:
 
         with fits.open(filename) as f:
             primary_header = f[0].header
+            self.primary_header = primary_header
 
             self.date_obs = dateobs2datetime(primary_header["DATE-OBS"])
 
@@ -105,6 +108,9 @@ class ChroMagL1File:
         self.basename = f"{prefix}.chromag.l1.fits"
         self.filename = os.path.join(l1_dir, self.basename)
 
+        self.primary_header = reorder_header(raw_file.primary_header)
+        self.primary_header["LEVEL"] = "L1"
+
         self._data = None
 
     @property
@@ -122,3 +128,11 @@ class ChroMagL1File:
     @data.deleter
     def data(self):
         del self._data
+
+
+def reorder_header(header: fits.header.Header):
+    h = fits.header.Header.fromstring(header_template, sep="\n")
+    for k, v in header.items():
+        if k != "COMMENT" and k != "":
+            h[k] = v
+    return h
