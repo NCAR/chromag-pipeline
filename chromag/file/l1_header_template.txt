@@ -1,5 +1,5 @@
 SIMPLE  =                    T / image conforms to FITS standard
-BITPIX  =                  -32 / 16-bit two's complement binary integer
+BITPIX  =                  -32 / floating point
 NAXIS   =                    3
 NAXIS1  =                 2560 / [pixels] image width
 NAXIS2  =                 2160 / [pixels] image height

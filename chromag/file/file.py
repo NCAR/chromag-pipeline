@@ -22,6 +22,7 @@ with open(os.path.join(os.path.dirname(__file__), "l1_header_template.txt"), "r"
 cp = configparser.ConfigParser()
 cp.read(os.path.join(os.path.dirname(__file__), "keyword_formats.cfg"))
 keyword_formats = {k.upper(): cp.get("formats", k) for k in cp.options("formats")}
+del cp
 
 
 class ChroMagRawFile:
@@ -150,10 +151,15 @@ class ChroMagL1File:
         del self._data
 
 
+# save away default behavior, will need for non-FormattedFloat values
 _orig_format_value = Card._format_value
 
 
 class FormattedFloat(float):
+    """Subclass float, adding a `fmt` attribute to specify how to format it,
+    where `fmt` is an f-string format specifier.
+    """
+
     def __new__(cls, value, fmt):
         obj = super().__new__(cls, value)
         obj.fmt = fmt
@@ -161,22 +167,30 @@ class FormattedFloat(float):
 
 
 def custom_format_value(self):
+    """Method to be inserted into Card, so `self` is an instance of Card."""
     value = self.value
 
+    # handle FormattedFloat values specially
     if isinstance(value, FormattedFloat):
-        # Format the float explicitly using your custom specifier
-        val_str = f"{value:{value.fmt}}"
+        # format the float explicitly using your custom specifier
+        value_str = f"{value:{value.fmt}}"
         # FITS requires the float string to be right-justified within 20 chars
-        return f"{val_str:>20}"
+        return f"{value_str:>20}"
 
-    # Revert to standard astropy behavior for all other data types
+    # revert to standard astropy behavior for all other data types
     return _orig_format_value(self)
 
 
+# use our new custom float formatting function
 Card._format_value = custom_format_value
 
 
 def reorder_header(header: fits.header.Header):
+    """Create a new header with the layout of a template (from the file
+    l1_header_template.txt), but the values from the given header. Format the
+    floating point values using the format specifications in
+    keyword_formats.cfg.
+    """
     h = fits.header.Header.fromstring(l1_header_template, sep="\n")
     for k, v in header.items():
         if k != "COMMENT" and k != "":
