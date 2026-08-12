@@ -75,6 +75,9 @@ class Calibration:
             self.dark_images[i, :, :] = np.mean(dark_images[mask, :, :], axis=0)
             self.dark_exposures[i] = dark_exposures[indices[0]]
 
+        for f in self.dark_files:
+            del f.data
+
         self.flat_files = [f for f in catalog if f.is_flat()]
         self.flat_images = [f.data for f in self.flat_files]
         self.flat_exposures = np.array([d.exposure for d in self.flat_files])
