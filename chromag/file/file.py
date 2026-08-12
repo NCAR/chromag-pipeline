@@ -2,9 +2,11 @@
 
 """Module handling ChroMag files."""
 
+import configparser
 import os
 
 from astropy.io import fits
+from astropy.io.fits.card import Card, _format_float
 import numpy as np
 
 from ..config import get_basedir
@@ -15,7 +17,11 @@ l0_basename_format = "{year:04d}{month:02d}{day:02d}T{hour:02d}{minute:02d}{seco
 l1_basename_format = "{year:04d}{month:02d}{day:02d}T{hour:02d}{minute:02d}{second:02d}.{milliseconds}Z.chromag.l1.fits"
 
 with open(os.path.join(os.path.dirname(__file__), "l1_header_template.txt"), "r") as f:
-    header_template = f.read()
+    l1_header_template = f.read()
+
+cp = configparser.ConfigParser()
+cp.read(os.path.join(os.path.dirname(__file__), "keyword_formats.cfg"))
+keyword_formats = {k.upper(): cp.get("formats", k) for k in cp.options("formats")}
 
 
 class ChroMagRawFile:
@@ -41,25 +47,31 @@ class ChroMagRawFile:
 
             # possible values Scientific, Engineering, or Calibration
             self.datatype = (
-                primary_header["DATATYPE"] if "DATATYPE" in primary_header else ""
+                primary_header["DATATYPE"] if "DATATYPE" in primary_header else None
             )
 
             self.wavelength = (
-                primary_header["WAVELNTH"] if "WAVELNTH" in primary_header else 0.0
+                primary_header["WAVELNTH"] if "WAVELNTH" in primary_header else None
             )
             self.exposure = (
-                primary_header["EXPTIME"] if "EXPTIME" in primary_header else 0.0
+                primary_header["EXPTIME"] if "EXPTIME" in primary_header else None
             )
 
-            self.scan_i = primary_header["SCAN_I"] if "SCAN_I" in primary_header else 0
-            self.scan_n = primary_header["SCAN_N"] if "SCAN_N" in primary_header else 0
+            self.scan_i = (
+                primary_header["SCAN_I"] if "SCAN_I" in primary_header else None
+            )
+            self.scan_n = (
+                primary_header["SCAN_N"] if "SCAN_N" in primary_header else None
+            )
 
             self.obs_description = (
-                primary_header["OBS_DESC"] if "OBS_DESC" in primary_header else ""
+                primary_header["OBS_DESC"] if "OBS_DESC" in primary_header else None
             )
 
             # possible values Sun, Diffuser, Dark, or Lamp
-            self.object = primary_header["OBJECT"] if "OBJECT" in primary_header else ""
+            self.object = (
+                primary_header["OBJECT"] if "OBJECT" in primary_header else None
+            )
 
     def is_dark(self):
         return self.datatype == "Calibration" and self.object == "Dark"
@@ -72,7 +84,13 @@ class ChroMagRawFile:
         return self.datatype == "Science"
 
     def __str__(self):
-        wavelength = f"{self.wavelength} nm" if self.wavelength is not None else "---"
+        if self.wavelength is None:
+            wavelength = "---"
+        else:
+            if self.wavelength < 0.001:
+                wavelength = "---"
+            else:
+                wavelength = f"{self.wavelength:0.3f}"
         datatype = self.datatype[0:3]
         return f"{self.basename} [{wavelength}] ({datatype} scan: {self.scan_i}/{self.scan_n})"
 
@@ -132,9 +150,38 @@ class ChroMagL1File:
         del self._data
 
 
+_orig_format_value = Card._format_value
+
+
+class FormattedFloat(float):
+    def __new__(cls, value, fmt):
+        obj = super().__new__(cls, value)
+        obj.fmt = fmt
+        return obj
+
+
+def custom_format_value(self):
+    value = self.value
+
+    if isinstance(value, FormattedFloat):
+        # Format the float explicitly using your custom specifier
+        val_str = f"{value:{value.fmt}}"
+        # FITS requires the float string to be right-justified within 20 chars
+        return f"{val_str:>20}"
+
+    # Revert to standard astropy behavior for all other data types
+    return _orig_format_value(self)
+
+
+Card._format_value = custom_format_value
+
+
 def reorder_header(header: fits.header.Header):
-    h = fits.header.Header.fromstring(header_template, sep="\n")
+    h = fits.header.Header.fromstring(l1_header_template, sep="\n")
     for k, v in header.items():
         if k != "COMMENT" and k != "":
-            h[k] = v
+            if k in keyword_formats and v is not None:
+                h[k] = FormattedFloat(v, keyword_formats[k])
+            else:
+                h[k] = v
     return h
