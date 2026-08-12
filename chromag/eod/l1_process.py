@@ -8,10 +8,25 @@ from ..fileio import write_l1_file
 
 
 @step()
+def dark_correct(run, l1_file):
+    """Apply dark subtraction to raw data."""
+    # get averaged dark of same exposure time
+    dark = run.calibration.get_dark(l1_file.exposure)
+    for i in range(4):
+        l1_file.data[i, :, :] -= dark.squeeze()
+
+    # update header
+    l1_file.primary_header["DARKCOR"] = True
+    # [TODO]: which dark(s) used?
+
+
+@step()
 def run_l1_process(run):
     """Run the level 1 processing."""
 
-    # [TODO]: need to do this by line?
+    # [TODO]: need to do this by wave region?
+
+    # [TODO]: flush the logging FileHandler periodically
 
     run.logger.info("L1 processing...")
 
@@ -22,26 +37,31 @@ def run_l1_process(run):
         l1_file = ChroMagL1File(raw_file)
 
         # apply non-linearity camera correction (if necessary)
+
         # initial quality check
         #   discard really bad data
+
         # apply camera corrections, i.e., hot pixels, etc.
 
-        # apply dark subtraction
-        # [TODO]: move to subroutine
-        # get master dark of same exposure time
-        dark = run.calibration.get_dark(raw_file.exposure)
-        for i in range(4):
-            l1_file.data[i, :, :] -= dark.squeeze()
+        dark_correct(run, l1_file)
 
         # apply gain
+
         # demodulation
+
         # off-band leakage subtraction
+
         # distortion correction
+
         # rotate solar North up
+
         # mask outer field of view
+
         # polarimetric coordinate transformation
-        # [TODO]: write output (FITS, PNG, etc.)
+
         write_l1_file(l1_file)
+        # [TODO]: write output (PNG, etc.)
+
         del l1_file.data
 
         # some sort of quality assessment TBD

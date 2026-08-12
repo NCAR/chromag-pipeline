@@ -9,7 +9,9 @@ The format is based on [Keep a Changelog] and this project adheres to
 
 ### Added
 
-- Grouping like darks together
+- Grouping like darks together.
+- Dark correction.
+- Create database tables.
 
 ## [0.0.1]
 

@@ -80,7 +80,7 @@ class ChroMagRawFile:
     def data(self):
         if self._data is None:
             with fits.open(self.filename) as f:
-                self._data = f[0].data
+                self._data = f[0].data.astype(np.float32)
         return self._data
 
     @data.setter
@@ -101,6 +101,8 @@ class ChroMagL1File:
 
         self.observing_day = raw_file.observing_day
 
+        self.exposure = raw_file.exposure
+
         process_basedir = get_basedir(self.observing_day, "process")
         l1_dir = os.path.join(process_basedir, self.observing_day, "level1")
 
@@ -117,7 +119,7 @@ class ChroMagL1File:
     def data(self):
         if self._data is None:
             with fits.open(self.raw_file.filename) as f:
-                self._data = f[0].data
+                self._data = f[0].data.astype(np.float32)
 
         return self._data
 
