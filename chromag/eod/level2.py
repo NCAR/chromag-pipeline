@@ -6,6 +6,6 @@ from ..pipeline import step
 
 
 @step()
-def run_l2_process(run):
+def process(run):
     """Run the level 2 processing."""
     run.logger.info("L2 processing stuff...")

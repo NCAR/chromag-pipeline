@@ -14,7 +14,7 @@ from ..string_helpers import truncate as truncate_string
 
 
 class MissingRawData(Exception):
-    """Exception subclass to indicate a missing raw data."""
+    """Exception subclass to indicate a missing raw data directory."""
 
 
 class Catalog:

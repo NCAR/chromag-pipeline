@@ -54,6 +54,11 @@ class ChroMagRawFile:
             self.wavelength = (
                 primary_header["WAVELNTH"] if "WAVELNTH" in primary_header else None
             )
+            self.wave_region = (
+                str(int(float(primary_header["OSF_ID"])))
+                if "OSF_ID" in primary_header
+                else None
+            )
             self.exposure = (
                 primary_header["EXPTIME"] if "EXPTIME" in primary_header else None
             )
@@ -120,19 +125,29 @@ class ChroMagL1File:
 
         self.observing_day = raw_file.observing_day
 
+        self.wavelength = raw_file.wavelength
+        self.wave_region = raw_file.wave_region
         self.exposure = raw_file.exposure
-
-        process_basedir = get_basedir(self.observing_day, "process")
-        l1_dir = os.path.join(process_basedir, self.observing_day, "level1")
-
-        prefix = self.raw_file.basename.removesuffix(".fits")
-        self.basename = f"{prefix}.chromag.l1.fits"
-        self.filename = os.path.join(l1_dir, self.basename)
 
         self.primary_header = reorder_header(raw_file.primary_header)
         self.primary_header["LEVEL"] = "L1"
 
         self._data = None
+
+    def get_filename(self, name: str):
+        process_basedir = get_basedir(self.observing_day, "process")
+        l1_dir = os.path.join(process_basedir, self.observing_day, "level1")
+
+        prefix = self.raw_file.basename.removesuffix(".fits")
+
+        if name == "filename":
+            basename = f"{prefix}.chromag.l1.fits"
+        elif name == "i_quicklook":
+            basename = f"{prefix}.chromag.l1.i.png"
+        elif name == "iquv_quicklook":
+            basename = f"{prefix}.chromag.l1.iquv.png"
+
+        return os.path.join(l1_dir, basename)
 
     @property
     def data(self):

@@ -14,8 +14,9 @@ from ..logging import setup_logging, get_level
 
 from .inventory import run_inventory, Catalog
 from ..calibration import make_calibration
-from .level1 import run_l1_process
-from .level2 import run_l2_process
+from .level1 import process as process_l1
+from .level2 import process as process_l2
+
 
 # set umask for process: rwxrwxr-x for directories, rw-rw-r--- for files
 os.umask(0o002)
@@ -57,8 +58,8 @@ def run(observing_day: str, config_filename: str):
     else:
         logger.info("process/caldir not set, not writing cal file")
 
-    run_l1_process(date_run, skip=not get_option("level1", "process"))
-    run_l2_process(date_run, skip=not get_option("level2", "process"))
+    process_l1(date_run, skip=not get_option("level1", "process"))
+    process_l2(date_run, skip=not get_option("level2", "process"))
 
     end_dt = datetime.datetime.now()
     time_interval = end_dt - start_dt

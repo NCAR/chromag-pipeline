@@ -8,7 +8,12 @@ from .. import __version__
 from .. import __revision__
 from ..datetime import datetime2dateobs
 from ..pipeline import step
-from ..file import ChroMagL1File, write_l1_file
+from ..file import (
+    ChroMagL1File,
+    write_l1_file,
+    write_l1_intensity_image,
+    write_l1_iquv_image,
+)
 
 
 @step()
@@ -31,11 +36,10 @@ def update_header(run, l1_file: ChroMagL1File):
 
 
 @step()
-def run_l1_process(run):
+def process(run):
     """Run the level 1 processing."""
 
     # [TODO]: need to do this by wave region?
-
     # [TODO]: flush the logging FileHandler periodically
 
     run.logger.info("L1 processing...")
@@ -72,7 +76,8 @@ def run_l1_process(run):
         update_header(run, l1_file)
 
         write_l1_file(l1_file)
-        # [TODO]: write output (PNG, etc.)
+        write_l1_intensity_image(l1_file)
+        write_l1_iquv_image(l1_file)
 
         del l1_file.data
 
