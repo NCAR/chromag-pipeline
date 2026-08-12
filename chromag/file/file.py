@@ -7,14 +7,14 @@ import os
 from astropy.io import fits
 import numpy as np
 
-from .config import get_basedir
-from .datetime import dateobs2datetime
+from ..config import get_basedir
+from ..datetime import dateobs2datetime
 
 # 20250813T215541.869Z.fits
 l0_basename_format = "{year:04d}{month:02d}{day:02d}T{hour:02d}{minute:02d}{second:02d}.{milliseconds}Z.fits"
 l1_basename_format = "{year:04d}{month:02d}{day:02d}T{hour:02d}{minute:02d}{second:02d}.{milliseconds}Z.chromag.l1.fits"
 
-with open(os.path.join(os.path.dirname(__file__), "header_template.txt"), "r") as f:
+with open(os.path.join(os.path.dirname(__file__), "l1_header_template.txt"), "r") as f:
     header_template = f.read()
 
 

@@ -8,7 +8,7 @@ import os
 from astropy.io import fits
 
 from .file import ChroMagL1File
-from .logging import logger
+from ..logging import logger
 
 
 def write_l1_file(l1_file: ChroMagL1File):
