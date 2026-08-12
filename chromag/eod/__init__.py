@@ -14,8 +14,8 @@ from ..logging import setup_logging, get_level
 
 from .inventory import run_inventory, Catalog
 from ..calibration import make_calibration
-from .l1_process import run_l1_process
-from .l2_process import run_l2_process
+from .level1 import run_l1_process
+from .level2 import run_l2_process
 
 # set umask for process: rwxrwxr-x for directories, rw-rw-r--- for files
 os.umask(0o002)

@@ -1,8 +1,8 @@
 SIMPLE  =                    T / image conforms to FITS standard
 BITPIX  =                  -32 / 16-bit two's complement binary integer
 NAXIS   =                    3
-NAXIS1  =                 2560 / [pixels] width
-NAXIS2  =                 2160 / [pixels] height
+NAXIS1  =                 2560 / [pixels] image width
+NAXIS2  =                 2160 / [pixels] image height
 NAXIS3  =                    4 / polarization states: I, Q, U, V
 EXTEND  =                    T / may contain conforming extensions
 COMMENT --- Basic info ---
