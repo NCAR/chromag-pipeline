@@ -124,6 +124,7 @@ class ChroMagL1File:
         raw_file.l1_file = self
 
         self.observing_day = raw_file.observing_day
+        self.date_obs = raw_file.date_obs
 
         self.wavelength = raw_file.wavelength
         self.wave_region = raw_file.wave_region
