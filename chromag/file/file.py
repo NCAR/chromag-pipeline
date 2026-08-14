@@ -79,15 +79,18 @@ class ChroMagRawFile:
                 primary_header["OBJECT"] if "OBJECT" in primary_header else None
             )
 
+    @property
     def is_dark(self):
         return self.datatype == "Calibration" and self.object == "Dark"
 
+    @property
     def is_flat(self):
         # TODO: is this the right way to tell if a file is a flat?
         return self.datatype == "Calibration" and self.object == "Diffuser"
 
+    @property
     def is_science(self):
-        return self.datatype == "Science"
+        return self.datatype == "Scientific"
 
     def __str__(self):
         if self.wavelength is None:

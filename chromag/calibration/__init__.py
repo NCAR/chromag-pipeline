@@ -37,7 +37,7 @@ class Calibration:
         self.add_catalog(catalog)
 
     def add_catalog(self, catalog):
-        self.dark_files = [f for f in catalog if f.is_dark()]
+        self.dark_files = [f for f in catalog if f.is_dark]
 
         dark_images = np.array([np.mean(d.data, axis=0) for d in self.dark_files])
         dark_exposures = np.array([d.exposure for d in self.dark_files])
@@ -78,7 +78,7 @@ class Calibration:
         for f in self.dark_files:
             del f.data
 
-        self.flat_files = [f for f in catalog if f.is_flat()]
+        self.flat_files = [f for f in catalog if f.is_flat]
         self.flat_images = [f.data for f in self.flat_files]
         self.flat_exposures = np.array([d.exposure for d in self.flat_files])
         self.flat_wavelengths = np.array([d.wavelength for d in self.flat_files])

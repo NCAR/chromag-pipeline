@@ -7,15 +7,16 @@ import datetime
 import logging
 import os
 
-from ..config import read_config, get_option
-from ..datetime import human_timedelta
-from ..pipeline import Run
-from ..logging import setup_logging, get_level
-
 from .inventory import run_inventory, Catalog
-from ..calibration import make_calibration
 from .level1 import process as process_l1
 from .level2 import process as process_l2
+
+from .. import __version__
+from ..calibration import make_calibration
+from ..config import read_config, get_option
+from ..datetime import human_timedelta
+from ..logging import setup_logging, get_level
+from ..pipeline import Run
 
 
 # set umask for process: rwxrwxr-x for directories, rw-rw-r--- for files
@@ -51,7 +52,7 @@ def run(observing_day: str, config_filename: str):
     if cal_dir is not None:
         if not os.path.isdir(cal_dir):
             os.mkdir(cal_dir)
-        cal_basename = f"{observing_day}.chromag.calibration.nc"
+        cal_basename = f"{observing_day}.chromag.calibration.{__version__}.nc"
         cal_filename = os.path.join(cal_dir, cal_basename)
         date_run.calibration.save_file(cal_filename)
         logger.info(f"wrote {cal_basename}")
