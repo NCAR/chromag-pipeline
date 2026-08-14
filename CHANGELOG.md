@@ -9,9 +9,10 @@ The format is based on [Keep a Changelog] and this project adheres to
 
 ### Added
 
-- Grouping like darks together.
-- Dark correction.
+- Make an averaged dark to apply to science images.
+- Apply dark correction to science images.
 - Create database tables.
+- Create intensity quicklooks.
 
 ## [0.0.1]
 

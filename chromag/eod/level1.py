@@ -46,6 +46,7 @@ def process(run):
 
     # loop through science files and perform the following steps:
     for raw_file in run.catalog[run.catalog.is_science]:
+        # [TODO]: darks are getting through here
         run.logger.info(f"processing {raw_file.basename}")
 
         l1_file = ChroMagL1File(raw_file)
