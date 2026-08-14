@@ -7,13 +7,9 @@ import datetime
 from .. import __version__
 from .. import __revision__
 from ..datetime import datetime2dateobs
+from ..display import write_intensity_image, write_iquv_image
 from ..pipeline import step
-from ..file import (
-    ChroMagL1File,
-    write_l1_file,
-    write_l1_intensity_image,
-    write_l1_iquv_image,
-)
+from ..file import ChroMagL1File, write_l1_file
 
 
 @step()
@@ -77,8 +73,8 @@ def process(run):
         update_header(run, l1_file)
 
         write_l1_file(l1_file)
-        write_l1_intensity_image(l1_file)
-        write_l1_iquv_image(l1_file)
+        write_intensity_image(l1_file)
+        write_iquv_image(l1_file)
 
         del l1_file.data
 
