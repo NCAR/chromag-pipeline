@@ -12,7 +12,7 @@ from .inventory import run_inventory, Catalog
 from .level1 import process as process_l1
 from .level2 import process as process_l2
 
-from .. import __version__
+from .. import __version__, __revision__
 from ..archive import archive_l0, archive_l1, archive_l2
 from ..calibration import make_calibration
 from ..config import read_config, get_option
@@ -44,6 +44,7 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
     date_run = Run(observing_day, "eod", logger)
 
     logger.info(f"starting pipeline on {observing_day}...")
+    logger.info(f"pipeline version {__version__} [{__revision__}]")
     start_dt = datetime.datetime.now()
 
     if reprocessing:
