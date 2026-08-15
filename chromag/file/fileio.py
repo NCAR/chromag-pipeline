@@ -41,7 +41,7 @@ def make_tarball(tarball_filename: str, basedir: str, directory: str):
     `basedir`) to the directory to tar.
     """
     tarball_basename = tarball_filename.removesuffix(".tar.gz")
-    shutil.make_archive(
+    return shutil.make_archive(
         tarball_basename, "gztar", basedir, directory, True, False, None, None, logger
     )
 
