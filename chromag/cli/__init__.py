@@ -8,6 +8,7 @@ import argparse
 from .. import __version__
 from .. import __revision__
 
+from .archive import add_archive_subcommand
 from .cat import add_cat_subcommand
 from .createdb import add_createdb_subcommand
 from .eod import add_eod_subcommand
@@ -33,7 +34,7 @@ def main():
 
     subparsers = parser.add_subparsers(help="sub-command help")
 
-    # helpers: cat, list, ls, log, versions
+    # helpers: cat, createdb, list, ls, log, versions
     add_cat_subcommand(subparsers)
     add_createdb_subcommand(subparsers)
     add_log_subcommand(subparsers)
@@ -43,6 +44,7 @@ def main():
     add_eod_subcommand(subparsers)
 
     # clearday, archive
+    add_archive_subcommand(subparsers)
 
     # testing: regress, simulate, validate
 
