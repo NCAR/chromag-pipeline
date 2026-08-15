@@ -33,7 +33,6 @@ def step():
                     time_interval = end_dt - start_dt
                     human_time = human_timedelta(time_interval)
                     logger.info(f"done with {func.__name__}: {human_time}", extra=e)
-                    logger.handlers[0].flush()
                 return value
 
         return func_wrapper
