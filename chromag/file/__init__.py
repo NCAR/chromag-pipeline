@@ -3,4 +3,4 @@
 """Handle files ChroMag files."""
 
 from .file import ChroMagRawFile, ChroMagL1File
-from .fileio import write_l1_file, create_dir
+from .fileio import write_l1_file, create_dir, make_tarball, make_tarlist

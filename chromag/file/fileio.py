@@ -4,6 +4,8 @@
 
 import grp
 import os
+import shutil
+import tarfile
 
 from astropy.io import fits
 
@@ -32,3 +34,25 @@ def create_dir(dir: str):
     os.mkdir(dir)
     gid = grp.getgrnam("cordyn").gr_gid
     os.chown(dir, -1, gid)
+
+
+def make_tarball(tarball_filename: str, basedir: str, directory: str):
+    """Make a tarball of the given name. `directory` is the path (relative to
+    `basedir`) to the directory to tar.
+    """
+    tarball_basename = tarball_filename.removesuffix(".tar.gz")
+    shutil.make_archive(
+        tarball_basename, "gztar", basedir, directory, True, False, None, None, logger
+    )
+
+
+def make_tarlist(tar_filename: str, tarlist_filename: str):
+    """Write a tarlist for the given tar file. Assumes all the files are in a
+    directory, so eliminates the directory entry and the directory name in the
+    path of the other entries.
+    """
+    with tarfile.open(tar_filename) as f:
+        names = f.getnames()
+    with open(tarlist_filename, "w") as f:
+        for n in names[1:]:  # assume first entry is the directory name
+            f.write(f"{os.path.basename(n)}\n")
