@@ -41,9 +41,10 @@ def process(run):
     run.logger.info("L1 processing...")
 
     # loop through science files and perform the following steps:
-    for raw_file in run.catalog[run.catalog.is_science]:
-        # [TODO]: darks are getting through here
-        run.logger.info(f"processing {raw_file.basename}")
+    science_files = run.catalog[run.catalog.is_science]
+    n_science_files = len(science_files)
+    for i, raw_file in enumerate(science_files):
+        run.logger.info(f"processing {i}/{n_science_files}: {raw_file.basename}")
 
         l1_file = ChroMagL1File(raw_file)
 
