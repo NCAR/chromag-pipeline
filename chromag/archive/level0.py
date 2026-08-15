@@ -29,7 +29,9 @@ def archive_l0(run):
     tarball_filename = os.path.join(l0_dir, tarball_basename)
 
     try:
-        make_tarball(tarball_filename, raw_basedir, run.observing_day)
+        tarball_filename = make_tarball(
+            tarball_filename, raw_basedir, run.observing_day
+        )
     except Exception as e:
         logger.error(f"error creating level 0 tarball: {e}")
         return
@@ -45,5 +47,9 @@ def archive_l0(run):
         if not os.path.isdir(gateway_dir):
             create_dir(gateway_dir)
 
-        os.symlink(tarball_filename, os.path.join(gateway_dir, tarball_basename))
+        gateway_filename = os.path.join(gateway_dir, tarball_basename)
+        if os.path.islink(gateway_filename):
+            os.remove(gateway_filename)
+
+        os.symlink(tarball_filename, gateway_filename)
         logger.info("sent level 0 tarball to archive via gateway")
