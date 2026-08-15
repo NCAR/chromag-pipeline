@@ -103,7 +103,7 @@ def setup_logging(
         handler = logging.FileHandler(filename)
         logger.addHandler(handler)
 
-    fmt = "%(asctime)s %(funcName)s: %(levelname)s %(message)s"
+    fmt = "%(asctime)s %(funcName)s: %(levelname)s: %(message)s"
     formatter = WrappedFormatter(fmt, datefmt=DATE_FORMAT)
     handler.setFormatter(formatter)
 
