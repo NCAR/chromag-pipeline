@@ -12,7 +12,8 @@ The format is based on [Keep a Changelog] and this project adheres to
 - Make an averaged dark to apply to science images.
 - Apply dark correction to science images.
 - Create database tables.
-- Create intensity quicklooks.
+- Create intensity and IQUV quicklooks.
+- Create archive level 0 tarball.
 
 ## [0.0.1]
 
