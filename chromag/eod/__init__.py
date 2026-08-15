@@ -7,11 +7,13 @@ import datetime
 import logging
 import os
 
+from .clearday import clearday
 from .inventory import run_inventory, Catalog
 from .level1 import process as process_l1
 from .level2 import process as process_l2
 
 from .. import __version__
+from ..archive import archive_l0, archive_l1, archive_l2
 from ..calibration import make_calibration
 from ..config import read_config, get_option
 from ..datetime import human_timedelta
@@ -23,7 +25,7 @@ from ..pipeline import Run
 os.umask(0o002)
 
 
-def run(observing_day: str, config_filename: str):
+def run(observing_day: str, config_filename: str, reprocessing: bool = False):
     """Run the end-of-day processing."""
     read_config(config_filename)
 
@@ -44,6 +46,9 @@ def run(observing_day: str, config_filename: str):
     logger.info(f"starting pipeline on {observing_day}...")
     start_dt = datetime.datetime.now()
 
+    if reprocessing:
+        clearday(date_run)
+
     date_run.catalog = run_inventory(date_run, skip=False)
 
     date_run.calibration = make_calibration(date_run.catalog)
@@ -61,6 +66,11 @@ def run(observing_day: str, config_filename: str):
 
     process_l1(date_run, skip=not get_option("level1", "process"))
     process_l2(date_run, skip=not get_option("level2", "process"))
+
+    if not reprocessing:
+        archive_l0(date_run)
+    archive_l1(date_run)
+    archive_l2(date_run)
 
     end_dt = datetime.datetime.now()
     time_interval = end_dt - start_dt
