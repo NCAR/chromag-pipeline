@@ -23,6 +23,17 @@ LEVELS = {
 DATE_FORMAT = "%Y%m%d.%H%M%S"
 
 
+class FileHandler(logging.FileHandler):
+    def flush(self):
+        if self.stream and hasattr(self.stream, "flush"):
+            self.stream.flush()
+
+    def emit(self, record):
+        super().emit(record)
+        self.flush()
+        os.fsync(self.stream.fileno())
+
+
 def rotate_logs(basename: str, max_version: Optional[int] = None):
     """Rotate logs to allow a new log to be written as basename. If
     max_version is given, delete logs with given basename and versions
@@ -100,7 +111,7 @@ def setup_logging(
         handler = logging.StreamHandler()
         logger.addHandler(handler)
     else:
-        handler = logging.FileHandler(filename)
+        handler = FileHandler(filename)
         logger.addHandler(handler)
 
     fmt = "%(asctime)s %(funcName)s: %(levelname)s: %(message)s"
