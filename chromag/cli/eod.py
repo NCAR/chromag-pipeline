@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Create and handle end-of-day (eod) sub-command.
+"""Create and handle end-of-day (eod) and reprocess sub-commands.
 """
 
 import os
@@ -47,15 +47,13 @@ def process_reprocess(args):
 
 
 def add_eod_subcommand(subparsers):
-    """Add end-of-day (eod) subcommand to the argparse subparsers."""
+    """Add end-of-day (eod) and reprocess subcommands to the argparse subparsers."""
     parser = subparsers.add_parser(
-        "end-of-day", aliases=["eod"], help="run end-of-day pipeline"
+        "end-of-day", aliases=["eod"], help="run end-of-day pipeline on the given dates"
     )
     add_run_arguments(parser)
     parser.set_defaults(func=process_eod, parser=parser)
 
-    parser = subparsers.add_parser(
-        "reprocess", help="clear output for day and run end-of-day pipeline"
-    )
+    parser = subparsers.add_parser("reprocess", help="reprocess the given dates")
     add_run_arguments(parser)
     parser.set_defaults(func=process_reprocess, parser=parser)

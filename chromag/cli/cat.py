@@ -52,7 +52,9 @@ def cat_subcommand(args):
 
 def add_cat_subcommand(subparsers):
     """Add cat subcommand to the argparse subparsers."""
-    cat_parser = subparsers.add_parser("cat", help="display file header")
+    cat_parser = subparsers.add_parser(
+        "cat", help="display file header of the given ChroMag FITS file"
+    )
     cat_parser.add_argument(
         "files", nargs="+", default=".", help="ChroMag files(s)", metavar="file(s)"
     )

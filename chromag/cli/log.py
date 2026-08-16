@@ -139,7 +139,8 @@ def log_subcommand(args):
 def add_log_subcommand(subparsers):
     """Add log subcommand to the argparse subparsers."""
     log_parser = subparsers.add_parser(
-        "log", help="display, and optionally filter, log output"
+        "log",
+        help="display, and optionally filter, log output from the ChroMag pipeline",
     )
     log_parser.add_argument(
         "logfiles", nargs="+", help="UCoMP log filename or date", metavar="logfile"

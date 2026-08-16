@@ -184,7 +184,7 @@ def ls_subcommand(args):
 def add_ls_subcommand(subparsers):
     """Add ls subcommand to the argparse subparsers."""
     ls_parser = subparsers.add_parser(
-        "ls", help="list files with extra ChroMag-specific info"
+        "ls", help="list ChroMag files with extra ChroMag-specific info"
     )
     ls_parser.add_argument(
         "files", nargs="*", default=".", help="ChroMag files(s)", metavar="file(s)"
