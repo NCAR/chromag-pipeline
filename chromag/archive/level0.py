@@ -28,6 +28,7 @@ def archive_l0(run):
     tarball_basename = f"{run.observing_day}.chromag.l0.tar.gz"
     tarball_filename = os.path.join(l0_dir, tarball_basename)
 
+    logger.info("creating level 0 tarball...")
     try:
         tarball_filename = make_tarball(
             tarball_filename, raw_basedir, run.observing_day
