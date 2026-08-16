@@ -152,6 +152,13 @@ def write_iquv_image(l1_file: ChroMagL1File):
         )
         if p == 0:
             ax.text(left_pad, line_height, "MLSO ChroMag", color="w", fontsize=fontsize)
+            ax.text(
+                left_pad,
+                2 * line_height,
+                f"{ionization} {l1_file.wavelength:0.3f} nm",
+                color="w",
+                fontsize=fontsize,
+            )
         if abs(display_exp - 1.0) < 0.001:
             state_text = sname
             scaling_text = (
