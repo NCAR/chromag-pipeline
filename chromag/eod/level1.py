@@ -44,7 +44,7 @@ def process(run):
     science_files = run.catalog[run.catalog.is_science]
     n_science_files = len(science_files)
     for i, raw_file in enumerate(science_files):
-        run.logger.info(f"processing {i}/{n_science_files}: {raw_file.basename}")
+        run.logger.info(f"processing {i+1}/{n_science_files}: {raw_file.basename}")
 
         l1_file = ChroMagL1File(raw_file)
 
