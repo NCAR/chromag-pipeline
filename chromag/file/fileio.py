@@ -54,5 +54,5 @@ def make_tarlist(tar_filename: str, tarlist_filename: str):
     with tarfile.open(tar_filename) as f:
         names = f.getnames()
     with open(tarlist_filename, "w") as f:
-        for n in names[1:]:  # assume first entry is the directory name
-            f.write(f"{os.path.basename(n)}\n")
+        for n in names:
+            f.write(f"{n}\n")
