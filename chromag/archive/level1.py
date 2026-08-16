@@ -10,8 +10,10 @@ from .. import __version__
 from ..config import get_option, get_basedir
 from ..file import create_dir, make_tarball, make_tarlist
 from ..logging import logger
+from ..pipeline import step
 
 
+@step()
 def archive_l1(run):
     """Create level 1 archive tarball from the files in the level1/ directory."""
     process_basedir = get_basedir(run.observing_day, "process")

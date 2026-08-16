@@ -9,8 +9,10 @@ import os
 from ..config import get_option, get_basedir
 from ..file import create_dir, make_tarball, make_tarlist
 from ..logging import logger
+from ..pipeline import step
 
 
+@step()
 def archive_l0(run):
     """Create level 0 archive tarball. Use the level 0 files in the raw
     directory, but produce a .tar.gz file in the level0/ directory of the
