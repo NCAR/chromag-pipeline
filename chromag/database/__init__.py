@@ -11,6 +11,8 @@ import os
 import mysql
 import mysql.connector
 
+from .clearday import clearday
+
 from .. import __version__
 from .. import __revision__
 from ..logging import logger
