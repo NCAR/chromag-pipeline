@@ -11,9 +11,10 @@ The format is based on [Keep a Changelog] and this project adheres to
 
 - Make an averaged dark to apply to science images.
 - Apply dark correction to science images.
-- Create database tables.
+- Create database tables (and createdb CLI subcommand)..
 - Create intensity and IQUV quicklooks.
-- Create archive level 0 tarball.
+- Create archive level 0 and 1 tarballs (and archive CLI subcommand).
+- Add reprocess and clearday CLI subcommands.
 
 ## [0.0.1]
 
