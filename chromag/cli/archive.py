@@ -61,7 +61,7 @@ def handle_archive(args):
 def add_archive_subcommand(subparsers):
     """Add archive subcommand to the argparse subparsers."""
     archive_parser = subparsers.add_parser(
-        "archive", help="archive data of a given level and date"
+        "archive", help="archive data of the given level and dates"
     )
     add_run_arguments(archive_parser)  # -f and dates
     archive_parser.add_argument(
