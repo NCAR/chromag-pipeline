@@ -6,6 +6,7 @@ import datetime
 
 from .. import __version__
 from .. import __revision__
+from ..config import get_basedir
 from ..datetime import datetime2dateobs
 from ..display import write_intensity_image, write_iquv_image
 from ..pipeline import step
@@ -36,7 +37,12 @@ def process(run):
     """Run the level 1 processing."""
 
     # [TODO]: need to do this by wave region?
-    # [TODO]: flush the logging FileHandler periodically
+
+    process_basedir = get_basedir(run.observing_day, "process")
+    l1_dir = os.path.join(process_basedir, run.observing_day, "level1")
+    if not os.path.isdir(l1_dir):
+        create_dir(l1_dir)
+        logger.info("created level1 directory")
 
     run.logger.info("L1 processing...")
 
