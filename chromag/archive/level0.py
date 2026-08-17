@@ -18,6 +18,10 @@ def archive_l0(run):
     directory, but produce a .tar.gz file in the level0/ directory of the
     process directory.
     """
+    if not get_option("raw", "archive"):
+        logger.info("skipping archiving raw data")
+        return
+
     raw_basedir = get_basedir(run.observing_day, "raw")
     raw_dir = os.path.join(raw_basedir, run.observing_day)
 
