@@ -43,7 +43,7 @@ def process(run):
     process_basedir = get_basedir(run.observing_day, "process")
     l1_dir = os.path.join(process_basedir, run.observing_day, "level1")
     if not os.path.isdir(l1_dir):
-        create_dir(l1_dir)
+        create_dir(l1_dir, basepath=process_basedir)
         logger.info("created level1 directory")
 
     logger.info("L1 processing...")

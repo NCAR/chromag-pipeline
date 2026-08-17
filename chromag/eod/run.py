@@ -16,7 +16,6 @@ from ..archive import archive_l0, archive_l1, archive_l2
 from ..calibration import make_calibration
 from ..config import read_config, get_option
 from ..datetime import human_timedelta
-from ..file import create_dir
 from ..logging import setup_logging, get_level
 from ..pipeline import Run
 

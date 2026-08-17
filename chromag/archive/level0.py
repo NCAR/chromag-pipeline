@@ -29,7 +29,7 @@ def archive_l0(run):
     l0_dir = os.path.join(process_basedir, run.observing_day, "level0")
     if not os.path.isdir(l0_dir):
         logger.info("creating level0 directory")
-        create_dir(l0_dir)
+        create_dir(l0_dir, basepath=process_basedir)
 
     tarball_basename = f"{run.observing_day}.chromag.l0.tar.gz"
     tarball_filename = os.path.join(l0_dir, tarball_basename)
