@@ -11,8 +11,9 @@ The format is based on [Keep a Changelog] and this project adheres to
 
 - Make an averaged dark to apply to science images.
 - Apply dark correction to science images.
-- Create database tables (and createdb CLI subcommand)..
+- Write level 1 FITS file.
 - Create intensity and IQUV quicklooks.
+- Create database tables (and createdb CLI subcommand).
 - Create archive level 0 and 1 tarballs (and archive CLI subcommand).
 - Add reprocess and clearday CLI subcommands.
 
@@ -22,7 +23,7 @@ The format is based on [Keep a Changelog] and this project adheres to
 
 - Basic infrastructure of the pipeline.
 - Create inventory files for a date's raw observation files.
-- `chromag` command line tool.
+- Create `chromag` command line tool.
 - Create plots of data in housekeeping CSV files.
 
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
