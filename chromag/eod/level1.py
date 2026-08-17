@@ -3,6 +3,7 @@
 """Module containing the level 1 processing."""
 
 import datetime
+import os
 
 from .. import __version__
 from .. import __revision__
@@ -10,7 +11,8 @@ from ..config import get_basedir
 from ..datetime import datetime2dateobs
 from ..display import write_intensity_image, write_iquv_image
 from ..pipeline import step
-from ..file import ChroMagL1File, write_l1_file
+from ..file import ChroMagL1File, write_l1_file, create_dir
+from ..logging import logger
 
 
 @step()
@@ -44,13 +46,13 @@ def process(run):
         create_dir(l1_dir)
         logger.info("created level1 directory")
 
-    run.logger.info("L1 processing...")
+    logger.info("L1 processing...")
 
     # loop through science files and perform the following steps:
     science_files = run.catalog[run.catalog.is_science]
     n_science_files = len(science_files)
     for i, raw_file in enumerate(science_files):
-        run.logger.info(f"processing {i+1}/{n_science_files}: {raw_file.basename}")
+        logger.info(f"processing {i+1}/{n_science_files}: {raw_file.basename}")
 
         l1_file = ChroMagL1File(raw_file)
 
