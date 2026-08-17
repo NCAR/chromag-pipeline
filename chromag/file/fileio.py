@@ -31,6 +31,7 @@ def write_l1_file(l1_file: ChroMagL1File):
 
 def create_dir(dir: str):
     """Create directory, making sure is in the cordyn group."""
+    logger.info(f"creating {dir}...")
     os.mkdir(dir)
     gid = grp.getgrnam("cordyn").gr_gid
     os.chown(dir, -1, gid)
