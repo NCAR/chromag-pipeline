@@ -2,6 +2,11 @@
 
 """Module containing the level 2 processing."""
 
+import os
+
+from ..config import get_basedir
+from ..file import create_dir
+from ..logging import logger
 from ..pipeline import step
 
 
@@ -14,4 +19,4 @@ def process(run):
         create_dir(l2_dir)
         logger.info("created level2 directory")
 
-    run.logger.info("L2 processing...")
+    logger.info("L2 processing...")
