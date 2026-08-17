@@ -22,8 +22,7 @@ def print_help(args):
     args.parser.print_help()
 
 
-def main():
-    """Entry point for chromag command-line interface (CLI)."""
+def setup():
     name = f"ChroMag pipeline {__version__} [{__revision__}]"
     parser = argparse.ArgumentParser(description=name)
 
@@ -51,8 +50,18 @@ def main():
     # etc: script
 
     # parse args and call appropriate sub-command
-    args = parser.parse_args()
-    if parser.get_default("func"):
-        args.func(args)
-    else:
-        parser.print_help()
+    return parser
+
+
+def main():
+    """Entry point for chromag command-line interface (CLI)."""
+    try:
+        parser = setup()
+
+        args = parser.parse_args()
+        if parser.get_default("func"):
+            args.func(args)
+        else:
+            parser.print_help()
+    except KeyboardInterrupt as e:
+        print()
