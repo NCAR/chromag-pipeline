@@ -20,8 +20,11 @@ def clearday(run):
 
     process_basedir = get_basedir(run.observing_day, "process")
     process_dir = os.path.join(process_basedir, run.observing_day)
-    logger.info(f"removing process directory {run.observing_day}/...")
-    shutil.rmtree(process_dir)
+    if os.path.isdir(process_dir):
+        logger.info(f"removing process directory {run.observing_day}/...")
+        shutil.rmtree(process_dir)
+    else:
+        logger.info("process directory already cleared")
 
     # [TODO]: implement
     #  - clear database tables
