@@ -12,13 +12,12 @@ import numpy as np
 from ..config import get_basedir
 from ..datetime import dateobs2datetime
 
-# 20250813T215541.869Z.fits
-l0_basename_format = "{year:04d}{month:02d}{day:02d}T{hour:02d}{minute:02d}{second:02d}.{milliseconds}Z.fits"
-l1_basename_format = "{year:04d}{month:02d}{day:02d}T{hour:02d}{minute:02d}{second:02d}.{milliseconds}Z.chromag.l1.fits"
 
+# read the level 1 header template
 with open(os.path.join(os.path.dirname(__file__), "l1_header_template.txt"), "r") as f:
     l1_header_template = f.read()
 
+# read the formats for the keywords present in the raw header
 cp = configparser.ConfigParser()
 cp.read(os.path.join(os.path.dirname(__file__), "keyword_formats.cfg"))
 keyword_formats = {k.upper(): cp.get("formats", k) for k in cp.options("formats")}
@@ -139,8 +138,11 @@ class ChroMagL1File:
         self._data = None
 
     def get_filename(self, name: str, intermediate_step: str | None = None):
+        """Get a filename related to the file, e.g., "filename" for the level 1
+        FITS file, "i_quicklook", "iquv_quicklook", or "intermediate".
+        """
         process_basedir = get_basedir(self.observing_day, "process")
-        l1_dir = os.path.join(process_basedir, self.observing_day, "level1")
+        output_dir = os.path.join(process_basedir, self.observing_day, "level1")
 
         prefix = self.raw_file.basename.removesuffix(".fits")
 
@@ -151,13 +153,16 @@ class ChroMagL1File:
         elif name == "iquv_quicklook":
             basename = f"{prefix}.chromag.l1.iquv.png"
         elif name == "intermediate":
-            l1_dir = os.path.join(l1_dir, intermediate_step)
+            output_dir = os.path.join(output_dir, intermediate_step)
             basename = f"{prefix}.chromag.l1.{intermediate_step}.fits"
 
-        return os.path.join(l1_dir, basename)
+        return os.path.join(output_dir, basename)
 
     @property
     def data(self):
+        """Retrieve the NumPy ndarray representing the data, reading the file
+        if neccessary.
+        """
         if self._data is None:
             with fits.open(self.raw_file.filename) as f:
                 self._data = f[0].data.astype(np.float32)
@@ -166,10 +171,12 @@ class ChroMagL1File:
 
     @data.setter
     def data(self, im: np.ndarray):
+        """Set the data of the file, for example, after a processing step."""
         self._data = im
 
     @data.deleter
     def data(self):
+        """Free the memory of the data."""
         del self._data
 
 
@@ -178,8 +185,8 @@ _orig_format_value = Card._format_value
 
 
 class FormattedFloat(float):
-    """Subclass float, adding a `fmt` attribute to specify how to format it,
-    where `fmt` is an f-string format specifier.
+    """Subclass float, adding a `fmt` attribute to specify how to format the
+    float, where `fmt` is an f-string format specifier.
     """
 
     def __new__(cls, value, fmt):
