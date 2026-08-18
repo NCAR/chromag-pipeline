@@ -58,3 +58,5 @@ def archive_l2(run):
 
         os.symlink(tarball_filename, gateway_filename)
         logger.info("sent level 2 tarball to archive via gateway")
+    else:
+        logger.warn("no archive gateway set, not sending to archive")
