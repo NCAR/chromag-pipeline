@@ -138,7 +138,7 @@ class ChroMagL1File:
 
         self._data = None
 
-    def get_filename(self, name: str):
+    def get_filename(self, name: str, intermediate_step: str | None = None):
         process_basedir = get_basedir(self.observing_day, "process")
         l1_dir = os.path.join(process_basedir, self.observing_day, "level1")
 
@@ -150,6 +150,9 @@ class ChroMagL1File:
             basename = f"{prefix}.chromag.l1.i.png"
         elif name == "iquv_quicklook":
             basename = f"{prefix}.chromag.l1.iquv.png"
+        elif name == "intermediate":
+            l1_dir = os.path.join(l1_dir, intermediate_step)
+            basename = f"{prefix}.chromag.l1.{intermediate_step}.fits"
 
         return os.path.join(l1_dir, basename)
 

@@ -7,6 +7,9 @@ import os
 import shutil
 import tarfile
 
+from astropy.io import fits
+import numpy as np
+
 from ..logging import logger
 
 
@@ -45,3 +48,10 @@ def make_tarlist(tar_filename: str, tarlist_filename: str):
     with open(tarlist_filename, "w") as f:
         for n in names:
             f.write(f"{n}\n")
+
+
+def write_fits_file(output_filename: str, data: np.ndarray, primary_header):
+    """Write a FITS file with only a primary extension."""
+    hdu = fits.PrimaryHDU(data=data)
+    hdu.header = primary_header
+    hdu.writeto(output_filename, overwrite=True)

@@ -7,7 +7,7 @@ import os
 from astropy.io import fits
 
 from .file import ChroMagL1File
-from .fileio import create_dir
+from .fileio import create_dir, write_fits_file
 
 from ..logging import logger
 
@@ -19,9 +19,24 @@ def write_l1_file(l1_file: ChroMagL1File):
     if not os.path.isdir(l1_dir):
         create_dir(l1_dir, basepath=l1_dir)
 
-    hdu = fits.PrimaryHDU(data=l1_file.data)
-    hdu.header = l1_file.primary_header
-    hdu.writeto(output_filename, overwrite=True)
+    write_fits_file(output_filename, l1_file.data, l1_file.primary_header)
+
+    output_basename = os.path.basename(output_filename)
+    logger.debug(f"wrote {output_basename}")
+
+
+def write_l1_intermediate(l1_file: ChroMagL1File, name: str):
+    """Write a partially processed level 1 file. The `name` argument indicates
+    which step of the processing was last completed.
+    """
+    logger.debug(f"writing {name} intermediate product")
+
+    output_filename = l1_file.get_filename("intermediate", intermediate_step=name)
+    intermediate_dir = os.path.dirname(output_filename)
+    if not os.path.isdir(intermediate_dir):
+        create_dir(intermediate_dir, basepath=os.path.dirname(intermediate_dir))
+
+    write_fits_file(output_filename, l1_file.data, l1_file.primary_header)
 
     output_basename = os.path.basename(output_filename)
     logger.debug(f"wrote {output_basename}")

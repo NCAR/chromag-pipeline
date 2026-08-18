@@ -9,7 +9,7 @@ import logging
 
 from .calibration import Calibration
 from .datetime import human_timedelta
-
+from .file import write_l1_intermediate
 from .logging import logger, null_logger_func
 
 
@@ -22,7 +22,12 @@ def step(top=False):
 
     def actual_decorator(func):
         @functools.wraps(func)
-        def func_wrapper(*args, skip: bool = False, **kwargs):
+        def func_wrapper(
+            *args,
+            skip: bool = False,
+            intermediate: bool = False,
+            **kwargs,
+        ):
             e = {"func": func}
             if logger is None:
                 logger_func = null_logger_func
@@ -37,6 +42,8 @@ def step(top=False):
                 start_dt = datetime.datetime.now()
 
                 value = func(*args, **kwargs)
+                if intermediate:
+                    write_l1_intermediate(args[1], func.__name__)
 
                 end_dt = datetime.datetime.now()
                 time_interval = end_dt - start_dt

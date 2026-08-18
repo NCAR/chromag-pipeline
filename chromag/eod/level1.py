@@ -7,7 +7,7 @@ import os
 
 from .. import __version__
 from .. import __revision__
-from ..config import get_basedir
+from ..config import get_basedir, get_option
 from ..datetime import datetime2dateobs
 from ..display import write_intensity_image, write_iquv_image
 from ..pipeline import step
@@ -44,7 +44,6 @@ def process(run):
     l1_dir = os.path.join(process_basedir, run.observing_day, "level1")
     if not os.path.isdir(l1_dir):
         create_dir(l1_dir, basepath=process_basedir)
-        logger.info("created level1 directory")
 
     logger.info("L1 processing...")
 
@@ -63,7 +62,9 @@ def process(run):
 
         # apply camera corrections, i.e., hot pixels, etc.
 
-        dark_correct(run, l1_file)
+        dark_correct(
+            run, l1_file, intermediate=get_option("intermediate", "dark_correction")
+        )
 
         # apply gain
 
