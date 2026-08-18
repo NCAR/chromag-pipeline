@@ -36,7 +36,7 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
         log_filename, level=level, rotate=rotate, max_version=max_version
     )
 
-    date_run = Run(observing_day, "eod", logger)
+    date_run = Run(observing_day, "eod")
 
     logger.info(f"starting pipeline on {observing_day}...")
     logger.info(f"pipeline version {__version__} [{__revision__}]")

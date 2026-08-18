@@ -22,7 +22,7 @@ def create_dir(dir: str, /, *, basepath: str = None):
     os.mkdir(dir)
     gid = grp.getgrnam("cordyn").gr_gid
     os.chown(dir, -1, gid)
-    logger.info(f"created ~~~{dirname}")
+    logger.debug(f"created ~~~{dirname}")
 
 
 def make_tarball(tarball_filename: str, basedir: str, directory: str):

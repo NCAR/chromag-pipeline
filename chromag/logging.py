@@ -1,6 +1,27 @@
 # -*- coding: utf-8 -*-
 
 """Module containing helper functions for logging.
+
+Notes about which logging level to use:
+
+  - Use CRITICAL only when the pipeline is crashing.
+  - Use ERROR for reporting on problems with the pipeline, e.g., the database
+    was unreachable, a file couldn't be deleted/read/written, or some other
+    internal infrastructure problem.
+  - Use WARN for reporting on conditions that are unexpected, a problem in the
+    data.
+  - Use INFO for top-level steps of the pipeline.
+  - Use DEBUG for anything else.
+  - The overall principle is that if you filter on INFO messages that you
+    should get a basic idea of what is happening and the big problems should
+    stand out with higher level messages. Read the full log to get the details
+    about a single operations.
+
+A note on style:
+
+  - Use "..." at the end of messages that are starting a process, e.g.,
+    "processing f...", while messages like "processed f" after the process has
+    been completed.
 """
 
 import glob
@@ -23,7 +44,18 @@ LEVELS = {
 DATE_FORMAT = "%Y%m%d.%H%M%S"
 
 
+def null_logger_func(msg, **extra):
+    """Function that takes the same arguments as logger.info, etc., but does
+    nothing.
+    """
+    pass
+
+
 class FileHandler(logging.FileHandler):
+    """A subclass of the standard logging FileHandler that makes sure to write
+    each log message to disk before moving on.
+    """
+
     def flush(self):
         if self.stream and hasattr(self.stream, "flush"):
             self.stream.flush()

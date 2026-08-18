@@ -19,7 +19,6 @@ def write_intensity_image(l1_file: ChroMagL1File):
     output_filename = l1_file.get_filename("i_quicklook")
     l1_dir = os.path.dirname(output_filename)
     if not os.path.isdir(l1_dir):
-        logger.info("creating level1 directory...")
         create_dir(l1_dir, basepath=l1_dir)
 
     imdata = l1_file.data[0, :, :].squeeze()
@@ -94,7 +93,7 @@ def write_intensity_image(l1_file: ChroMagL1File):
     plt.close(fig)
 
     output_basename = os.path.basename(output_filename)
-    logger.info(f"wrote {output_basename}...")
+    logger.debug(f"wrote {output_basename}")
 
 
 def write_iquv_image(l1_file: ChroMagL1File):
@@ -102,7 +101,6 @@ def write_iquv_image(l1_file: ChroMagL1File):
     output_filename = l1_file.get_filename("iquv_quicklook")
     l1_dir = os.path.dirname(output_filename)
     if not os.path.isdir(l1_dir):
-        logger.info("creating level1 directory...")
         create_dir(l1_dir, basepath=l1_dir)
 
     state_name = ["I", "Q", "U", "V"]
@@ -186,4 +184,4 @@ def write_iquv_image(l1_file: ChroMagL1File):
     plt.close(fig)
 
     output_basename = os.path.basename(output_filename)
-    logger.info(f"wrote {output_basename}...")
+    logger.debug(f"wrote {output_basename}")

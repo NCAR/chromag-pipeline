@@ -34,7 +34,7 @@ def update_header(run, l1_file: ChroMagL1File):
     l1_file.primary_header["DPSWID"] = f"{__version__} [{__revision__}]"
 
 
-@step()
+@step("top")
 def process(run):
     """Run the level 1 processing."""
 
@@ -52,7 +52,7 @@ def process(run):
     science_files = run.catalog[run.catalog.is_science]
     n_science_files = len(science_files)
     for i, raw_file in enumerate(science_files):
-        logger.info(f"processing {i+1}/{n_science_files}: {raw_file.basename}")
+        logger.info(f"processing {i+1}/{n_science_files}: {raw_file.basename}...")
 
         l1_file = ChroMagL1File(raw_file)
 

@@ -9,6 +9,7 @@ import numpy as np
 
 from ..config import get_basedir
 from ..file import ChroMagRawFile
+from ..logging import logger
 from ..pipeline import step
 from ..string_helpers import truncate as truncate_string
 
@@ -90,11 +91,11 @@ def run_inventory(run):
 
     for f in filenames:  # pylint: disable=invalid-name
         file = ChroMagRawFile(f, run.observing_day)
-        run.logger.debug(str(file))
+        logger.debug(str(file))
         catalog.add_file(file)
 
-    run.logger.info(f"created catalog with {catalog.n_files} files")
-    run.logger.info("writing inventory files...")
+    logger.info(f"created catalog with {catalog.n_files} files")
+    logger.info("writing inventory files...")
 
     process_dir = get_basedir(run.observing_day, "process")
     if not os.path.isdir(process_dir):

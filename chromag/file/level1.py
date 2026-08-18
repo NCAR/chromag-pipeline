@@ -17,7 +17,6 @@ def write_l1_file(l1_file: ChroMagL1File):
     output_filename = l1_file.get_filename("filename")
     l1_dir = os.path.dirname(output_filename)
     if not os.path.isdir(l1_dir):
-        logger.info("creating level1 directory")
         create_dir(l1_dir, basepath=l1_dir)
 
     hdu = fits.PrimaryHDU(data=l1_file.data)
@@ -25,4 +24,4 @@ def write_l1_file(l1_file: ChroMagL1File):
     hdu.writeto(output_filename, overwrite=True)
 
     output_basename = os.path.basename(output_filename)
-    logger.info(f"wrote {output_basename}...")
+    logger.debug(f"wrote {output_basename}")

@@ -10,29 +10,38 @@ import logging
 from .calibration import Calibration
 from .datetime import human_timedelta
 
+from .logging import logger, null_logger_func
 
-logger = logging.getLogger("ChroMag")
 
+def step(top=False):
+    """Function for decorating pipeline steps that logs basic information about
+    the step, e.g., start it started/ended, how long it took. The `top`
+    argument indicates whether it is a top-level step, with an INFO logging
+    level, or not, with a DEBUG logging level.
+    """
 
-def step():
     def actual_decorator(func):
         @functools.wraps(func)
         def func_wrapper(*args, skip: bool = False, **kwargs):
             e = {"func": func}
+            if logger is None:
+                logger_func = null_logger_func
+            else:
+                logger_func = logger.info if top else logger.debug
 
             if skip:
-                if logger:
-                    logger.info(f"skipping {func.__name__}", extra=e)
+                logger_func(f"skipping {func.__name__}", extra=e)
+                return None
             else:
-                if logger:
-                    logger.info(f"starting {func.__name__}", extra=e)
-                    start_dt = datetime.datetime.now()
+                logger_func(f"starting {func.__name__}", extra=e)
+                start_dt = datetime.datetime.now()
+
                 value = func(*args, **kwargs)
-                if logger:
-                    end_dt = datetime.datetime.now()
-                    time_interval = end_dt - start_dt
-                    human_time = human_timedelta(time_interval)
-                    logger.info(f"done with {func.__name__}: {human_time}", extra=e)
+
+                end_dt = datetime.datetime.now()
+                time_interval = end_dt - start_dt
+                human_time = human_timedelta(time_interval)
+                logger_func(f"done with {func.__name__}: {human_time}", extra=e)
                 return value
 
         return func_wrapper
@@ -41,10 +50,11 @@ def step():
 
 
 class Run:
-    def __init__(self, observing_day: str, mode: str, logger: logging.Logger):
+    """A class representing a pipeline run on a given observing day."""
+
+    def __init__(self, observing_day: str, mode: str):
         self.observing_day = observing_day
         self.mode = mode
-        self.logger = logger
         self._catalog = None
         self._calibration = None
 
