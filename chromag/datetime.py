@@ -47,3 +47,10 @@ def datetime2dateobs(dt: datetime.datetime, no_milliseconds=False) -> str:
         return dt.isoformat(sep="T", timespec="seconds")
     else:
         return dt.isoformat(sep="T", timespec="milliseconds")
+
+
+def short2hyphenated(short_date: str):
+    """Convert a "short date", like "20240409", to a hyphenated date, like
+    "2024-04-9".
+    """
+    return f"{short_date[0:4]}-{short_date[4:6]}-{short_date[6:8]}"
