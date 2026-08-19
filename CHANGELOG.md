@@ -14,8 +14,9 @@ The format is based on [Keep a Changelog] and this project adheres to
 - Write level 1 FITS file.
 - Create intensity and IQUV quicklooks.
 - Create database tables (and createdb CLI subcommand).
-- Create archive level 0 and 1 tarballs (and archive CLI subcommand).
+- Create archive level 0, 1, and 2 tarballs (and archive CLI subcommand).
 - Add reprocess and clearday CLI subcommands.
+- Add ability to save intermediate FITS file after each processing step.
 
 ## [0.0.1]
 
