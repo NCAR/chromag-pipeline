@@ -10,7 +10,7 @@ from ..logging import logger
 from ..pipeline import step
 
 
-@step("top")
+@step(top=True)
 def process(run):
     """Run the level 2 processing."""
     process_basedir = get_basedir(run.observing_day, "process")

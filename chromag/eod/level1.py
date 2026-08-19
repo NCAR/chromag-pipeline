@@ -43,7 +43,7 @@ def update_header(run, l1_file: ChroMagL1File):
     l1_file.primary_header["CALFILE"] = cal_basename
 
 
-@step("top")
+@step(top=True)
 def process(run):
     """Run the level 1 processing."""
 
