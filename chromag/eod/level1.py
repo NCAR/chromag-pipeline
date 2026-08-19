@@ -18,20 +18,29 @@ from ..logging import logger
 @step()
 def dark_correct(run, l1_file: ChroMagL1File):
     """Apply dark subtraction to raw data."""
-    # get averaged dark of same exposure time
+
+    # get averaged dark of matching exposure time to science image
     dark = run.calibration.get_dark(l1_file.exposure)
-    for i in range(4):
+    # [TODO]: return the dark index along with the dark above
+    dark_index = 0
+
+    dims = l1_file.data.shape
+    for i in range(dims[0]):
         l1_file.data[i, :, :] -= dark.squeeze()
 
     # update header
     l1_file.primary_header["DARK_COR"] = True
-    # [TODO]: which dark(s) used?
+    l1_file.primary_header["DARKUSED"] = dark_index
 
 
 @step()
 def update_header(run, l1_file: ChroMagL1File):
     l1_file.primary_header["DATE_DP"] = datetime2dateobs(datetime.datetime.now())
     l1_file.primary_header["DPSWID"] = f"{__version__} [{__revision__}]"
+
+    # [TODO]: should really get this from the calibration object
+    cal_basename = f"{run.observing_day}.chromag.calibration.{__version__}.nc"
+    l1_file.primary_header["CALFILE"] = cal_basename
 
 
 @step("top")
