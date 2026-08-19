@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
-"""Handle configuration options."""
+"""Handle configuration options.
+
+chromag.config.spec.cfg defines the specification of the valid configuration
+files. It defines all the options to be set by the user of the pipeline, e.g.,
+where to look for the raw data, where to put the processed data, options on
+how particular steps should run, etc.
+
+In particular, `get_option` and `get_basedir` will be needed by many other
+sections of the pipeline.
+"""
 
 import configparser
 import fnmatch
