@@ -53,12 +53,14 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
     if cal_dir is not None:
         if not os.path.isdir(cal_dir):
             os.mkdir(cal_dir)
+
+        # [TODO]: should save this filename in the calibration object
         cal_basename = f"{observing_day}.chromag.calibration.{__version__}.nc"
         cal_filename = os.path.join(cal_dir, cal_basename)
         date_run.calibration.save_file(cal_filename)
         logger.info(f"wrote {cal_basename}")
     else:
-        logger.info("process/caldir not set, not writing cal file")
+        logger.warn("process/caldir not set, not writing cal file")
 
     process_l1(date_run, skip=not get_option("level1", "process"))
     process_l2(date_run, skip=not get_option("level2", "process"))
