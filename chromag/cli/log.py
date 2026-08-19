@@ -4,16 +4,29 @@
 """ Create and handle log sub-command.
 """
 
+import collections
 import datetime
 import glob
 import os
 import re
 import time
 
+import rich
+
 from ..logging import DATE_FORMAT as LOG_DATE_FORMAT
 
 POLL_SECS = 0.1
 LEVELS = ["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"]
+
+
+def print_bold(text: str):
+    rich.print(f"[bold magenta]{text}[/]")
+    # rich.print(f"[bold red]{text}[/]")
+
+
+def bold(text: str):
+    return f"[bold magenta]{text}[/]"
+    # return f"[bold red]{text}[/]"
 
 
 def prune_logfiles(files, max_version):
@@ -44,17 +57,23 @@ def begins_with_date(line, fmt):
         return False
 
 
-def filter_file(logfile, level_index, follow):
+def filter_file(logfile, level_index, follow, tail, error_writer):
     """Filter a given log file at the given level (DEBUG, INFO, WARN, ERROR,
     or CRITICAL). Optionally, "follow" the log file, i.e., continuously
     wait for new lines to be added to the log file and filter them.
     """
     loglevel_filter = "|".join(LEVELS[level_index:])
     loglevel_prog = re.compile(f".*({loglevel_filter}):.*")
+    logstart_prog = re.compile(r"(\[\d+\] )?\d{8}.\d{6}")
+    exact_loglevel_prog = re.compile(f".*{LEVELS[level_index]}:.*")
 
     matched_last_line = False
+    exact_matched_last_line = False
 
     line = "not empty"
+
+    if tail is not None:
+        queue = collections.deque(maxlen=tail)
 
     try:
         with open(logfile, "r") as f:
@@ -70,8 +89,20 @@ def filter_file(logfile, level_index, follow):
 
                     if loglevel_prog.match(line):
                         matched_last_line = True
+                        exact_matched_last_line = (
+                            True if exact_loglevel_prog.match(line) else False
+                        )
                         try:
-                            print(line.rstrip())
+                            if tail is None:
+                                if exact_matched_last_line:
+                                    print(line.rstrip())
+                                else:
+                                    print_bold(line.rstrip())
+                            else:
+                                if exact_matched_last_line:
+                                    queue.append(line.rstrip())
+                                else:
+                                    queue.append(bold(line.rstrip()))
                         except IOError:
                             return
                     else:
@@ -80,13 +111,24 @@ def filter_file(logfile, level_index, follow):
                                 matched_last_line = False
                             else:
                                 try:
-                                    print(line.rstrip())
+                                    if tail is None:
+                                        print(line.rstrip())
+                                    else:
+                                        queue.append(line.rstrip())
                                 except IOError:
                                     return
             except KeyboardInterrupt:
+                print()
                 return
     except IOError:
-        print("Problem reading %s" % logfile)
+        error_writer("Problem reading %s" % logfile)
+
+    if tail is not None:
+        for line in queue:
+            if line.startswith("["):
+                rich.print(line)
+            else:
+                print(line)
 
 
 def log_subcommand(args):
@@ -99,8 +141,7 @@ def log_subcommand(args):
 
     follow = args.follow
     if follow and len(args.logfiles) > 1:
-        print("cannot follow multiple files")
-        return
+        args.parser.error("cannot follow multiple files")
 
     if args.prune is not None:
         prune_logfiles(args.logfiles, int(args.prune))
@@ -123,9 +164,7 @@ def log_subcommand(args):
     try:
         level_index = LEVELS.index(level)
     except ValueError:
-        print(f"invalid level: {level}")
-        args.parser.print_help()
-        return
+        args.parser.error(f"invalid level: {level}")
 
     for i, f in enumerate(args.logfiles):
         if len(args.logfiles) > 1:
@@ -133,7 +172,7 @@ def log_subcommand(args):
                 print("")
             print(f)
             print("-" * len(f))
-        filter_file(f, level_index, follow)
+        filter_file(f, level_index, follow, args.tail, args.parser.error)
 
 
 def add_log_subcommand(subparsers):
@@ -151,6 +190,13 @@ def add_log_subcommand(subparsers):
     log_parser.add_argument("-p", "--prune", help=prune_help, metavar="MAX_VERSION")
     log_parser.add_argument(
         "-f", "--follow", help="output appended data as file grows", action="store_true"
+    )
+    log_parser.add_argument(
+        "-t",
+        "--tail",
+        type=int,
+        metavar="N",
+        help="show the last N lines of the log at the otherwise given level",
     )
     log_parser.add_argument(
         "-d", "--debug", help="DEBUG filter level", action="store_true"
