@@ -43,7 +43,7 @@ def handle_clearday(args):
         logger = setup_logging(
             log_filename, level=log_level, rotate=rotate, max_version=max_version
         )
-        date_run = Run(d, "eod", logger)
+        date_run = Run(d, "eod")
         logger.info(f"clearing results for on {d}...")
         logger.info(f"pipeline version {__version__} [{__revision__}]")
         start_dt = datetime.datetime.now()
