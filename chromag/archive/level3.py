@@ -1,0 +1,55 @@
+# -*- coding: utf-8 -*-
+
+"""Routines for archiving ChroMag level 0 data, i.e., sending data to cold
+storage.
+"""
+
+
+@step()
+def archive_l3(run):
+    """Create level 3 archive tarball from the files in the level3/ directory."""
+    if not get_option("level3", "archive"):
+        logger.info("skipping archiving level 3 data")
+        return
+
+    process_basedir = get_basedir(run.observing_day, "process")
+    l3_dir = os.path.join(process_basedir, run.observing_day, "level3")
+    if not os.path.isdir(l3_dir):
+        logger.warn("no level3/ directory to archive")
+        return
+
+    tarball_basename = f"{run.observing_day}.chromag.l3.{__version__}.tar.gz"
+    tarball_filename = os.path.join(l3_dir, tarball_basename)
+
+    # [TODO]: should it be limited to only certain files? maybe use
+    # tarfile.TarFile.add() to individually add files.
+    logger.info("creating level 3 tarball...")
+    try:
+        tarball_filename = make_tarball(
+            tarball_filename,
+            process_basedir,
+            os.path.join(run.observing_day, "level3"),
+        )
+    except Exception as e:
+        logger.error(f"error creating level 3 tarball: {e}")
+        return
+    logger.info("created level 3 tarball")
+
+    tarlist_basename = f"{run.observing_day}.chromag.l3.{__version__}.tarlist"
+    tarlist_filename = os.path.join(l3_dir, tarlist_basename)
+    make_tarlist(tarball_filename, tarlist_filename)
+    logger.info("created level 3 tarlist")
+
+    gateway_dir = get_option("archive", "gateway_dir")
+    if gateway_dir is not None:
+        if not os.path.isdir(gateway_dir):
+            create_dir(gateway_dir)
+
+        gateway_filename = os.path.join(gateway_dir, tarball_basename)
+        if os.path.islink(gateway_filename):
+            os.remove(gateway_filename)
+
+        os.symlink(tarball_filename, gateway_filename)
+        logger.info("sent level 3 tarball to archive via gateway")
+    else:
+        logger.warn("no archive gateway set, not sending to archive")
