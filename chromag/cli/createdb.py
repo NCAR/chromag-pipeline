@@ -7,7 +7,7 @@ from configparser import NoSectionError
 import os
 
 from ..config import read_config, get_option
-from ..database import initialize_tables, DatabaseConnectionError
+from ..database import initialize_tables, DatabaseError
 from ..logging import setup_logging, get_level
 
 
@@ -37,7 +37,7 @@ def process_createdb(args):
             args.parser.error(f"file {config_filename} not found")
         except NoSectionError as e:
             args.parser.error(f"section {config_section} not found in config file")
-        except DatabaseConnectionError as e:
+        except DatabaseError as e:
             args.parser.error(e)
 
 

@@ -6,7 +6,7 @@ import os
 import shutil
 
 from ..config import get_basedir
-from ..database import clearday as db_clearday
+from ..database import DatabaseError, clearday as db_clearday
 from ..logging import logger
 from ..pipeline import step
 from ..publish import clearday_l1
@@ -29,7 +29,11 @@ def clearday(run):
         logger.info("process directory already cleared")
 
     # clear database
-    db_clearday(run)
+    try:
+        db_clearday(run)
+    except DatabaseError as e:
+        logger.error("error clearing database...")
+        logger.error(e)
 
     # clear web directories
     clearday_l1(run)

@@ -15,6 +15,7 @@ from .. import __version__, __revision__
 from ..archive import archive_l0, archive_l1, archive_l2
 from ..calibration import make_calibration
 from ..config import read_config, get_option
+from ..database import DatabaseError
 from ..datetime import human_timedelta
 from ..logging import setup_logging, get_level
 from ..pipeline import Run
@@ -43,7 +44,11 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
     start_dt = datetime.datetime.now()
 
     if reprocessing:
-        clearday(date_run)
+        try:
+            clearday(date_run)
+        except DatabaseError as e:
+            logger.error("error clearing database...")
+            logger.error(e)
 
     date_run.catalog = run_inventory(date_run, skip=False)
 

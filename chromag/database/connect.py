@@ -7,12 +7,7 @@ import configparser
 import errno
 import os
 
-import mysql
 import mysql.connector
-
-
-class DatabaseConnectionError(Exception):
-    """Exception to indicate a problem connecting to the database."""
 
 
 def get_db_info(config_filename: str, config_section: str):

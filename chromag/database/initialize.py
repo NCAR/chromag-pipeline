@@ -3,11 +3,13 @@
 """Utilities for initializing the database.
 """
 
+from contextlib import closing
+
 import mysql
 import mysql.connector
 import os
 
-from . import DatabaseConnectionError, get_connection
+from . import DatabaseError, get_connection
 
 from ..logging import logger
 
@@ -40,23 +42,19 @@ def create_table(cursor: mysql.connector.cursor_cext.CMySQLCursor, table_name: s
 
 def initialize_tables(config_filename: str, config_section: str):
     """Delete any existing tables and then re-create new tables."""
+
     try:
-        connection = get_connection(config_filename, config_section)
-        cursor = connection.cursor()
-    except mysql.connector.errors.DatabaseError as e:
-        raise DatabaseConnectionError(e.msg)
-
-    logger.info(f"connected to database")
-
-    for t in reversed(TABLE_NAMES):
-        delete_table(cursor, t)
-        logger.info(f"deleted {t} database table")
-
-    for t in TABLE_NAMES:
-        create_table(cursor, t)
-        logger.info(f"created {t} database table")
-
-    cursor.close()
-    connection.close()
+        with closing(get_connection(config_filename, config_section)) as connection:
+            logger.info(f"connected to database")
+            with closing(connection.cursor()) as cursor:
+                for t in reversed(TABLE_NAMES):
+                    delete_table(cursor, t)
+                    logger.info(f"deleted {t} database table")
+                for t in TABLE_NAMES:
+                    create_table(cursor, t)
+                    logger.info(f"created {t} database table")
+            connection.commit()
+    except mysql.connector.errors.Error as e:
+        raise DatabaseError(e.msg)
 
     logger.info("closed database connection")
