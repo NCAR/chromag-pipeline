@@ -7,7 +7,7 @@ storage.
 import os
 
 from .. import __version__
-from ..config import get_option
+from ..config import get_option, get_basedir
 from ..logging import logger
 from ..pipeline import step
 
