@@ -147,14 +147,16 @@ class ChroMagL1File:
         prefix = self.raw_file.basename.removesuffix(".fits")
 
         if name == "filename":
-            basename = f"{prefix}.chromag.l1.fits"
+            basename = f"{prefix}.chromag.{self.wave_region}.l1.fits"
         elif name == "i_quicklook":
-            basename = f"{prefix}.chromag.l1.i.png"
+            basename = f"{prefix}.chromag.{self.wave_region}.l1.i.png"
         elif name == "iquv_quicklook":
-            basename = f"{prefix}.chromag.l1.iquv.png"
+            basename = f"{prefix}.chromag.{self.wave_region}.l1.iquv.png"
         elif name == "intermediate":
             output_dir = os.path.join(output_dir, intermediate_step)
-            basename = f"{prefix}.chromag.l1.{intermediate_step}.fits"
+            basename = (
+                f"{prefix}.chromag.{self.wave_region}.l1.{intermediate_step}.fits"
+            )
 
         return os.path.join(output_dir, basename)
 
