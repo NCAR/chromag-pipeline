@@ -18,7 +18,7 @@ def notify_eod(date_run):
     notification."""
     send_notifications = get_option("notifications", "send")
     if not send_notifications:
-        logger.info("skipping sending notification")
+        logger.info("skipped sending notification")
         return False
 
     to = get_option("notifications", "email")
