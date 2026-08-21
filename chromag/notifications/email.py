@@ -18,7 +18,7 @@ def send_email(to_email: str, subject: str, body_text: str):
     user = os.path.split(userhome)[-1]
     hostname = socket.gethostname()
 
-    body_text += "\n\nSent from ChroMag pipeline {__version__} [{__revision__}] by {user}@{hostname}"
+    body_text += f"\n\nSent from ChroMag pipeline {__version__} [{__revision__}] by {user}@{hostname}"
 
     msg = MIMEText(body_text)
     msg["Subject"] = subject
