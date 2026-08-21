@@ -18,6 +18,7 @@ from ..config import read_config, get_option
 from ..database import DatabaseError
 from ..datetime import human_timedelta
 from ..logging import setup_logging, get_level
+from ..notifications import notify_eod
 from ..pipeline import Run
 
 
@@ -26,7 +27,6 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
     read_config(config_filename)
 
     log_basedir = get_option("logging", "basedir")
-
     log_filename = os.path.join(log_basedir, f"{observing_day}.chromag.eod.log")
 
     level = get_level(get_option("logging", "level"))
@@ -74,6 +74,8 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
         archive_l0(date_run)
     archive_l1(date_run)
     archive_l2(date_run)
+
+    notify_eod(date_run)
 
     end_dt = datetime.datetime.now()
     time_interval = end_dt - start_dt
