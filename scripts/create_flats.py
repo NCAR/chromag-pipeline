@@ -105,36 +105,46 @@ def create_flats(start_datetime: datetime.datetime, exptime: float, numflats: in
         
         # if kll, four flats will be generated with the above function call
         if kll_flag: 
+            known_offsets = ['upper right', 'upper left', 'lower left', 'lower right']
             for j in range(4): 
-                new_dt = (start_datetime + datetime.timedelta(seconds=5*idx)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+'Z'
+                
+                # flat should have something in the header about if kll and offset?
+                primary_header['OFFSET'] = 'True'
+
+                new_dt = (start_datetime + datetime.timedelta(seconds=5*idx)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
+                new_fn = (start_datetime + datetime.timedelta(seconds=5*idx)).strftime("%Y%m%dT%H%M%S.%f")[:-3]+"Z"
                 primary_header['DATE-OBS'] = new_dt
                 primary_hdu = fits.PrimaryHDU(data=observations[j], header=primary_header)
                 hdu1 = fits.ImageHDU(true_flat, name='true flat')
                 hdu2 = fits.ImageHDU(offsets[j], name='offset')
                 hdul = fits.HDUList([primary_hdu, hdu1, hdu2])
-                
+    
                 # filename = datetime in utc including ms 
                 outdir = path + new_dt[:10].replace("-", "") + '/'
                 if not os.path.exists(outdir):
                     os.makedirs(outdir)
-                filename = new_dt+'.fts'
+                filename = new_fn+'.fits'
                 hdul.writeto(outdir+filename, overwrite=True)
                 print(f'saving {outdir+filename}')
                 idx += 1 
                 
         else: 
-            new_dt = (start_datetime + datetime.timedelta(seconds=5*idx)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+'Z'
+            # flat should have something in the header specifying it isn't kll
+            primary_header['OFFSET'] = 'False'
+
+            new_dt = (start_datetime + datetime.timedelta(seconds=5*idx)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
+            new_fn = (start_datetime + datetime.timedelta(seconds=5*idx)).strftime("%Y%m%dT%H%M%S.%f")[:-3]+"Z"
             primary_header['DATE-OBS'] = new_dt
             primary_hdu = fits.PrimaryHDU(data=observations[0], header=primary_header)
             hdu1 = fits.ImageHDU(true_flat, name='true flat')
             hdu2 = fits.ImageHDU(offsets[0], name='offset')
             hdul = fits.HDUList([primary_hdu, hdu1, hdu2])
-            
+           
             # filename = datetime in utc including ms 
             outdir = path + new_dt[:10].replace("-", "") + '/'
             if not os.path.exists(outdir):
                 os.makedirs(outdir)
-            filename = new_dt+'.fts'
+            filename = new_fn+'.fits'
             hdul.writeto(outdir+filename, overwrite=True)
             print(f'saving {outdir+filename}')
             idx += 1 

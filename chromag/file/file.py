@@ -78,6 +78,12 @@ class ChroMagRawFile:
                 primary_header["OBJECT"] if "OBJECT" in primary_header else None
             )
 
+            # adding this 8/21 as synthetic flats have option in header called OFFSET
+            # which can be "True" or "False", assuming now we do not know the offset 
+            self.offset = (
+                primary_header["OFFSET"] if "OFFSET" in primary_header else None
+            ) 
+
     @property
     def is_dark(self):
         return self.datatype == "Calibration" and self.object == "Dark"
@@ -85,7 +91,12 @@ class ChroMagRawFile:
     @property
     def is_flat(self):
         # TODO: is this the right way to tell if a file is a flat?
-        return self.datatype == "Calibration" and self.object == "Diffuser"
+        return self.datatype == "Calibration" and self.object == "Diffuser" and self.offset == "False" 
+
+    @property
+    def is_kll_flat(self):
+        # TODO: is this the right way to tell if a file is a flat?
+        return self.datatype == "Calibration" and self.object == "Diffuser" and self.offset == "True" 
 
     @property
     def is_science(self):

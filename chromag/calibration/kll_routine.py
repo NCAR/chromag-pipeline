@@ -167,7 +167,8 @@ def get_flat(files, l=None, m=None, ndata_integ=1.0,
              object_param=None, c=None, maxiter=10, xr=None, yr=None, 
              shift_flag=0, minfrac=0.01, mask=None, silent=False):
     """
-    Produces flat patterns from displaced observations (without dark frames).
+    Produces flat patterns from displaced observations 
+    **NOTE**: this is currently without dark frames! 
     
     Parameters:
     -----------
@@ -240,13 +241,75 @@ def get_flat(files, l=None, m=None, ndata_integ=1.0,
 
 
 
-# then in main code, would want to call with a "known" or pretty well known offset
-# offset = signed x, y from center (or regular flat) 
-# then can call the kll procedure like: derived_flat, derived_sun, c, solved_x, solved_y = get_flat(
-#    files=observations,
-#    l=known_y,           # known offset if possible 
-#    m=known_x,         
-#    shift_flag=2,        
-#    maxiter=20,
-#    silent=True
-#) 
+# function for estimating offsets if we dont have them - really speeds up the kll algo 
+from scipy.ndimage import center_of_mass, gaussian_filter
+def estimate_offsets(observations, reference_idx=0):
+    """
+    Estimates large dither offsets (dy, dx) for solar/coronagraph beam flats.
+    
+    Parameters
+    ----------
+    observations : list of np.ndarray
+        The generated observation frames.
+    reference_idx : int
+        The index of the frame to serve as (0, 0) baseline.
+        
+    Returns
+    -------
+    relative_offsets : np.ndarray
+        Array of shape (N, 2) with estimated (dy, dx) offsets relative to reference_idx.
+    """
+    centroids = []
+    
+    for obs in observations:
+        # 1. Heavily smooth to remove true_flat spatial noise structure
+        smoothed = gaussian_filter(obs, sigma=20)
+        
+        # 2. Threshold top brightness (e.g., top 30% intensity range) 
+        # This isolates the beam center and prevents edge-truncation bias at image borders
+        v_min, v_max = smoothed.min(), smoothed.max()
+        threshold = v_min + 0.70 * (v_max - v_min)
+        
+        masked_beam = np.where(smoothed >= threshold, smoothed, 0.0)
+        
+        # 3. Compute center of mass (returns [y, x])
+        cy, cx = center_of_mass(masked_beam)
+        centroids.append([cy, cx])
+        
+    centroids = np.array(centroids)
+    
+    # Calculate offset relative to reference frame
+    # Note: If frame_i center is further down/right than ref, frame_i position shift is +
+    relative_offsets = centroids - centroids[reference_idx]
+    
+    return relative_offsets
+
+
+
+# then need a function to get offsets and return the flat field (i.e. call both pieces) 
+def flat_kll(observations): 
+    """
+    Function to: 
+    (1) estimate the offset from center of the frame for KLL flats 
+    (2) run the KLL algorithm to deduce the flat 
+
+    input: observations (list of the KLL flats)      
+    """ 
+    estimated_offsets = estimate_offsets(observations)
+    known_y = np.array([dy for dy, dx in estimated_offsets], dtype=np.float32)
+    known_x = np.array([dx for dy, dx in estimated_offsets], dtype=np.float32)
+
+    derived_flat, derived_sun, c, solved_x, solved_y = get_flat(
+        files=observations,
+        l=known_y,           # derived Y shifts
+        m=known_x,           # derived X shifts
+        shift_flag=2,        
+        maxiter=20,
+        silent=True 
+    )
+
+    return derived_flat, derived_sun 
+
+
+
+

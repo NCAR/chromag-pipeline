@@ -83,6 +83,12 @@ class Calibration:
         self.flat_exposures = np.array([d.exposure for d in self.flat_files])
         self.flat_wavelengths = np.array([d.wavelength for d in self.flat_files])
 
+        # also need to do kll flats, but will want to treat them differently? 
+        self.flat_kll_files = [f for f in catalog if f.is_kll_flat]
+        self.flat_kll_images = [f.data for f in self.flat_kll_files]
+        self.flat_kll_exposures = np.array([d.exposure for d in self.flat_kll_files])
+        self.flat_kll_wavelengths = np.array([d.wavelength for d in self.flat_kll_files])
+
         # [TODO]: consolidate flats by exposure time, camera gain, camera bit
         # depth, and camera temperature, then perform Kuhn-Lin to get a single
         # flat for each combination
