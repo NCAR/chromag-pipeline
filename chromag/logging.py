@@ -8,8 +8,8 @@ Notes about which logging level to use:
   - Use ERROR for reporting on problems with the pipeline, e.g., the database
     was unreachable, a file couldn't be deleted/read/written, or some other
     internal infrastructure problem.
-  - Use WARN for reporting on conditions that are unexpected, a problem in the
-    data.
+  - Use WARNING for reporting on conditions that are unexpected, a problem in
+    the data.
   - Use INFO for top-level steps of the pipeline.
   - Use DEBUG for anything else.
   - The overall principle is that if you filter on INFO messages that you
@@ -37,12 +37,11 @@ logger = logging.getLogger("ChroMag")
 LEVELS = {
     "CRITICAL": logging.CRITICAL,
     "ERROR": logging.ERROR,
-    "WARN": logging.WARN,
     "WARNING": logging.WARNING,
     "INFO": logging.INFO,
     "DEBUG": logging.DEBUG,
 }
-LEVEL_NAMES = ["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"]
+LEVEL_NAMES = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 DATE_FORMAT = "%Y%m%d.%H%M%S"
 
@@ -109,7 +108,7 @@ def get_level(level_name: str):
     """Convert a string name to a logging level constant value.
 
     level_name : str
-      case insensitive level name: CRITICAL, ERROR, WARN, WARNING, INFO, DEBUG
+      case insensitive level name: CRITICAL, ERROR, WARNING, INFO, DEBUG
     """
     return LEVELS[level_name.upper()]
 
@@ -172,7 +171,7 @@ def begins_with_date(line, fmt):
 
 
 def filter_log(logfile: str, level_index: int):
-    """Filter a given log file at the given level (DEBUG, INFO, WARN, ERROR,
+    """Filter a given log file at the given level (DEBUG, INFO, WARNING, ERROR,
     or CRITICAL).
     """
     loglevel_filter = "|".join(LEVEL_NAMES[level_index:])
@@ -196,6 +195,6 @@ def filter_log(logfile: str, level_index: int):
                         else:
                             results.append(line.rstrip())
     except IOError:
-        logger.warn("problem reading {logfile}")
+        logger.warning(f"problem reading {logfile}")
 
     return "\n".join(results)

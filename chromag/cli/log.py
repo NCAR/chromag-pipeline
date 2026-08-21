@@ -16,7 +16,7 @@ import rich
 from ..logging import DATE_FORMAT as LOG_DATE_FORMAT, begins_with_date
 
 POLL_SECS = 0.1
-LEVELS = ["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"]
+LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 
 def print_bold(text: str):
@@ -45,7 +45,7 @@ def prune_logfiles(files, max_version):
 
 
 def filter_file(logfile, level_index, follow, tail, error_writer):
-    """Filter a given log file at the given level (DEBUG, INFO, WARN, ERROR,
+    """Filter a given log file at the given level (DEBUG, INFO, WARNING, ERROR,
     or CRITICAL). Optionally, "follow" the log file, i.e., continuously
     wait for new lines to be added to the log file and filter them.
     """
@@ -142,7 +142,7 @@ def log_subcommand(args):
     elif args.error:
         level = "ERROR"
     elif args.warn:
-        level = "WARN"
+        level = "WARNING"
     elif args.info:
         level = "INFO"
     else:
@@ -171,7 +171,7 @@ def add_log_subcommand(subparsers):
     log_parser.add_argument(
         "logfiles", nargs="+", help="UCoMP log filename or date", metavar="logfile"
     )
-    level_help = "filter level: DEBUG INFO WARN ERROR CRITICAL (default DEBUG)"
+    level_help = "filter level: DEBUG INFO WARNING ERROR CRITICAL (default DEBUG)"
     log_parser.add_argument("-l", "--level", help=level_help)
     prune_help = "delete rotated logs with versions higher than MAX_VERSION"
     log_parser.add_argument("-p", "--prune", help=prune_help, metavar="MAX_VERSION")
@@ -192,7 +192,7 @@ def add_log_subcommand(subparsers):
         "-i", "--info", help="INFO filter level", action="store_true"
     )
     log_parser.add_argument(
-        "-w", "--warn", help="WARN filter level", action="store_true"
+        "-w", "--warn", "--warning", help="WARNING filter level", action="store_true"
     )
     log_parser.add_argument(
         "-e", "--error", help="ERROR filter level", action="store_true"
