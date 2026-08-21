@@ -8,6 +8,7 @@ import sys
 
 from .helper import add_run_arguments, split_dates
 from ..eod import run, clearday
+from ..logging import logger
 
 
 def process_eod(args):
@@ -25,7 +26,15 @@ def process_eod(args):
         sys.exit(1)
 
     for d in dates:
-        run(d, args.configuration_filename, reprocessing=False)
+        try:
+            run(d, args.configuration_filename, reprocessing=False)
+        except Exception as e:
+            logger.exception("uncaught exception in end")
+            logger.critical(e)
+            print(
+                "chromag eod: eod command failed, see log for details", file=sys.stderr
+            )
+            sys.exit(1)
 
 
 def process_reprocess(args):
@@ -43,7 +52,16 @@ def process_reprocess(args):
         sys.exit(1)
 
     for d in dates:
-        run(d, args.configuration_filename, reprocessing=True)
+        try:
+            run(d, args.configuration_filename, reprocessing=True)
+        except Exception as e:
+            logger.exception("uncaught exception in reprocess")
+            logger.critical(e)
+            print(
+                "chromag reprocess: reprocess command failed, see log for details",
+                file=sys.stderr,
+            )
+            sys.exit(1)
 
 
 def add_eod_subcommand(subparsers):

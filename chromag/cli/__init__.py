@@ -24,6 +24,7 @@ def print_help(args):
 
 def setup():
     name = f"ChroMag pipeline {__version__} [{__revision__}]"
+    # [TODO]: add suggest_on_error=True when we upgrade to Python 3.15
     parser = argparse.ArgumentParser(description=name)
 
     # top-level options
