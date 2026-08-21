@@ -13,7 +13,7 @@ import time
 
 import rich
 
-from ..logging import DATE_FORMAT as LOG_DATE_FORMAT
+from ..logging import DATE_FORMAT as LOG_DATE_FORMAT, begins_with_date
 
 POLL_SECS = 0.1
 LEVELS = ["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"]
@@ -42,19 +42,6 @@ def prune_logfiles(files, max_version):
                 if int(n) > max_version:
                     file_to_delete = f"{f}.{n}"
                     os.remove(file_to_delete)
-
-
-def begins_with_date(line, fmt):
-    """Determine if a line starts with a date of the given format."""
-    # use current date/time to determine the length of a date/time with the
-    # given format
-    dt_length = len(datetime.datetime.now().strftime(fmt))
-
-    try:
-        dt = datetime.datetime.strptime(line[0:dt_length], fmt)
-        return dt is not None
-    except ValueError:
-        return False
 
 
 def filter_file(logfile, level_index, follow, tail, error_writer):
