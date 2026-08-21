@@ -21,10 +21,11 @@ def notify_eod(date_run):
         logger.info("skipped sending notification")
         return False
 
-    to = get_option("notifications", "email")
+    to = get_option("notifications", "to")
     if to is None:
-        logger.warn("no email to notify set")
+        logger.warning("no email to notify set")
         return False
+    from_email = get_option("notifications", "from")
 
     date = short2hyphenated(date_run.observing_day)
     # [TODO]: add status (success, failure, incomplete, etc.) to subject?
@@ -44,7 +45,7 @@ def notify_eod(date_run):
         body = log_msgs
 
     # [TODO]: probably should make a timeline histogram like KCor/UCoMP have
-    send_email(to, subject, body)
+    send_email(to, from_email, subject, body)
     logger.info(f"sent eod notification to {to}")
 
     return True
