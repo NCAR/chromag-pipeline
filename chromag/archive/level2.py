@@ -22,7 +22,7 @@ def archive_l2(run):
     process_basedir = get_basedir(run.observing_day, "process")
     l2_dir = os.path.join(process_basedir, run.observing_day, "level2")
     if not os.path.isdir(l2_dir):
-        logger.warn("no level2/ directory to archive")
+        logger.warning("no level2/ directory to archive")
         return
 
     tarball_basename = f"{run.observing_day}.chromag.l2.{__version__}.tar.gz"
@@ -59,4 +59,4 @@ def archive_l2(run):
         os.symlink(tarball_filename, gateway_filename)
         logger.info("sent level 2 tarball to archive via gateway")
     else:
-        logger.warn("no archive gateway set, not sending to archive")
+        logger.warning("no archive gateway set, not sending to archive")
