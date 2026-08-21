@@ -16,7 +16,7 @@ from ..pipeline import step
 def archive_l2(run):
     """Create level 2 archive tarball from the files in the level2/ directory."""
     if not get_option("level2", "archive"):
-        logger.info("skipping archiving level 2 data")
+        logger.info("skipped archiving level 2 data")
         return
 
     process_basedir = get_basedir(run.observing_day, "process")

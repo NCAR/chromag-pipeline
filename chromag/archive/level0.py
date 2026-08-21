@@ -19,7 +19,7 @@ def archive_l0(run):
     process directory.
     """
     if not get_option("raw", "archive"):
-        logger.info("skipping archiving raw data")
+        logger.info("skipped archiving raw data")
         return
 
     raw_basedir = get_basedir(run.observing_day, "raw")
@@ -28,7 +28,6 @@ def archive_l0(run):
     process_basedir = get_basedir(run.observing_day, "process")
     l0_dir = os.path.join(process_basedir, run.observing_day, "level0")
     if not os.path.isdir(l0_dir):
-        logger.info("creating level0 directory")
         create_dir(l0_dir, basepath=process_basedir)
 
     tarball_basename = f"{run.observing_day}.chromag.l0.tar.gz"
