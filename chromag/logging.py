@@ -24,9 +24,11 @@ A note on style:
     been completed.
 """
 
+import datetime
 import glob
 import logging
 import os
+import re
 from typing import Optional
 
 
@@ -40,6 +42,7 @@ LEVELS = {
     "INFO": logging.INFO,
     "DEBUG": logging.DEBUG,
 }
+LEVEL_NAMES = ["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"]
 
 DATE_FORMAT = "%Y%m%d.%H%M%S"
 
@@ -153,3 +156,46 @@ def setup_logging(
     logger.setLevel(level)
 
     return logger
+
+
+def begins_with_date(line, fmt):
+    """Determine if a line starts with a date of the given format."""
+    # use current date/time to determine the length of a date/time with the
+    # given format
+    dt_length = len(datetime.datetime.now().strftime(fmt))
+
+    try:
+        dt = datetime.datetime.strptime(line[0:dt_length], fmt)
+        return dt is not None
+    except ValueError:
+        return False
+
+
+def filter_log(logfile: str, level_index: int):
+    """Filter a given log file at the given level (DEBUG, INFO, WARN, ERROR,
+    or CRITICAL).
+    """
+    loglevel_filter = "|".join(LEVEL_NAMES[level_index:])
+    loglevel_prog = re.compile(f".*({loglevel_filter}):.*")
+    logstart_prog = re.compile(r"(\[\d+\] )?\d{8}.\d{6}")
+
+    matched_last_line = False
+
+    results = []
+
+    try:
+        with open(logfile, "r") as f:
+            for line in f:
+                if loglevel_prog.match(line):
+                    matched_last_line = True
+                    results.append(line.rstrip())
+                else:
+                    if matched_last_line:
+                        if begins_with_date(line, DATE_FORMAT):
+                            matched_last_line = False
+                        else:
+                            results.append(line.rstrip())
+    except IOError:
+        logger.warn("problem reading {logfile}")
+
+    return "\n".join(results)
