@@ -22,7 +22,9 @@ def clear_table(
     with closing(connection.cursor()) as cursor:
         cmd = f"delete from {table_name} where obsday_id={obsday_id}"
         cursor.execute(cmd)
-        logger.info(f"{cursor.rowcount} rows deleted from {table_name}")
+        logger.info(
+            f"{cursor.rowcount} row{'s'[:cursor.rowcount^1]} deleted from {table_name}"
+        )
 
 
 def clearday(date_run):
