@@ -36,7 +36,12 @@ def notify_eod(date_run):
     log_filename = os.path.join(
         log_basedir, f"{date_run.observing_day}.chromag.eod.log"
     )
-    body = filter_log(log_filename, 2)  # logging.WARN = 2
+    log_msgs = filter_log(log_filename, 2)  # logging.WARN = 2
+
+    if log_msgs == "":
+        body = "No log messages WARN or above"
+    else:
+        body = log_msgs
 
     # [TODO]: probably should make a timeline histogram like KCor/UCoMP have
     send_email(to, subject, body)
