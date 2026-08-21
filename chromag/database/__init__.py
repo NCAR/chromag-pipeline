@@ -6,7 +6,7 @@
 import os
 
 from .connect import get_connection
-from .query import get_obsday_id
+from .update import get_obsday_id, get_sw_id
 
 
 class DatabaseError(Exception):
@@ -15,5 +15,6 @@ class DatabaseError(Exception):
 
 from .clearday import clearday
 from .initialize import initialize_tables
+from .insert import insert_files
 
 from ..logging import logger
