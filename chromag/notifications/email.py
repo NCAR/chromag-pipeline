@@ -18,12 +18,12 @@ def send_email(to_email: str, subject: str, body_text: str):
     user = os.path.split(userhome)[-1]
     hostname = socket.gethostname()
 
+    body_text += "\n\nSent from ChroMag pipeline {__version__} [{__revision__}] by {user}@{hostname}"
+
     msg = MIMEText(body_text)
     msg["Subject"] = subject
     msg["From"] = f"{user}@ucar.edu"
     msg["To"] = to_email
-
-    body_text += "\n\nSent from ChroMag pipeline {__version__} [{__revision__}] by {user}@{hostname}"
 
     with smtplib.SMTP("localhost") as s:
         try:
