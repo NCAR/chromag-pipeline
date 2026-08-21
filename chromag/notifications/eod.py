@@ -14,11 +14,23 @@ from ..logging import logger, filter_log
 
 
 def notify_eod(date_run):
-    """Send notification at end of day."""
-    to = "mgalloy@ucar.edu"
+    """Send notification at end of day. Returns whether it sent a
+    notification."""
+    send_notifications = get_option("notifications", "send")
+    if not send_notifications:
+        logger.info("skipping sending notification")
+        return False
+
+    to = get_option("notifications", "email")
+    if to is None:
+        logger.warn("no email to notify set")
+        return False
+
     date = short2hyphenated(date_run.observing_day)
     # [TODO]: add status (success, failure, incomplete, etc.) to subject?
     subject = f"ChroMag end-of-day processing for {date}"
+
+    # [TODO]: add run statistics
 
     log_basedir = get_option("logging", "basedir")
     log_filename = os.path.join(
@@ -26,7 +38,8 @@ def notify_eod(date_run):
     )
     body = filter_log(log_filename, 2)  # logging.WARN = 2
 
-    # [TODO]: add run statistics, error messages in log
     # [TODO]: probably should make a timeline histogram like KCor/UCoMP have
     send_email(to, subject, body)
     logger.info(f"sent eod notification to {to}")
+
+    return True
