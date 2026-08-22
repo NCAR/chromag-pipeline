@@ -17,6 +17,9 @@ The format is based on [Keep a Changelog] and this project adheres to
 - Create archive level 0, 1, and 2 tarballs (and archive CLI subcommand).
 - Add reprocess and clearday CLI subcommands.
 - Add ability to save intermediate FITS file after each processing step.
+- Add completion notification emails.
+- Update mlso_numfiles, chromag_sw, chromag_level0 database tables.
+- Publish level 1 data.
 
 ## [0.0.1]
 
