@@ -25,6 +25,7 @@ def clear_table(
         logger.info(
             f"{cursor.rowcount} row{'s'[:cursor.rowcount^1]} deleted from {table_name}"
         )
+    connection.commit()
 
 
 def clearday(date_run):
