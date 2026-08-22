@@ -54,3 +54,8 @@ def short2hyphenated(short_date: str):
     "2024-04-9".
     """
     return f"{short_date[0:4]}-{short_date[4:6]}-{short_date[6:8]}"
+
+
+def decompose_date(short_date: str):
+    """Decompose a short date "YYYYMMDD" into an array ["YYYY", "MM", "DD"]."""
+    return [short_date[0:4], short_date[4:6], short_date[6:8]]
