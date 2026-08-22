@@ -29,8 +29,7 @@ def process_eod(args):
         try:
             run(d, args.configuration_filename, reprocessing=False)
         except Exception as e:
-            logger.exception("uncaught exception in end")
-            logger.critical(e)
+            logger.critical(e, exc_info=True)
             print(
                 "chromag eod: eod command failed, see log for details", file=sys.stderr
             )
@@ -55,8 +54,7 @@ def process_reprocess(args):
         try:
             run(d, args.configuration_filename, reprocessing=True)
         except Exception as e:
-            logger.exception("uncaught exception in reprocess")
-            logger.critical(e)
+            logger.critical(e, exc_info=True)
             print(
                 "chromag reprocess: reprocess command failed, see log for details",
                 file=sys.stderr,
