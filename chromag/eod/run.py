@@ -3,6 +3,7 @@
 """Module defining the actions to perform in an eod run.
 """
 
+from collections import OrderedDict
 import datetime
 import os
 
@@ -13,13 +14,14 @@ from .inventory import run_inventory
 
 from .. import __version__, __revision__
 from ..archive import archive_l0, archive_l1, archive_l2
-from ..calibration import make_calibration
+from ..calibration import Calibration
 from ..config import read_config, get_option
-from ..database import DatabaseError
+from ..database import DatabaseError, insert_files
 from ..datetime import human_timedelta
 from ..logging import setup_logging, get_level
 from ..notifications import notify_eod
 from ..pipeline import Run
+from ..publish import publish_l1, publish_l2, publish_l3
 
 
 def run(observing_day: str, config_filename: str, reprocessing: bool = False):
@@ -41,6 +43,7 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
 
     logger.info(f"starting pipeline on {observing_day}...")
     logger.info(f"pipeline version {__version__} [{__revision__}]")
+
     start_dt = datetime.datetime.now()
 
     if reprocessing:
@@ -52,23 +55,33 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
 
     date_run.catalog = run_inventory(date_run, skip=False)
 
-    date_run.calibration = make_calibration(date_run.catalog)
+    date_run.calibration = Calibration(date_run.catalog)
 
     cal_dir = get_option("process", "caldir")
     if cal_dir is not None:
         if not os.path.isdir(cal_dir):
             os.mkdir(cal_dir)
 
-        # [TODO]: should save this filename in the calibration object
-        cal_basename = f"{observing_day}.chromag.calibration.{__version__}.nc"
+        cal_basename = date_run.calibration.basename
         cal_filename = os.path.join(cal_dir, cal_basename)
         date_run.calibration.save_file(cal_filename)
         logger.info(f"wrote {cal_basename}")
     else:
-        logger.warn("process/caldir not set, not writing cal file")
+        logger.warning("process/caldir not set, not writing cal file")
 
     process_l1(date_run, skip=not get_option("level1", "process"))
     process_l2(date_run, skip=not get_option("level2", "process"))
+
+    publish_levels = {"level1": publish_l1, "level2": publish_l2, "level3": publish_l3}
+    for level, publish_routine in publish_levels.items():
+        if get_option(level, "publish"):
+            publish_routine(date_run)
+
+    try:
+        insert_files(date_run, date_run.catalog)
+    except DatabaseError as e:
+        logger.error("error updating database...")
+        logger.error(e)
 
     if not reprocessing:
         archive_l0(date_run)
