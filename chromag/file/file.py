@@ -79,10 +79,10 @@ class ChroMagRawFile:
             )
 
             # adding this 8/21 as synthetic flats have option in header called OFFSET
-            # which can be "True" or "False", assuming now we do not know the offset 
+            # which can be "True" or "False", assuming now we do not know the offset
             self.offset = (
                 primary_header["OFFSET"] if "OFFSET" in primary_header else None
-            ) 
+            )
 
     @property
     def is_dark(self):
@@ -91,12 +91,20 @@ class ChroMagRawFile:
     @property
     def is_flat(self):
         # TODO: is this the right way to tell if a file is a flat?
-        return self.datatype == "Calibration" and self.object == "Diffuser" and self.offset == "False" 
+        return (
+            self.datatype == "Calibration"
+            and self.object == "Diffuser"
+            and self.offset == "False"
+        )
 
     @property
     def is_kll_flat(self):
         # TODO: is this the right way to tell if a file is a flat?
-        return self.datatype == "Calibration" and self.object == "Diffuser" and self.offset == "True" 
+        return (
+            self.datatype == "Calibration"
+            and self.object == "Diffuser"
+            and self.offset == "True"
+        )
 
     @property
     def is_science(self):
@@ -148,7 +156,14 @@ class ChroMagL1File:
 
         self._data = None
 
-    def get_filename(self, name: str, intermediate_step: str | None = None):
+    def get_filename(
+        self,
+        name: str,
+        /,
+        *,
+        fullpath: bool = True,
+        intermediate_step: str | None = None,
+    ):
         """Get a filename related to the file, e.g., "filename" for the level 1
         FITS file, "i_quicklook", "iquv_quicklook", or "intermediate".
         """
@@ -169,7 +184,7 @@ class ChroMagL1File:
                 f"{prefix}.chromag.{self.wave_region}.l1.{intermediate_step}.fits"
             )
 
-        return os.path.join(output_dir, basename)
+        return os.path.join(output_dir, basename) if fullpath else basename
 
     @property
     def data(self):
