@@ -5,8 +5,11 @@ sending data to the web archive.
 """
 
 import os
+import shutil
 
 from ..config import get_option, get_basedir
+from ..datetime import decompose_date
+from ..lines import available_lines
 from ..logging import logger
 
 
@@ -17,18 +20,43 @@ def publish_l1(run):
     if not os.path.isdir(l1_dir):
         logger.warning("no level1 directory to publish")
 
-    # [TODO]: where should I get these from?
-    wave_regions = ["587", "617", "656", "854", "1083"]
+    webarchive_basedir = get_option("results", "webarchive_basedir")
+    publish_to_webarchive = webarchive_basedir is not None
+    if publish_to_webarchive:
+        webarchive_dir = os.path.join(
+            webarchive_basedir, *decompose_date(run.observing_day)
+        )
+        if not os.path.isdir(webarchive_dir):
+            os.makedirs(webarchive_dir)
+
+    fullres_basedir = get_option("results", "fullres_basedir")
+    publish_to_fullres = fullres_basedir is not None
+    if publish_to_fullres:
+        fullres_dir = os.path.join(fullres_basedir, *decompose_date(run.observing_day))
+        if not os.path.isdir(fullres_dir):
+            os.makedirs(fullres_dir)
+
+    wave_regions = available_lines()
     for w in wave_regions:
         if get_option(w, "publish_l1"):
             wave_files = run.catalog[
-                run.catalog.is_flat & (run.catalog.wave_region == w)
+                run.catalog.is_science & (run.catalog.wave_region == w)
             ]
             logger.info(f"publishing {len(wave_files)} {w} nm level 1 files...")
             for f in wave_files:
-                filename = f.l1_file.get_filename("filename")
-                basename = os.path.basename(filename)
-                logger.debug(f"{basename}")
+                # [TODO]: check GBU file before publishing
+                if publish_to_webarchive:
+                    filename = f.l1_file.get_filename("filename")
+                    basename = os.path.basename(filename)
+                    shutil.copy(filename, os.path.join(webarchive_dir, basename))
+                    logger.debug(f"published {basename}")
+                if publish_to_fullres:
+                    for p in ["i_quicklook", "iquv_quicklook"]:
+                        filename = f.l1_file.get_filename(p)
+                        basename = os.path.basename(filename)
+                        shutil.copy(filename, os.path.join(fullres_dir, basename))
+                        logger.debug(f"published {basename}")
+
         else:
             logger.info(f"skipped publishing {w} nm level 1 files")
 
@@ -36,4 +64,4 @@ def publish_l1(run):
 def clearday_l1(run):
     # get web archive dir, fullres dir
     # delete all files with "chromag" in the same
-    pass
+    logger.warning("not implemented")
