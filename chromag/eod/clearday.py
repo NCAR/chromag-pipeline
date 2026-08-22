@@ -26,7 +26,7 @@ def clearday(run):
         logger.info(f"removing process directory {run.observing_day}/...")
         shutil.rmtree(process_dir)
     else:
-        logger.info("process directory already cleared")
+        logger.info("no process directory")
 
     # clear database
     try:

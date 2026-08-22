@@ -34,6 +34,7 @@ def clearday(date_run):
         config_section = get_option("database", "config_section")
 
         table_names = ["chromag_level0", "chromag_level1", "chromag_web"]
+        logger.info("clearing database tables...")
         try:
             with closing(get_connection(config_filename, config_section)) as connection:
                 obsday_id = get_obsday_id(connection, date_run.observing_day)
