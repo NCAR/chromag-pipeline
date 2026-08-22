@@ -23,7 +23,7 @@ class Catalog:
     a subset of files from the catalog using any attributes of ChroMag file
     objects, such as:
 
-       new_catalog = catalog[catalog.is_flat & (catalog.line == "1083")]
+       new_catalog = catalog[catalog.is_flat & (catalog.wave_region == "1083")]
     """
 
     def __init__(self):
