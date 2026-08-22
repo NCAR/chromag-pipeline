@@ -35,10 +35,10 @@ def step(top=False):
                 logger_func = logger.info if top else logger.debug
 
             if skip:
-                logger_func(f"skipping {func.__name__}", extra=e)
+                logger_func(f"skipped {func.__name__}", extra=e)
                 return None
             else:
-                logger_func(f"starting {func.__name__}", extra=e)
+                logger_func(f"starting {func.__name__}...", extra=e)
                 start_dt = datetime.datetime.now()
 
                 value = func(*args, **kwargs)
