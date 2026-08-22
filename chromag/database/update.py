@@ -22,7 +22,6 @@ def get_sw_id(connection: mysql.connector.connection_cext.CMySQLConnection):
     with closing(connection.cursor()) as cursor:
         # check to see if version is already present
         query = f'select sw_id from chromag_sw where version="{__version__}" and revision="{__revision__}" limit 1'
-        logger.debug(query)
         cursor.execute(query)
         result = cursor.fetchone()
 
@@ -32,14 +31,14 @@ def get_sw_id(connection: mysql.connector.connection_cext.CMySQLConnection):
             release_date = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
             cmd = f'insert into chromag_sw (release_date, version, revision) values ("{release_date}", "{__version__}", "{__revision__}");'
-            logger.debug(cmd)
             cursor.execute(cmd)
             sw_id = cursor.lastrowid
+            connection.commit()
         else:
             sw_id = result[0]
             logger.debug(f"found sw_id={sw_id} for {__version__} [{__revision__}]")
 
-    connection.commit()
+    return sw_id
 
 
 def get_obsday_id(
@@ -52,6 +51,7 @@ def get_obsday_id(
 
     with closing(connection.cursor()) as cursor:
         date = short2hyphenated(obs_date)
+
         cmd = f'select day_id from mlso_numfiles where obs_day = "{date}" limit 1;'
         cursor.execute(cmd)
         result = cursor.fetchone()
@@ -61,10 +61,9 @@ def get_obsday_id(
             cursor.execute(cmd)
             obsday_id = cursor.lastrowid
             logger.debug(f"inserted obsday_id={obsday_id} for {date}")
+            connection.commit()
         else:
             obsday_id = result[0]
             logger.debug(f"found obsday_id={obsday_id} for {date}")
-
-    connection.commit()
 
     return obsday_id
