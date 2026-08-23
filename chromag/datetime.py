@@ -49,6 +49,21 @@ def datetime2dateobs(dt: datetime.datetime, no_milliseconds=False) -> str:
         return dt.isoformat(sep="T", timespec="milliseconds")
 
 
+def obsday_hours2str(obsday_hours: float) -> str:
+    """Format an `obsday_hours` (fractional hours into an HST day) value into a
+    formatted string of the time.
+    """
+    hours = int(obsday_hours)
+    mins = int((obsday_hours - hours) * 60)
+    am_pm = "pm" if hours >= 12 else "am"
+    if hours > 12:
+        hours -= 12
+    if hours == 12 and mins == 0:
+        return "noon"
+    else:
+        return f"{hours} {am_pm}" if mins == 0 else f"{hours}:{mins:02d} {am_pm}"
+
+
 def ut2hst(dt: datetime.datetime) -> datetime.datetime:
     """Convert date/time from UT to HST time zone."""
     return dt - datetime.timedelta(hours=10)
