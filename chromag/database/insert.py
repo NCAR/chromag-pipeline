@@ -16,13 +16,54 @@ from ..lines import available_lines
 from ..logging import logger
 
 
+def insert_web(
+    connection: mysql.connector.connection_cext.CMySQLConnection,
+    obsday_id: int,
+    catalog,
+):
+    """Update the chromag_web database table."""
+
+    sw_id = get_sw_id(connection)
+    wave_regions = available_lines()
+    with closing(connection.cursor()) as cursor:
+        for w in wave_regions:
+            if get_option(w, "publish_l1"):
+                cat = catalog[catalog.is_science & (catalog.wave_region == w)]
+                logger.info(
+                    f"inserting {len(cat)} {w} nm files into web database table..."
+                )
+                for f in cat:
+                    l1_file = f.l1_file
+                    filename = l1_file.get_filename("filename")
+                    basename = os.path.basename(filename)
+                    fields = {
+                        "filename": (f'"{basename}"', "s"),
+                        "l0_filename": (f'"{f.basename}"', "s"),
+                        "filesize": (os.path.getsize(filename), "d"),
+                        "date_obs": (f'"{datetime2dateobs(f.date_obs)}"', "s"),
+                        "obsday_id": (obsday_id, "d"),
+                        "wave_region": (f'"{f.wave_region}"', "s"),
+                        "wavelength": (f.wavelength, "0.3f"),
+                    }
+                    field_names = ",".join(fields.keys())
+                    field_values = ",".join([f"{v[0]:{v[1]}}" for v in fields.values()])
+                    cmd = f"insert into chromag_web ({field_names}) value ({field_values});"
+                    cursor.execute(cmd)
+
+                    logger.debug(f"inserted {basename}")
+            else:
+                logger.info(f"skipped inserting {w} nm files to web database table")
+
+    connection.commit()
+
+
 def insert_level0(
     connection: mysql.connector.connection_cext.CMySQLConnection,
     obsday_id: int,
     catalog,
 ):
     """Update the chromag_level0 database table."""
-    logger.info(f"inserting {len(catalog)} level 0 files into database...")
+    logger.info(f"inserting {len(catalog)} files into level 0 database...")
     with closing(connection.cursor()) as cursor:
         for f in catalog:
             fields = {
@@ -53,13 +94,15 @@ def insert_level1(
     catalog,
 ):
     """Update the chromag_level1 database table."""
-    logger.info("inserting level 1 files into database...")
+    logger.info("inserting files into level 1 database...")
 
     sw_id = get_sw_id(connection)
     wave_regions = available_lines()
     with closing(connection.cursor()) as cursor:
         for w in wave_regions:
-            for f in catalog[catalog.is_science & (catalog.wave_region == w)]:
+            cat = catalog[catalog.is_science & (catalog.wave_region == w)]
+            logger.info(f"inserting {len(cat)} {w} nm files into level 1 database...")
+            for f in cat:
                 l1_file = f.l1_file
                 filename = l1_file.get_filename("filename")
                 basename = os.path.basename(filename)
@@ -92,7 +135,7 @@ def insert_level2(
     catalog,
 ):
     """Update the chromag_level2 database table."""
-    logger.info("inserting level 2 files into database...")
+    logger.info("inserting files into level 2 database...")
     logger.warning("not implemented")
 
 
@@ -101,8 +144,8 @@ def insert_level3(
     obsday_id: int,
     catalog,
 ):
-    """Update the chromag_level2 database table."""
-    logger.info("inserting level 3 files into database...")
+    """Update the chromag_level3 database table."""
+    logger.info("inserting files into level 3 database...")
     logger.warning("not implemented")
 
 
@@ -114,7 +157,13 @@ def insert_files(run, catalog):
         config_filename = get_option("database", "config_filename")
         config_section = get_option("database", "config_section")
 
-        level_routines = [insert_level0, insert_level1, insert_level2, insert_level3]
+        level_routines = [
+            insert_web,
+            insert_level0,
+            insert_level1,
+            insert_level2,
+            insert_level3,
+        ]
 
         try:
             with closing(get_connection(config_filename, config_section)) as connection:
