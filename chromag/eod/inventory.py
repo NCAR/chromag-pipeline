@@ -7,7 +7,8 @@ import os
 
 import numpy as np
 
-from ..config import get_basedir
+from ..config import get_option, get_basedir
+from ..datetime import decompose_date
 from ..file import ChroMagRawFile
 from ..logging import logger
 from ..pipeline import step
@@ -110,10 +111,15 @@ def run_inventory(run):
         date_dir, f"{run.observing_day}.chromag.inventory.txt"
     )
     write_inventory_file(catalog, inventory_filename)
-    # [TODO]: move to engineering directory
-    timeline_filename = os.path.join(
-        date_dir, f"{run.observing_day}.chromag.timeline.png"
-    )
-    write_timeline(timeline_filename, catalog)
+
+    eng_basedir = get_option("engineering", "basedir")
+    if eng_basedir is not None:
+        eng_dir = os.path.join(eng_basedir, *decompose_date(run.observing_day))
+        if not os.path.isdir(eng_dir):
+            os.makedirs(eng_dir)
+        timeline_filename = os.path.join(
+            eng_dir, f"{run.observing_day}.chromag.timeline.png"
+        )
+        write_timeline(timeline_filename, catalog)
 
     return catalog
