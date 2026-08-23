@@ -12,6 +12,7 @@ from ..lines import available_lines, line_property
 START_TIME = 6  # 6 am HST
 END_TIME = 18  # 6 pm HST
 BINS_PER_HOUR = 6  # bins are 10 minutes
+MAX_FILES_PER_BIN = 100
 
 
 def obsday_hours_formatter(obsday_hours: float, pos: float) -> str:
@@ -46,21 +47,23 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
     for i, w in enumerate(wave_regions):
         wave_files = catalog[catalog.wave_region == w]
         wave_color = line_property(w, "color")
-
         # [TODO]: to add flats/cal files:
         # - change histtype to "stepfilled"
         # - pass [sci_files, flat_files, cal_files]
         # - pass color=[sci_color, flat_color, cal_color]
         # - use alpha=
+        # [TODO]: might need to do histogram separately so that I can determine
+        # the MAX_FILES_PER_BIN for this day because I think that it could be
+        # over 600 files in 10 minutes, at least theoretically
         axes[i].hist(
             wave_files.obsday_hours,
             bins=(END_TIME - START_TIME) * BINS_PER_HOUR,
             range=(START_TIME, END_TIME),
             color=wave_color,
             edgecolor=darken(wave_color, factor=edge_darkening_factor),
-            histtype="edgefilled",
+            histtype="stepfilled",
         )
-        axes[i].set_ylim(0, 30)
+        axes[i].set_ylim(0, MAX_FILES_PER_BIN)
         axes[i].tick_params(
             left=False, bottom=False, labelleft=False, labelbottom=False
         )
@@ -78,9 +81,9 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
         range=(START_TIME, END_TIME),
         color="#606060",
         edgecolor=darken("#606060", factor=edge_darkening_factor),
-        histtype="edgefilled",
+        histtype="stepfilled",
     )
-    axes[dark_index].set_ylim(0, 15)
+    axes[dark_index].set_ylim(0, MAX_FILES_PER_BIN)
     axes[dark_index].set_yticks([])
     axes[dark_index].tick_params(left=False, labelsize=label_fontsize)
     axes[dark_index].spines["top"].set_visible(False)
