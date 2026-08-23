@@ -21,6 +21,6 @@ def available_lines():
     return cp.specification.sections()
 
 
-def property(line_name, property_name):
+def line_property(line_name, property_name):
     """Retrieve a property of a given spectral line."""
     return cp.get(line_name, property_name)

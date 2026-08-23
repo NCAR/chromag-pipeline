@@ -10,7 +10,7 @@ import numpy as np
 
 from ..datetime import datetime2dateobs
 from ..file import ChroMagL1File, create_dir
-from ..lines import property
+from ..lines import line_property
 from ..logging import logger
 
 
@@ -25,12 +25,12 @@ def write_intensity_image(l1_file: ChroMagL1File):
 
     # [TODO]: mask
 
-    display_min = property(l1_file.wave_region, "display_i_min")
-    display_max = property(l1_file.wave_region, "display_i_max")
-    display_exp = property(l1_file.wave_region, "display_i_exp")
-    display_gamma = property(l1_file.wave_region, "display_i_gamma")
-    colormap = property(l1_file.wave_region, "colormap")
-    ionization = property(l1_file.wave_region, "ionization")
+    display_min = line_property(l1_file.wave_region, "display_i_min")
+    display_max = line_property(l1_file.wave_region, "display_i_max")
+    display_exp = line_property(l1_file.wave_region, "display_i_exp")
+    display_gamma = line_property(l1_file.wave_region, "display_i_gamma")
+    colormap = line_property(l1_file.wave_region, "colormap")
+    ionization = line_property(l1_file.wave_region, "ionization")
 
     imdata = np.clip(imdata, a_min=display_min, a_max=display_max) ** display_exp
 
@@ -106,7 +106,7 @@ def write_iquv_image(l1_file: ChroMagL1File):
     state_name = ["I", "Q", "U", "V"]
     display_name = {"I": "i", "Q": "qu", "U": "qu", "V": "v"}
 
-    ionization = property(l1_file.wave_region, "ionization")
+    ionization = line_property(l1_file.wave_region, "ionization")
 
     reduce_factor = 4
     dpi = 100.0
@@ -132,11 +132,11 @@ def write_iquv_image(l1_file: ChroMagL1File):
         fig.add_axes(ax)
 
         dname = display_name[sname]
-        display_min = property(l1_file.wave_region, f"display_{dname}_min")
-        display_max = property(l1_file.wave_region, f"display_{dname}_max")
-        display_exp = property(l1_file.wave_region, f"display_{dname}_exp")
-        display_gamma = property(l1_file.wave_region, f"display_{dname}_gamma")
-        colormap = property(l1_file.wave_region, "colormap")
+        display_min = line_property(l1_file.wave_region, f"display_{dname}_min")
+        display_max = line_property(l1_file.wave_region, f"display_{dname}_max")
+        display_exp = line_property(l1_file.wave_region, f"display_{dname}_exp")
+        display_gamma = line_property(l1_file.wave_region, f"display_{dname}_gamma")
+        colormap = line_property(l1_file.wave_region, "colormap")
 
         imdata = l1_file.data[p, :, :].squeeze()
         imdata = np.clip(imdata, a_min=display_min, a_max=display_max) ** display_exp
