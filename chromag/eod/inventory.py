@@ -11,6 +11,7 @@ from ..config import get_basedir
 from ..file import ChroMagRawFile
 from ..logging import logger
 from ..pipeline import step
+from ..plot import write_timeline
 from ..string_helpers import truncate as truncate_string
 
 
@@ -109,5 +110,10 @@ def run_inventory(run):
         date_dir, f"{run.observing_day}.chromag.inventory.txt"
     )
     write_inventory_file(catalog, inventory_filename)
+    # [TODO]: move to engineering directory
+    timeline_filename = os.path.join(
+        date_dir, f"{run.observing_day}.chromag.timeline.png"
+    )
+    write_timeline(timeline_filename, catalog)
 
     return catalog
