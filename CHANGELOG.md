@@ -12,14 +12,15 @@ The format is based on [Keep a Changelog] and this project adheres to
 - Make an averaged dark to apply to science images.
 - Apply dark correction to science images.
 - Write level 1 FITS file.
-- Create intensity and IQUV quicklooks.
-- Create database tables (and createdb CLI subcommand).
-- Create archive level 0, 1, and 2 tarballs (and archive CLI subcommand).
+- Write intensity and IQUV quicklooks.
 - Add reprocess and clearday CLI subcommands.
 - Add ability to save intermediate FITS file after each processing step.
 - Add completion notification emails.
-- Update mlso_numfiles, chromag_sw, chromag_level0 database tables.
-- Publish level 1 data.
+- Create database tables (and createdb CLI subcommand).
+- Update database tables.
+- Publish and retract level 1 data.
+- Create archive level 0, 1, and 2 tarballs (and archive CLI subcommand).
+- Create timeline histogram of the observations for the day.
 
 ## [0.0.1]
 
