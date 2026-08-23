@@ -11,6 +11,7 @@ create table chromag_web (
   obsday_id                             mediumint(5) not null,
 
   wave_region                           char(4),
+  wavelength                            float,
 
   -- [TODO]: web specific information
 
