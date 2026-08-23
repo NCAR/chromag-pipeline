@@ -7,7 +7,7 @@ import datetime
 import math
 
 
-def human_timedelta(timedelta):
+def human_timedelta(timedelta: datetime.timedelta) -> str:
     """Create a human-readable string for a timedelta, for example, like
     "2 days 4 hrs 10 mins 5 secs".
     """
@@ -49,13 +49,24 @@ def datetime2dateobs(dt: datetime.datetime, no_milliseconds=False) -> str:
         return dt.isoformat(sep="T", timespec="milliseconds")
 
 
-def short2hyphenated(short_date: str):
+def ut2hst(dt: datetime.datetime) -> datetime.datetime:
+    """Convert date/time from UT to HST time zone."""
+    return dt - datetime.timedelta(hours=10)
+
+
+def obsday_hours(dt: datetime.datetime) -> float:
+    """Return the numbers of hours into the observing day."""
+    hst = ut2hst(dt)
+    return hst.hour + hst.minute / 60.0 + hst.second / 60.0 / 60.0
+
+
+def short2hyphenated(short_date: str) -> str:
     """Convert a "short date", like "20240409", to a hyphenated date, like
     "2024-04-9".
     """
     return f"{short_date[0:4]}-{short_date[4:6]}-{short_date[6:8]}"
 
 
-def decompose_date(short_date: str):
+def decompose_date(short_date: str) -> list[str]:
     """Decompose a short date "YYYYMMDD" into an array ["YYYY", "MM", "DD"]."""
     return [short_date[0:4], short_date[4:6], short_date[6:8]]
