@@ -9,7 +9,7 @@ import os
 from .email import send_email
 
 from ..config import get_option
-from ..datetime import short2hyphenated
+from ..datetime import decompose_date, short2hyphenated
 from ..logging import logger, filter_log
 
 
@@ -44,8 +44,18 @@ def notify_eod(date_run):
     else:
         body = log_msgs
 
-    # [TODO]: probably should make a timeline histogram like KCor/UCoMP have
-    send_email(to, from_email, subject, body)
+    attachments = []
+
+    eng_basedir = get_option("engineering", "basedir")
+    if eng_basedir is not None:
+        eng_dir = os.path.join(eng_basedir, *decompose_date(date_run.observing_day))
+        if eng_dir is not None:
+            timeline_filename = os.path.join(
+                eng_dir, f"{date_run.observing_day}.chromag.timeline.png"
+            )
+            attachments.append(timeline_filename)
+
+    send_email(to, from_email, subject, body, attachments=attachments)
     logger.info(f"sent eod notification to {to}")
 
     return True
