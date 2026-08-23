@@ -50,6 +50,26 @@ def make_tarlist(tar_filename: str, tarlist_filename: str):
             f.write(f"{n}\n")
 
 
+def read_rawheader(filename: str):
+    """Read the primary header of a raw ChroMag FITS file."""
+    with fits.open(filename) as f:
+        primary_header = f[0].header
+
+    # [TODO]: repair header from known epoch-based issues
+
+    return primary_header
+
+
+def read_rawdata(filename: str):
+    """Read the data from raw ChroMag FITS file."""
+    with fits.open(filename) as f:
+        data = f[0].data.astype(np.float32)
+
+    # [TODO]: repair data from known epoch-based issues
+
+    return data
+
+
 def write_fits_file(output_filename: str, data: np.ndarray, primary_header):
     """Write a FITS file with only a primary extension."""
     hdu = fits.PrimaryHDU(data=data)

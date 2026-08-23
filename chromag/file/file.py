@@ -9,8 +9,10 @@ from astropy.io import fits
 from astropy.io.fits.card import Card, _format_float
 import numpy as np
 
+from .fileio import read_rawheader, read_rawdata
+
 from ..config import get_basedir
-from ..datetime import dateobs2datetime
+from ..datetime import dateobs2datetime, obsday_hours
 
 
 # read the level 1 header template
@@ -34,55 +36,47 @@ class ChroMagRawFile:
         self._data = None
         self.observing_day = observing_day
 
-        with fits.open(filename) as f:
-            primary_header = f[0].header
-            self.primary_header = primary_header
+        primary_header = read_rawheader(filename)
 
-            self.date_obs = dateobs2datetime(primary_header["DATE-OBS"])
+        self.primary_header = primary_header
+        self.date_obs = dateobs2datetime(self.primary_header["DATE-OBS"])
+        self.obsday_hours = obsday_hours(self.date_obs)
 
-            # [TODO]: what should be done if required FITS keywords are
-            # missing? Probably should fail in some way instead of just giving
-            # a default value. Maybe there should be a validation before
-            # attempting to process?
+        # [TODO]: what should be done if required FITS keywords are
+        # missing? Probably should fail in some way instead of just giving
+        # a default value. Maybe there should be a validation before
+        # attempting to process?
 
-            # possible values Scientific, Engineering, or Calibration
-            self.datatype = (
-                primary_header["DATATYPE"] if "DATATYPE" in primary_header else None
-            )
+        # possible values Scientific, Engineering, or Calibration
+        self.datatype = (
+            primary_header["DATATYPE"] if "DATATYPE" in primary_header else None
+        )
 
-            self.wavelength = (
-                primary_header["WAVELNTH"] if "WAVELNTH" in primary_header else None
-            )
-            self.wave_region = (
-                str(int(float(primary_header["OSF_ID"])))
-                if "OSF_ID" in primary_header
-                else None
-            )
-            self.exposure = (
-                primary_header["EXPTIME"] if "EXPTIME" in primary_header else None
-            )
+        self.wavelength = (
+            primary_header["WAVELNTH"] if "WAVELNTH" in primary_header else None
+        )
+        self.wave_region = (
+            str(int(float(primary_header["OSF_ID"])))
+            if "OSF_ID" in primary_header
+            else None
+        )
+        self.exposure = (
+            primary_header["EXPTIME"] if "EXPTIME" in primary_header else None
+        )
 
-            self.scan_i = (
-                primary_header["SCAN_I"] if "SCAN_I" in primary_header else None
-            )
-            self.scan_n = (
-                primary_header["SCAN_N"] if "SCAN_N" in primary_header else None
-            )
+        self.scan_i = primary_header["SCAN_I"] if "SCAN_I" in primary_header else None
+        self.scan_n = primary_header["SCAN_N"] if "SCAN_N" in primary_header else None
 
-            self.obs_description = (
-                primary_header["OBS_DESC"] if "OBS_DESC" in primary_header else None
-            )
+        self.obs_description = (
+            primary_header["OBS_DESC"] if "OBS_DESC" in primary_header else None
+        )
 
-            # possible values Sun, Diffuser, Dark, or Lamp
-            self.object = (
-                primary_header["OBJECT"] if "OBJECT" in primary_header else None
-            )
+        # possible values Sun, Diffuser, Dark, or Lamp
+        self.object = primary_header["OBJECT"] if "OBJECT" in primary_header else None
 
-            # adding this 8/21 as synthetic flats have option in header called OFFSET
-            # which can be "True" or "False", assuming now we do not know the offset
-            self.offset = (
-                primary_header["OFFSET"] if "OFFSET" in primary_header else None
-            )
+        # adding this 8/21 as synthetic flats have option in header called OFFSET
+        # which can be "True" or "False", assuming now we do not know the offset
+        self.offset = primary_header["OFFSET"] if "OFFSET" in primary_header else None
 
     @property
     def is_dark(self):
@@ -124,8 +118,7 @@ class ChroMagRawFile:
     @property
     def data(self):
         if self._data is None:
-            with fits.open(self.filename) as f:
-                self._data = f[0].data.astype(np.float32)
+            self._data = read_rawdata(self.filename)
         return self._data
 
     @data.setter
@@ -192,8 +185,7 @@ class ChroMagL1File:
         if neccessary.
         """
         if self._data is None:
-            with fits.open(self.raw_file.filename) as f:
-                self._data = f[0].data.astype(np.float32)
+            self._data = read_rawdata(self.raw_file.filename)
 
         return self._data
 
