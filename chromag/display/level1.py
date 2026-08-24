@@ -96,9 +96,13 @@ def write_intensity_image(l1_file: ChroMagL1File):
     logger.debug(f"wrote {output_basename}")
 
 
-def write_iquv_image(l1_file: ChroMagL1File):
+def write_iquv_image(
+    l1_file: ChroMagL1File, /, *, reduce_factor=4, output_filename: str | None = None
+):
     """Write a quicklook PNG file displaying the level 1 intensity."""
-    output_filename = l1_file.get_filename("iquv_quicklook")
+    if output_filename is None:
+        output_filename = l1_file.get_filename("iquv_quicklook")
+
     l1_dir = os.path.dirname(output_filename)
     if not os.path.isdir(l1_dir):
         create_dir(l1_dir, basepath=l1_dir)
@@ -108,7 +112,6 @@ def write_iquv_image(l1_file: ChroMagL1File):
 
     ionization = line_property(l1_file.wave_region, "ionization")
 
-    reduce_factor = 4
     dpi = 100.0
     px = 1.0 / dpi
 
