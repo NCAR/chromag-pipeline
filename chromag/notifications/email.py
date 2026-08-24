@@ -39,13 +39,13 @@ def send_email(
     if len(html_text) > 0:
         msg.attach(MIMEText(html_text, "html"))
 
-    for f in attachments or []:
+    for f, name in attachments or []:
         with open(f, "rb") as file:
-            part = MIMEApplication(file.read(), Name=os.path.basename(f))
+            part = MIMEApplication(file.read(), Name=name)
 
         # after the file is closed
-        part["Content-ID"] = f"<{os.path.basename(f)}>"
-        part["Content-Disposition"] = f'attachment; filename="{os.path.basename(f)}"'
+        part["Content-ID"] = f"<{name}>"
+        part["Content-Disposition"] = f'attachment; filename="{name}"'
         msg.attach(part)
 
     with smtplib.SMTP("localhost") as s:

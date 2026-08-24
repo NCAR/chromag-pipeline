@@ -8,7 +8,7 @@ import os
 from .. import __version__
 from .. import __revision__
 from ..config import get_basedir, get_option
-from ..datetime import datetime2dateobs
+from ..datetime import datetime2dateobs, human_timedelta
 from ..display import write_intensity_image, write_iquv_image
 from ..pipeline import step
 from ..file import ChroMagL1File, write_l1_file, create_dir
@@ -20,10 +20,9 @@ def dark_correct(run, l1_file: ChroMagL1File):
     """Apply dark subtraction to raw data."""
 
     # get averaged dark of matching exposure time to science image
-    dark = run.calibration.get_dark(l1_file.exposure)
-    # [TODO]: return the dark index along with the dark above
-    dark_index = 0
+    dark, dark_index = run.calibration.get_dark(l1_file.exposure)
 
+    # [TODO]: use broadcasting to speed this up
     dims = l1_file.data.shape
     for i in range(dims[0]):
         l1_file.data[i, :, :] -= dark.squeeze()
@@ -59,6 +58,8 @@ def process(run):
     # loop through science files and perform the following steps:
     science_files = run.catalog[run.catalog.is_science]
     n_science_files = len(science_files)
+
+    start_dt = datetime.datetime.now()
     for i, raw_file in enumerate(science_files):
         logger.info(f"processing {i+1}/{n_science_files}: {raw_file.basename}...")
 
@@ -102,3 +103,10 @@ def process(run):
         #   possibly use data from Tip/Tilt system
         #   more sophisticated metrics from Level1B data that may reject data
         #     for some higher-level uses but not others
+
+    end_dt = datetime.datetime.now()
+    time_interval = end_dt - start_dt
+    time_per_file = time_interval / n_science_files
+    human_time = human_timedelta(time_per_file)
+    logger.info(f"{human_time} per file for level 1 processing")
+    run.l1_processing_time_per_file = time_per_file

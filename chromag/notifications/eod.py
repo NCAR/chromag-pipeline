@@ -11,7 +11,7 @@ from .email import send_email
 
 from .. import __version__, __revision__
 from ..config import get_option
-from ..datetime import decompose_date, short2hyphenated
+from ..datetime import decompose_date, short2hyphenated, human_timedelta
 from ..logging import logger, filter_log
 
 
@@ -60,7 +60,7 @@ def notify_eod(date_run):
         if eng_dir is not None:
             timeline_basename = f"{date_run.observing_day}.chromag.timeline.png"
             timeline_filename = os.path.join(eng_dir, timeline_basename)
-            attachments.append(timeline_filename)
+            attachments.append((timeline_filename, timeline_basename))
             timeline_plot_html = (
                 f'<img src="cid:{timeline_basename}" alt="Timeline plot"/>'
             )
@@ -76,6 +76,10 @@ def notify_eod(date_run):
     plain_text += f"\n\nSent from ChroMag pipeline {__version__} [{__revision__}] by {user}@{hostname}"
 
     html_text = eod_template.format(
+        n_raw_files=len(date_run.catalog),
+        l1_processing_time_per_file=human_timedelta(
+            date_run.l1_processing_time_per_file
+        ),
         log_msgs=log_msgs,
         timeline_plot_html=timeline_plot_html,
         __version__=__version__,
