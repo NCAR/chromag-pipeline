@@ -65,6 +65,8 @@ class Run:
         self._catalog = None
         self._calibration = None
 
+        self.l1_processing_time_per_file = None
+
     @property
     def catalog(self):
         return self._catalog
