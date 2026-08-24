@@ -14,9 +14,13 @@ from ..lines import line_property
 from ..logging import logger
 
 
-def write_intensity_image(l1_file: ChroMagL1File):
+def write_intensity_image(
+    l1_file: ChroMagL1File, /, *, reduce_factor=1, output_filename: str | None = None
+):
     """Write a quicklook PNG file displaying the level 1 intensity."""
-    output_filename = l1_file.get_filename("i_quicklook")
+    if output_filename is None:
+        output_filename = l1_file.get_filename("i_quicklook")
+
     l1_dir = os.path.dirname(output_filename)
     if not os.path.isdir(l1_dir):
         create_dir(l1_dir, basepath=l1_dir)
@@ -37,7 +41,9 @@ def write_intensity_image(l1_file: ChroMagL1File):
     dpi = 100.0
     px = 1.0 / dpi
     fig = plt.figure(frameon=False)
-    fig.set_size_inches(imdata.shape[1] * px, imdata.shape[0] * px)
+    fig.set_size_inches(
+        imdata.shape[1] * px / reduce_factor, imdata.shape[0] * px / reduce_factor
+    )
 
     ax = plt.Axes(fig, [0.0, 0.0, 1.0, 1.0])
     ax.set_axis_off()
