@@ -1,0 +1,23 @@
+<head>
+  <style>
+    body {{background-color: white; font-size: 11pt}}
+    h1 {{color: #2864d1; font-size: 13pt;}}
+    p.sentfrom {{color: grey; font-size: 9pt; padding-bottom: 20px;}}
+  </style>
+</head>
+<body>
+  <h1>Statistics</h1>
+
+  <h1>Log messages</h1>
+    <pre><code>
+{log_msgs}
+    </code></pre>
+
+  <h1>Timeline</h1>
+
+    {timeline_plot_html}
+
+  <p class="sentfrom">
+    Sent from ChroMag pipeline {__version__} [{__revision__}] by {user}@{hostname}
+  </p>
+</body>

@@ -3,14 +3,13 @@
 """Module containing helper functions for sending emails.
 """
 
+import os
+
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import os
 import smtplib
-import socket
 
-from .. import __version__, __revision__
 from ..logging import logger
 
 
@@ -18,28 +17,34 @@ def send_email(
     to_email: str,
     from_email: str | None = None,
     subject: str = "",
-    body_text: str = "",
+    plain_text: str = "",
     /,
     *,
     attachments: list[str] | None = None,
+    html_text: str = "",
 ):
-    """Send an email."""
+    """Send an email. Attachments will be attached with the file basename as
+    "Content-ID" and "Content-Disposition" filename.
+    """
+
     userhome = os.path.expanduser("~")
     user = os.path.split(userhome)[-1]
-    hostname = socket.gethostname()
 
-    body_text += f"\n\nSent from ChroMag pipeline {__version__} [{__revision__}] by {user}@{hostname}"
-
-    msg = MIMEMultipart()
+    msg = MIMEMultipart("alternative" if len(html_text) > 0 else "mixed")
     msg["Subject"] = subject
     msg["From"] = f"{user}@ucar.edu" if from_email is None else from_email
     msg["To"] = to_email
 
-    msg.attach(MIMEText(body_text))
+    msg.attach(MIMEText(plain_text, "plain"))
+    if len(html_text) > 0:
+        msg.attach(MIMEText(html_text, "html"))
+
     for f in attachments or []:
         with open(f, "rb") as file:
             part = MIMEApplication(file.read(), Name=os.path.basename(f))
-        # After the file is closed
+
+        # after the file is closed
+        part["Content-ID"] = f"<{os.path.basename(f)}>"
         part["Content-Disposition"] = f'attachment; filename="{os.path.basename(f)}"'
         msg.attach(part)
 
