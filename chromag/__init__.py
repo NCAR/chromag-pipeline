@@ -11,19 +11,28 @@ import subprocess
 __version__ = importlib.metadata.version("chromag")
 
 repo_dir = os.path.dirname(__file__)
-__revision__ = (
-    subprocess.check_output(["git", "-C", repo_dir, "rev-parse", "--short", "HEAD"])
-    .decode("ascii")
-    .strip()
-)
+try:
+    __revision__ = (
+        subprocess.check_output(["git", "-C", repo_dir, "rev-parse", "--short", "HEAD"])
+        .decode("ascii")
+        .strip()
+    )
+except CalledProcessError as e:
+    __revision__ = "N/A"
+
 # add a "*" to the revision if there are uncommitted changes
 p = subprocess.run(["git", "-C", repo_dir, "diff-index", "--quiet", "HEAD", "--"])
 if p.returncode != 0:
     __revision__ += "*"
 
-description = (
-    subprocess.check_output(["git", "-C", repo_dir, "describe"]).decode("ascii").strip()
-)
+try:
+    description = (
+        subprocess.check_output(["git", "-C", repo_dir, "describe"])
+        .decode("ascii")
+        .strip()
+    )
+except CalledProcessError as e:
+    description = f"v{__version__}"
 
 if description != f"v{__version__}":
     __version__ = f"{__version__}-dev"
