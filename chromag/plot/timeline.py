@@ -91,7 +91,9 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
     axes[dark_index].spines["right"].set_visible(False)
     axes[dark_index].spines["bottom"].set_color("#d0d0d0")
     axes[dark_index].set_ylabel("darks", fontsize=label_fontsize, rotation=0)
-    axes[dark_index].xaxis.set_major_locator(FixedLocator(range(6, 19, 2)))
+    axes[dark_index].xaxis.set_major_locator(
+        FixedLocator(range(START_TIME, END_TIME + 1, 1))
+    )
     axes[dark_index].xaxis.set_major_formatter(FuncFormatter(obsday_hours_formatter))
     axes[dark_index].set_xlabel("observing day [HST]", fontsize=label_fontsize)
 
