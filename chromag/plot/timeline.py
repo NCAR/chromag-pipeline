@@ -5,6 +5,7 @@
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, FixedLocator
+from matplotlib.transforms import IdentityTransform
 
 from ..datetime import obsday_hours2str
 from ..lines import available_lines, line_property
@@ -12,7 +13,8 @@ from ..lines import available_lines, line_property
 START_TIME = 6  # 6 am HST
 END_TIME = 18  # 6 pm HST
 BINS_PER_HOUR = 6  # bins are 10 minutes
-MAX_FILES_PER_BIN = 100
+MAX_WAVE_FILES_PER_BIN = 100
+MAX_DARK_FILES_PER_BIN = 10
 
 
 def obsday_hours_formatter(obsday_hours: float, pos: float) -> str:
@@ -53,8 +55,8 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
         # - pass color=[sci_color, flat_color, cal_color]
         # - use alpha=
         # [TODO]: might need to do histogram separately so that I can determine
-        # the MAX_FILES_PER_BIN for this day because I think that it could be
-        # over 600 files in 10 minutes, at least theoretically
+        # the MAX_WAVE_FILES_PER_BIN for this day because I think that it could
+        # be over 600 files in 10 minutes, at least theoretically
         axes[i].hist(
             wave_files.obsday_hours,
             bins=(END_TIME - START_TIME) * BINS_PER_HOUR,
@@ -63,7 +65,7 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
             edgecolor=darken(wave_color, factor=edge_darkening_factor),
             histtype="stepfilled",
         )
-        axes[i].set_ylim(0, MAX_FILES_PER_BIN)
+        axes[i].set_ylim(0, MAX_WAVE_FILES_PER_BIN)
         axes[i].tick_params(
             left=False, bottom=False, labelleft=False, labelbottom=False
         )
@@ -83,7 +85,9 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
         edgecolor=darken("#606060", factor=edge_darkening_factor),
         histtype="stepfilled",
     )
-    axes[dark_index].set_ylim(0, MAX_FILES_PER_BIN)
+    # [TODO]: darks might need a different scale, we will never take enough
+    # darks to show up as much
+    axes[dark_index].set_ylim(0, MAX_DARK_FILES_PER_BIN)
     axes[dark_index].set_yticks([])
     axes[dark_index].tick_params(left=False, labelsize=label_fontsize)
     axes[dark_index].spines["top"].set_visible(False)
@@ -95,7 +99,14 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
         FixedLocator(range(START_TIME, END_TIME + 1, 1))
     )
     axes[dark_index].xaxis.set_major_formatter(FuncFormatter(obsday_hours_formatter))
+
     axes[dark_index].set_xlabel("observing day [HST]", fontsize=label_fontsize)
+
+    binsize_msg = f"max {MAX_WAVE_FILES_PER_BIN} in wave region or {MAX_DARK_FILES_PER_BIN} dark files per {60 // BINS_PER_HOUR:d} min bin"
+    annotation = fig.text(
+        5.0, 5.0, binsize_msg, transform=IdentityTransform(), fontsize=6, color="grey"
+    )
+    annotation.set_in_layout(False)
 
     plt.savefig(output_filename)
     plt.close(fig)
