@@ -13,6 +13,7 @@ from .cat import add_cat_subcommand
 from .clearday import add_clearday_subcommand
 from .createdb import add_createdb_subcommand
 from .eod import add_eod_subcommand
+from .list import add_list_subcommand
 from .log import add_log_subcommand
 from .ls import add_ls_subcommand
 
@@ -40,6 +41,7 @@ def setup():
     add_cat_subcommand(subparsers)
     add_clearday_subcommand(subparsers)
     add_createdb_subcommand(subparsers)
+    add_list_subcommand(subparsers)
     add_log_subcommand(subparsers)
     add_ls_subcommand(subparsers)
 

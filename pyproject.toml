@@ -26,6 +26,7 @@ dev = [
     "pylint",
     "black",
     "pre-commit",
+    "psutil",
     "pytest-cov",
     "Sphinx",
     "sphinx_rtd_theme",
