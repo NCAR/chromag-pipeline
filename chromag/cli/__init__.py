@@ -13,9 +13,9 @@ from .cat import add_cat_subcommand
 from .clearday import add_clearday_subcommand
 from .createdb import add_createdb_subcommand
 from .eod import add_eod_subcommand
-from .list import add_list_subcommand
 from .log import add_log_subcommand
 from .ls import add_ls_subcommand
+from .ps import add_ps_subcommand
 
 
 def print_help(args):
@@ -36,14 +36,14 @@ def setup():
 
     subparsers = parser.add_subparsers(help="sub-command help")
 
-    # helpers: archive, cat, clearday, createdb, list, ls, log, versions
+    # helpers: archive, cat, clearday, createdb, ls, log, ps, versions
     add_archive_subcommand(subparsers)
     add_cat_subcommand(subparsers)
     add_clearday_subcommand(subparsers)
     add_createdb_subcommand(subparsers)
-    add_list_subcommand(subparsers)
     add_log_subcommand(subparsers)
     add_ls_subcommand(subparsers)
+    add_ps_subcommand(subparsers)
 
     # processing: rt, eod, cal, reprocess
     add_eod_subcommand(subparsers)

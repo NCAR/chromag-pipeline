@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Create and handle list sub-command, which lists running ChroMag processes.
+"""Create and handle ps sub-command, which lists running ChroMag processes.
 """
 
 import datetime
@@ -14,7 +14,7 @@ from ..datetime import human_timedelta
 from ..file import human_bytes
 
 
-def list_subcommand(args):
+def ps_subcommand(args):
     """List all the running ChroMag processes."""
     n_processes = 0
     now = datetime.datetime.now()
@@ -23,7 +23,7 @@ def list_subcommand(args):
         if p.name() == "chromag":
             with p.oneshot():
                 cmdline = p.cmdline()
-                if cmdline[2] == "list":
+                if cmdline[2] == "ps":
                     continue
 
                 n_processes += 1
@@ -55,10 +55,10 @@ def list_subcommand(args):
         print("no ChroMag processes currently running")
 
 
-def add_list_subcommand(subparsers):
-    """Add list subcommand to the argparse subparsers."""
-    list_parser = subparsers.add_parser("list", help="list running ChroMag processes")
-    list_parser.add_argument(
+def add_ps_subcommand(subparsers):
+    """Add ps subcommand to the argparse subparsers."""
+    ps_parser = subparsers.add_parser("ps", help="list running ChroMag processes")
+    ps_parser.add_argument(
         "-v", "--verbose", help="set to show full output", action="store_true"
     )
-    list_parser.set_defaults(func=list_subcommand, parser=list_parser)
+    ps_parser.set_defaults(func=ps_subcommand, parser=ps_parser)
