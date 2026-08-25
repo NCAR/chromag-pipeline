@@ -105,14 +105,11 @@ class Calibration:
     def get_dark(self, exposure: float) -> np.ndarray:
         """Get dark matching the exposure."""
 
-        # generate list of matching exposures for a specified tolerance
         exp_diffs = np.abs(self.dark_exposures - exposure)
-        matching_exps = np.where(exp_diffs < self.exposure_tolerance)[0]
-        matching_index = matching_exps[0]
-        # matching_exps = np.array([int(i) for i in matching_exps])
-        dark = np.array(self.dark_images)[matching_index]
+        matching_indices = np.where(exp_diffs < self.exposure_tolerance)[0]
+        dark = np.array(self.dark_images)[matching_indices[0]]
 
-        return dark, matching_index
+        return dark, matching_indices[0]
 
     def get_flat(self, time, exposure, wavelength) -> np.ndarray:
         """Get closest flat to the given time matching the exposure and wavelength."""
