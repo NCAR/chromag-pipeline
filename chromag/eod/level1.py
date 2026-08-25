@@ -22,10 +22,8 @@ def dark_correct(run, l1_file: ChroMagL1File):
     # get averaged dark of matching exposure time to science image
     dark, dark_index = run.calibration.get_dark(l1_file.exposure)
 
-    # [TODO]: use broadcasting to speed this up
-    dims = l1_file.data.shape
-    for i in range(dims[0]):
-        l1_file.data[i, :, :] -= dark.squeeze()
+    # broadcast dark
+    l1_file.data -= dark.reshape(1, *dark.shape)
 
     # update header
     l1_file.primary_header["DARK_COR"] = True
