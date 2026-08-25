@@ -3,6 +3,7 @@
 """Module handling reading/writing ChroMag files."""
 
 import grp
+import math
 import os
 import shutil
 import tarfile
@@ -11,6 +12,16 @@ from astropy.io import fits
 import numpy as np
 
 from ..logging import logger
+
+
+def human_bytes(n_bytes: int) -> str:
+    if n_bytes == 0:
+        return "0B"
+    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+    i = int(math.floor(math.log(n_bytes, 1024)))
+    p = math.pow(1024, i)
+    s = round(n_bytes / p, 2)
+    return f"{s} {size_name[i]}"
 
 
 def create_dir(dir: str, /, *, basepath: str = None):
