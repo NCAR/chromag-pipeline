@@ -9,13 +9,13 @@ import sys
 from .helper import add_run_arguments, split_dates
 from ..eod import run, clearday
 from ..logging import logger
+from ..notifications import notify_eod
 
 
 def process_eod(args):
     """Main routine to handle keyword arguments and dispatch the work.
 
-    System status code is 0 for a valid run, 1 if configuration file is not
-    found.
+    System status code is the number of failing date.
     """
     dates = split_dates(",".join(args.dates), args.parser.error)
 
@@ -25,22 +25,27 @@ def process_eod(args):
         )
         sys.exit(1)
 
+    exit_code = 0
+    date_run = None
     for d in dates:
         try:
-            run(d, args.configuration_filename, reprocessing=False)
+            date_run = run(d, args.configuration_filename, reprocessing=False)
         except Exception as e:
             logger.critical(e, exc_info=True)
             print(
                 "chromag eod: eod command failed, see log for details", file=sys.stderr
             )
-            sys.exit(1)
+            exit_code += 1
+
+        notify_eod(d, date_run)
+
+    sys.exit(exit_code)
 
 
 def process_reprocess(args):
     """Main routine to handle keyword arguments and dispatch the work.
 
-    System status code is 0 for a valid run, 1 if configuration file is not
-    found.
+    System status code is the number of failing date.
     """
     dates = split_dates(",".join(args.dates), args.parser.error)
 
@@ -50,16 +55,22 @@ def process_reprocess(args):
         )
         sys.exit(1)
 
+    exit_code = 0
+    date_run = None
     for d in dates:
         try:
-            run(d, args.configuration_filename, reprocessing=True)
+            date_run = run(d, args.configuration_filename, reprocessing=True)
         except Exception as e:
             logger.critical(e, exc_info=True)
             print(
                 "chromag reprocess: reprocess command failed, see log for details",
                 file=sys.stderr,
             )
-            sys.exit(1)
+            exit_code += 1
+
+        notify_eod(d, date_run)
+
+    sys.exit(exit_code)
 
 
 def add_eod_subcommand(subparsers):
