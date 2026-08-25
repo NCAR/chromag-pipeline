@@ -12,6 +12,11 @@ def human_timedelta(timedelta: datetime.timedelta) -> str:
     "2 days 4 hrs 10 mins 5 secs".
     """
     secs = timedelta.total_seconds()
+    if secs < 0:
+        secs = -secs
+        before = " before"
+    else:
+        before = ""
     decimals = max(0, -math.ceil(math.log10(secs)) + 3)
     secs_format = f"%0.{decimals}f"
 
@@ -29,7 +34,9 @@ def human_timedelta(timedelta: datetime.timedelta) -> str:
                 n = secs_format % secs
             if n != "0":
                 parts.append("%s %s%s" % (n, unit, "" if n == "1" else "s"))
-    return " ".join(parts)
+
+    result = " ".join(parts)
+    return f"{result}{before}"
 
 
 def dateobs2datetime(date_obs: str) -> datetime.datetime:
