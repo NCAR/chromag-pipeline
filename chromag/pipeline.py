@@ -6,6 +6,7 @@
 import datetime
 import functools
 import logging
+import os
 
 from .calibration import Calibration
 from .datetime import human_timedelta
@@ -82,3 +83,31 @@ class Run:
     @calibration.setter
     def calibration(self, calibration: Calibration):
         self._calibration = calibration
+
+
+class LockException(Exception):
+    """Exception to indicate the lock is not available."""
+
+
+class RunLock:
+    """Context manager to handle locking a processing directory of a run while
+    processing is active so that two different processes overwriting each other.
+    """
+
+    def __init__(self, lock_filename: str):
+        self.lock_filename = lock_filename
+
+    def __enter__(self):
+        """Enter the context: create lockfile containing process PID in the
+        specified location.
+        """
+        if os.path.exists(self.lock_filename):
+            raise LockException("lockfile already exists")
+
+        with open(self.lock_filename, "w") as f:
+            f.write(f"{os.getpid()}")
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        """Remove the lockfile."""
+        os.remove(self.lock_filename)
