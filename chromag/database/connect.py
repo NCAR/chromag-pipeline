@@ -9,6 +9,8 @@ import os
 
 import mysql.connector
 
+from . import DatabaseError
+
 
 def get_db_info(config_filename: str, config_section: str):
     """Read a configuration file with the login information for the database.
@@ -39,15 +41,13 @@ def get_connection(config_filename: str, config_section: str):
     within it with login details for the database. Returns connection.
     """
     if config_filename is None:
-        raise NameError("database configuration filename is not defined")
+        raise DatabaseError("database.config_filename is not defined")
 
     if not os.path.exists(config_filename):
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), config_filename
-        )
+        raise DatabaseError("database.config_filename not found")
 
     if config_section is None:
-        raise NameError("database configuration section is not defined")
+        raise DatabaseError("database.config_section is not defined")
 
     host, user, password, database = get_db_info(config_filename, config_section)
 

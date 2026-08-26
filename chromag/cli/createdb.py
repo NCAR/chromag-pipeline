@@ -31,6 +31,7 @@ def process_createdb(args):
     if get_option("database", "update"):
         config_filename = get_option("database", "config_filename")
         config_section = get_option("database", "config_section")
+
         try:
             initialize_tables(config_filename, config_section)
         except FileNotFoundError as e:

@@ -5,14 +5,13 @@
 
 import os
 
-from .connect import get_connection
-from .update import get_obsday_id, get_sw_id
-
 
 class DatabaseError(Exception):
     """Exception to indicate a problem connecting to the database."""
 
 
+from .connect import get_connection
+from .update import get_obsday_id, get_sw_id
 from .clearday import clearday
 from .initialize import initialize_tables
 from .insert import insert_files
