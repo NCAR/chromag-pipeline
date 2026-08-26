@@ -17,22 +17,22 @@ from ..pipeline import LockException, RunLock
 
 def process_eod(args):
     """Main routine to handle keyword arguments and dispatch the end-of-day
-    work. The "reprocessing" attribute of `args` is set when creating the
-    argument parsers to the appropriate value and passed on to `run` routine.
+    work from either the eod or reprocess subcommand. The "reprocessing"
+    attribute of `args` is set when creating the argument parsers to the
+    appropriate value and passed on to `run` routine.
 
     System status code is the number of failing date.
     """
+    subcommand = "reprocess" if args.reprocessing else "eod"
     dates = split_dates(",".join(args.dates), args.parser.error)
 
     if not os.path.isfile(args.configuration_filename):
-        args.parser.error(
-            f"configuration file not found: {args.configuration_filename}"
+        args.parser.exit(
+            1, f"configuration file not found: {args.configuration_filename}"
         )
-        sys.exit(1)
 
     read_config(args.configuration_filename)
 
-    subcommand = "reprocess" if args.reprocessing else "eod"
     exit_code = 0
     date_run = None
     for d in dates:
@@ -43,14 +43,12 @@ def process_eod(args):
                     d, args.configuration_filename, reprocessing=args.reprocessing
                 )
         except LockException as e:
-            print(
-                f"chromag {subcommand}: processing directory for {d} locked, skipping"
-            )
+            print(f"processing directory for {d} locked, skipping")
             exit_code += 1
         except Exception as e:
             logger.critical(e, exc_info=True)
             print(
-                f"chromag {subcommand}: {subcommand} command failed, see log for details",
+                f"chromag {subcommand} command failed, see log for details",
                 file=sys.stderr,
             )
             exit_code += 1
