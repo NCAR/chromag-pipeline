@@ -7,6 +7,7 @@ import datetime
 import functools
 import logging
 import os
+import socket
 
 from .calibration import Calibration
 from .datetime import human_timedelta
@@ -105,7 +106,8 @@ class RunLock:
             raise LockException("lockfile already exists")
 
         with open(self.lock_filename, "w") as f:
-            f.write(f"{os.getpid()}")
+            hostname = socket.gethostname()
+            f.write(f"{hostname} {os.getpid()}")
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
