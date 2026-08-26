@@ -66,7 +66,7 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
         date_run.calibration.save_file(cal_filename)
         logger.info(f"wrote {cal_basename}")
     else:
-        logger.warning("process/caldir not set, not writing cal file")
+        logger.warning("process.caldir not set, not writing cal file")
 
     process_l1(date_run, skip=not get_option("level1", "process"))
     process_l2(date_run, skip=not get_option("level2", "process"))
