@@ -14,13 +14,16 @@ import numpy as np
 from ..logging import logger
 
 
-def human_bytes(n_bytes: int) -> str:
+def human_bytes(n_bytes: int, n_decimals: int = 1) -> str:
+    """Convert an integer number of bytes to a string representing that in B,
+    KB, MB, GB, etc.
+    """
     if n_bytes == 0:
         return "0B"
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     i = int(math.floor(math.log(n_bytes, 1024)))
     p = math.pow(1024, i)
-    s = round(n_bytes / p, 2)
+    s = round(n_bytes / p, n_decimals)
     return f"{s} {size_name[i]}"
 
 

@@ -19,7 +19,6 @@ from ..config import read_config, get_option
 from ..database import DatabaseError, insert_files
 from ..datetime import human_timedelta
 from ..logging import setup_logging, get_level
-from ..notifications import notify_eod
 from ..pipeline import Run
 from ..publish import publish_l1, publish_l2, publish_l3
 
@@ -67,7 +66,7 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
         date_run.calibration.save_file(cal_filename)
         logger.info(f"wrote {cal_basename}")
     else:
-        logger.warning("process/caldir not set, not writing cal file")
+        logger.warning("process.caldir not set, not writing cal file")
 
     process_l1(date_run, skip=not get_option("level1", "process"))
     process_l2(date_run, skip=not get_option("level2", "process"))
@@ -88,9 +87,9 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
     archive_l1(date_run)
     archive_l2(date_run)
 
-    notify_eod(date_run)
-
     end_dt = datetime.datetime.now()
     time_interval = end_dt - start_dt
     human_time = human_timedelta(time_interval)
     logger.info(f"done: {human_time}")
+
+    return date_run

@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog] and this project adheres to
 - Apply dark correction to science images.
 - Write level 1 FITS file.
 - Write intensity and IQUV quicklooks.
+- Lock processing directory when starting eod/reprocess run.
 - Add reprocess and clearday CLI subcommands.
 - Add ability to save intermediate FITS file after each processing step.
 - Add completion notification emails.

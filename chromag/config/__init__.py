@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-"""Handle configuration options.
+"""Handle retrieving configuration options.
 
-chromag.config.spec.cfg defines the specification of the valid configuration
-files. It defines all the options to be set by the user of the pipeline, e.g.,
-where to look for the raw data, where to put the processed data, options on
-how particular steps should run, etc.
+chromag.config.spec.cfg defines the specification of valid configuration files.
+It defines all the options to be set by the user of the pipeline, e.g., where
+to look for the raw data, where to put the processed data, options on how
+particular steps should run, etc.
 
 In particular, `get_option` and `get_basedir` will be needed by many other
 sections of the pipeline.
@@ -18,15 +18,17 @@ import os
 import epochs
 
 
-CONFIG_ROOT = os.path.dirname(os.path.abspath(__file__))
-CONFIG_SPEC = os.path.join(CONFIG_ROOT, "chromag.config.spec.cfg")
-
-cp = epochs.ConfigParser(CONFIG_SPEC)
+cp = None
 
 
 def read_config(config_filename):
     """Read a configuration file."""
-    cp.read(config_filename)
+    global cp
+    if cp is None:
+        config_root = os.path.dirname(os.path.abspath(__file__))
+        config_spec = os.path.join(config_root, "chromag.config.spec.cfg")
+        cp = epochs.ConfigParser(config_spec)
+        cp.read(config_filename)
     return cp.is_valid()
 
 

@@ -15,11 +15,14 @@ from ..datetime import decompose_date, short2hyphenated, human_timedelta
 from ..logging import logger, filter_log
 
 
-with open(os.path.join(os.path.dirname(__file__), "eod-template.html"), "r") as f:
-    eod_template = f.read()
+def get_template() -> str:
+    """Get the end-of-day notification email template."""
+    with open(os.path.join(os.path.dirname(__file__), "eod-template.html"), "r") as f:
+        eod_template = f.read()
+    return eod_template
 
 
-def notify_eod(date_run):
+def notify_eod(observing_day: str, date_run=None):
     """Send notification at end of day. Returns whether it sent a
     notification."""
     send_notifications = get_option("notifications", "send")
@@ -33,7 +36,7 @@ def notify_eod(date_run):
         return False
     from_email = get_option("notifications", "from")
 
-    date = short2hyphenated(date_run.observing_day)
+    date = short2hyphenated(observing_day)
     # [TODO]: add status (success, failure, incomplete, etc.) to subject?
     subject = f"ChroMag end-of-day processing for {date}"
 
@@ -42,9 +45,7 @@ def notify_eod(date_run):
     # [TODO]: add run statistics
 
     log_basedir = get_option("logging", "basedir")
-    log_filename = os.path.join(
-        log_basedir, f"{date_run.observing_day}.chromag.eod.log"
-    )
+    log_filename = os.path.join(log_basedir, f"{observing_day}.chromag.eod.log")
     log_msgs = filter_log(log_filename, 2)  # logging.WARN = 2
 
     if log_msgs == "":
@@ -56,9 +57,9 @@ def notify_eod(date_run):
 
     eng_basedir = get_option("engineering", "basedir")
     if eng_basedir is not None:
-        eng_dir = os.path.join(eng_basedir, *decompose_date(date_run.observing_day))
+        eng_dir = os.path.join(eng_basedir, *decompose_date(observing_day))
         if eng_dir is not None:
-            timeline_basename = f"{date_run.observing_day}.chromag.timeline.png"
+            timeline_basename = f"{observing_day}.chromag.timeline.png"
             timeline_filename = os.path.join(eng_dir, timeline_basename)
             attachments.append((timeline_filename, timeline_basename))
             timeline_plot_html = (
@@ -75,11 +76,13 @@ def notify_eod(date_run):
 
     plain_text += f"\n\nSent from ChroMag pipeline {__version__} [{__revision__}] by {user}@{hostname}"
 
-    html_text = eod_template.format(
-        n_raw_files=len(date_run.catalog),
+    html_text = get_template().format(
+        n_raw_files=f"{len(date_run.catalog)} files" if date_run is not None else "—",
         l1_processing_time_per_file=human_timedelta(
             date_run.l1_processing_time_per_file
-        ),
+        )
+        if date_run is not None
+        else "—",
         log_msgs=log_msgs,
         timeline_plot_html=timeline_plot_html,
         __version__=__version__,

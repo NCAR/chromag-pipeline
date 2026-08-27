@@ -23,8 +23,12 @@ def clearday(run):
     process_basedir = get_basedir(run.observing_day, "process")
     process_dir = os.path.join(process_basedir, run.observing_day)
     if os.path.isdir(process_dir):
-        logger.info(f"removing process directory {run.observing_day}/...")
-        shutil.rmtree(process_dir)
+        subdirs = ["level0", "level1", "level2", "level3"]
+        for d in subdirs:
+            dir = os.path.join(process_dir, d)
+            if os.path.isdir(dir):
+                logger.info(f"removing process directory {run.observing_day}/{d}...")
+                shutil.rmtree(dir)
     else:
         logger.info("no process directory")
 

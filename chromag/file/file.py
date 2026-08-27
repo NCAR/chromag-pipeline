@@ -15,15 +15,31 @@ from ..config import get_basedir
 from ..datetime import dateobs2datetime, obsday_hours
 
 
-# read the level 1 header template
-with open(os.path.join(os.path.dirname(__file__), "l1_header_template.txt"), "r") as f:
-    l1_header_template = f.read()
+l1_header_template = None
+keyword_formats = None
 
-# read the formats for the keywords present in the raw header
-cp = configparser.ConfigParser()
-cp.read(os.path.join(os.path.dirname(__file__), "keyword_formats.cfg"))
-keyword_formats = {k.upper(): cp.get("formats", k) for k in cp.options("formats")}
-del cp
+
+def initialize_l1_header():
+    """Read the level 1 header template if it hasn't been read yet."""
+    global l1_header_template
+    if l1_header_template is None:
+        with open(
+            os.path.join(os.path.dirname(__file__), "l1_header_template.txt"), "r"
+        ) as f:
+            l1_header_template = f.read()
+
+
+def initialize_keyword_formats():
+    """Read the formats for the keywords present in the raw header if they
+    haven't been read yet.
+    """
+    global keyword_formats
+    if keyword_formats is None:
+        cp = configparser.ConfigParser()
+        cp.read(os.path.join(os.path.dirname(__file__), "keyword_formats.cfg"))
+        keyword_formats = {
+            k.upper(): cp.get("formats", k) for k in cp.options("formats")
+        }
 
 
 class ChroMagRawFile:
@@ -240,6 +256,9 @@ def reorder_header(header: fits.header.Header):
     floating point values using the format specifications in
     keyword_formats.cfg.
     """
+    initialize_l1_header()
+    initialize_keyword_formats()
+
     h = fits.header.Header.fromstring(l1_header_template, sep="\n")
     for k, v in header.items():
         if k != "COMMENT" and k != "":
