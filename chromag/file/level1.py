@@ -12,6 +12,8 @@ from .fileio import create_dir, write_fits_file
 from ..logging import logger
 
 
+# [TODO]: it would be good to make this a pipeline.step if I can get around the
+# circular imports
 def write_l1_file(l1_file: ChroMagL1File):
     """Write a level 1 ChroMag file."""
     output_filename = l1_file.get_filename("filename")
@@ -25,6 +27,8 @@ def write_l1_file(l1_file: ChroMagL1File):
     logger.debug(f"wrote {output_basename}")
 
 
+# [TODO]: it would be good to make this a pipeline.step if I can get around the
+# circular imports
 def write_l1_intermediate(l1_file: ChroMagL1File, name: str):
     """Write a partially processed level 1 file. The `name` argument indicates
     which step of the processing was last completed.
