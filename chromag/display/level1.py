@@ -12,8 +12,10 @@ from ..datetime import datetime2dateobs
 from ..file import ChroMagL1File, create_dir
 from ..lines import line_property
 from ..logging import logger
+from ..pipeline import step
 
 
+@step()
 def write_intensity_image(
     l1_file: ChroMagL1File, /, *, reduce_factor=1, output_filename: str | None = None
 ):
@@ -102,6 +104,7 @@ def write_intensity_image(
     logger.debug(f"wrote {output_basename}")
 
 
+@step()
 def write_iquv_image(
     l1_file: ChroMagL1File, /, *, reduce_factor=4, output_filename: str | None = None
 ):
