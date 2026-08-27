@@ -31,6 +31,27 @@ def dark_correct(run, l1_file: ChroMagL1File):
 
 
 @step()
+def flat_correct(run, l1_file: ChroMagL1File):
+    """Apply flat correction to dark-corrected data."""
+
+    # get flat of matching exposure time & wavelength to science image
+    flat, flat_index = run.calibration.get_flat(l1_file.exposure, l1_file.wavelength)
+
+    # get averaged dark of matching exposure time to science image
+    dark, dark_index = run.calibration.get_dark(l1_file.exposure)
+
+    # mulitply with transmission and subtract off dark (??)
+    flat_dark_corrected = flat - dark
+
+    # correct science
+    l1_file.data /= flat_dark_corrected.reshape(1, *dark.shape)
+
+    # update header
+    l1_file.primary_header["FLAT_COR"] = True
+    l1_file.primary_header["FLATUSED"] = flat_index
+
+
+@step()
 def update_header(run, l1_file: ChroMagL1File):
     l1_file.primary_header["DATE_DP"] = datetime2dateobs(datetime.datetime.now())
     l1_file.primary_header["DPSWID"] = f"{__version__} [{__revision__}]"
