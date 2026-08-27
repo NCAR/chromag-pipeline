@@ -6,7 +6,11 @@ import importlib.metadata
 import os
 import subprocess
 
-# find version and git revision
+# find version and git revision:
+#
+# - add "-dev" to the version if there have been commits since the version was
+#   tagged
+# - add "*" to the revision if there are uncommitted changes
 
 __version__ = importlib.metadata.version("chromag")
 
