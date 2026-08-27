@@ -13,15 +13,13 @@ from . import DatabaseError, get_connection
 
 from ..logging import logger
 
-DATABASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TABLE_NAMES = ["sw", "level", "filetype", "producttype", "level0", "level1", "web"]
-
 
 def get_sql_cmds(table_name: str, type: str):
     """Read the `{table_name}.tbl` file in this directory and return it."""
-    table_filename = os.path.join(DATABASE_DIR, f"{type}_{table_name}.sql")
-    if os.path.exists(table_filename):
-        with open(table_filename, "r") as f:
+    database_dir = os.path.dirname(os.path.abspath(__file__))
+    cmd_filename = os.path.join(database_dir, f"{type}_{table_name}.sql")
+    if os.path.exists(cmd_filename):
+        with open(cmd_filename, "r") as f:
             sql_cmds = f.read()
         return sql_cmds
     else:
@@ -55,22 +53,25 @@ def init_table(cursor: mysql.connector.cursor_cext.CMySQLCursor, table_name: str
 
 
 def initialize_tables(config_filename: str, config_section: str):
-    """Delete any existing tables and then re-create new tables."""
+    """Delete any existing tables and then re-create new tables and initialize
+    them."""
+
+    table_names = ["sw", "level", "filetype", "producttype", "level0", "level1", "web"]
 
     try:
         with closing(get_connection(config_filename, config_section)) as connection:
             logger.info(f"connected to database")
             with closing(connection.cursor()) as cursor:
                 # delete tables
-                for t in reversed(TABLE_NAMES):
+                for t in reversed(table_names):
                     delete_table(cursor, t)
 
                 # create tables
-                for t in TABLE_NAMES:
+                for t in table_names:
                     create_table(cursor, t)
 
                 # initialize values in tables
-                for t in TABLE_NAMES:
+                for t in table_names:
                     init_table(cursor, t)
             connection.commit()
     except mysql.connector.errors.Error as e:
