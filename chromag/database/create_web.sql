@@ -13,13 +13,16 @@ create table chromag_web (
   wave_region                           char(4),
   wavelength                            float,
 
-  -- [TODO]: web specific information
-
-  -- producttype_id?
+  producttype_id                        int,
+  filetype_id                           int,
+  level_id                              int,
 
   index (date_obs),
   index (obsday_id),
   unique(filename),
 
+  foreign key (producttype_id) references chromag_producttype(producttype_id),
+  foreign key (filetype_id) references chromag_filetype(filetype_id),
+  foreign key (level_id) references chromag_level(level_id),
   foreign key (obsday_id) references mlso_numfiles(day_id)
 );
