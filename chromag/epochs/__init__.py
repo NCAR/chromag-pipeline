@@ -14,7 +14,7 @@ DateValue = TypeVar("DateValue", str, datetime.datetime)
 ep = None
 
 
-def get(property_name, date: DateValue):
+def get(property_name: str, date: DateValue):
     """Get property value for a given datetime."""
     global ep
 
