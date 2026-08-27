@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Handle properties of the spectral lines."""
+"""Handle changing properties of the instrument."""
 
 import datetime
 import os
