@@ -56,6 +56,11 @@ def datetime2dateobs(dt: datetime.datetime, no_milliseconds=False) -> str:
         return dt.isoformat(sep="T", timespec="milliseconds")
 
 
+def ut2hst(ut_dt: datetime.datetime) -> datetime.datetime:
+    """Convert date/time from UT to HST time zone."""
+    return ut_dt - datetime.timedelta(hours=10)
+
+
 def obsday_hours2str(obsday_hours: float) -> str:
     """Format an `obsday_hours` (fractional hours into an HST day) value into a
     formatted string of the time.
@@ -71,15 +76,10 @@ def obsday_hours2str(obsday_hours: float) -> str:
         return f"{hours} {am_pm}" if mins == 0 else f"{hours}:{mins:02d} {am_pm}"
 
 
-def ut2hst(dt: datetime.datetime) -> datetime.datetime:
-    """Convert date/time from UT to HST time zone."""
-    return dt - datetime.timedelta(hours=10)
-
-
-def obsday_hours(dt: datetime.datetime) -> float:
-    """Return the numbers of hours into the observing day."""
-    hst = ut2hst(dt)
-    return hst.hour + hst.minute / 60.0 + hst.second / 60.0 / 60.0
+def obsday_hours(ut_dt: datetime.datetime) -> float:
+    """Return the numbers of hours into the observing day given a UT date/time."""
+    hst_dt = ut2hst(ut_dt)
+    return hst_dt.hour + hst_dt.minute / 60.0 + hst_dt.second / 60.0 / 60.0
 
 
 def short2hyphenated(short_date: str) -> str:
