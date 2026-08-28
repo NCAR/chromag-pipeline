@@ -78,11 +78,11 @@ def notify_eod(observing_day: str, date_run=None):
 
     html_text = get_template().format(
         n_raw_files=f"{len(date_run.catalog)} files" if date_run is not None else "—",
-        l1_processing_time_per_file=human_timedelta(
-            date_run.l1_processing_time_per_file
-        )
-        if date_run is not None
-        else "—",
+        l1_processing_time_per_file=(
+            human_timedelta(date_run.l1_processing_time_per_file)
+            if date_run is not None
+            else "—"
+        ),
         log_msgs=log_msgs,
         timeline_plot_html=timeline_plot_html,
         __version__=__version__,
