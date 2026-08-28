@@ -16,7 +16,21 @@ DateValue = TypeVar("DateValue", str, datetime.datetime)
 cps = None
 
 
-def initialize_waveregions():
+class WaveRegionError(Exception):
+    """Exception to indicate a problem initializig the wave region
+    configurations."""
+
+
+def _get_spec(waveregion: str):
+    """Get the `EpochConfigParser` spec for the given wave region."""
+    if cps is None:
+        _initialize_waveregions()
+
+    return cps[waveregion].spec
+
+
+def _initialize_waveregions():
+    """Initialize the dict of wave region options."""
     global cps
 
     cps = collections.OrderedDict()
@@ -29,13 +43,20 @@ def initialize_waveregions():
 
         waveregion_cfg = os.path.join(waveregion_root, f"{waveregion}.cfg")
         cp.read(waveregion_cfg)
+
+        try:
+            if not cp.is_valid():
+                raise WaveRegionError(f"{waveregion}.cfg not valid")
+        except ValueError as e:
+            raise WaveRegionError(e.msg)
+
         cps[waveregion] = cp
 
 
 def available_waveregions():
     """List the available wave regions. Returns a list of string names."""
     if cps is None:
-        initialize_waveregions()
+        _initialize_waveregions()
 
     return cps.keys()
 
@@ -43,6 +64,6 @@ def available_waveregions():
 def waveregion_property(waveregion: str, property_name: str, date: DateValue):
     """Retrieve a property of a given wave region."""
     if cps is None:
-        initialize_waveregions()
+        _initialize_waveregions()
 
     return cps[waveregion].get(property_name, date)

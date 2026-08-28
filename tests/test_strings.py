@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Tests for `string_helpers` package.
+"""Tests for `strings` package.
 """
 
 import pytest
