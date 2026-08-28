@@ -79,9 +79,7 @@ def _get_id(
     """Get ID given a name for any of the `chromag_{filetype,producttype,level}`
     database tables."""
     with closing(connection.cursor()) as cursor:
-        cmd = (
-            f'select {type}_id from chromag_level where {type}_name = "{name}" limit 1;'
-        )
+        cmd = f'select {type}_id from chromag_{type} where {type}_name = "{name}" limit 1;'
         cursor.execute(cmd)
         result = cursor.fetchone()
         if result is None:
@@ -98,7 +96,7 @@ def get_level_id(
 ):
     """Retrieve level ID for a given level name. If `level_name` is not found,
     raises a DatabaseError error."""
-    return _get_id("level", level_name)
+    return _get_id(connection, "level", level_name)
 
 
 def get_filetype_id(
@@ -106,7 +104,7 @@ def get_filetype_id(
 ):
     """Retrieve file type ID for a given file type name. If `filetype_name` is
     not found, raises a DatabaseError error."""
-    return _get_id("filetype", filetype_name)
+    return _get_id(connection, "filetype", filetype_name)
 
 
 def get_producttype_id(
@@ -114,4 +112,4 @@ def get_producttype_id(
 ):
     """Retrieve product type ID for a given product type name. If
     `producttype_name` is not found, raises a DatabaseError error."""
-    return _get_id("producttype", producttype_name)
+    return _get_id(connection, "producttype", producttype_name)

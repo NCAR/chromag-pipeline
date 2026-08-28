@@ -8,7 +8,15 @@ import os
 
 import mysql.connector
 
-from . import DatabaseError, get_connection, get_obsday_id, get_sw_id
+from . import (
+    DatabaseError,
+    get_connection,
+    get_obsday_id,
+    get_sw_id,
+    get_level_id,
+    get_filetype_id,
+    get_producttype_id,
+)
 
 from ..config import get_option
 from ..datetime import datetime2dateobs
@@ -24,6 +32,10 @@ def insert_web(
     """Update the chromag_web database table."""
 
     sw_id = get_sw_id(connection)
+    iquv_id = get_producttype_id(connection, "IQUV")
+    fits_id = get_filetype_id(connection, "FITS")
+    level1_id = get_level_id(connection, "L1")
+
     wave_regions = available_waveregions()
     with closing(connection.cursor()) as cursor:
         for w in wave_regions:
@@ -36,6 +48,7 @@ def insert_web(
                     l1_file = f.l1_file
                     filename = l1_file.get_filename("filename")
                     basename = os.path.basename(filename)
+                    # [TODO]: add other file/product types
                     fields = {
                         "filename": (f'"{basename}"', "s"),
                         "l0_filename": (f'"{f.basename}"', "s"),
@@ -44,10 +57,14 @@ def insert_web(
                         "obsday_id": (obsday_id, "d"),
                         "wave_region": (f'"{f.wave_region}"', "s"),
                         "wavelength": (f.wavelength, "0.3f"),
+                        "producttype_id": (iquv_id, "d"),
+                        "filetype_id": (fits_id, "d"),
+                        "level_id": (level1_id, "d"),
                     }
                     field_names = ",".join(fields.keys())
                     field_values = ",".join([f"{v[0]:{v[1]}}" for v in fields.values()])
                     cmd = f"insert into chromag_web ({field_names}) value ({field_values});"
+                    logger.debug(cmd)
                     cursor.execute(cmd)
 
                     logger.debug(f"inserted {basename}")
@@ -171,6 +188,9 @@ def insert_files(run, catalog):
                 for insert_level_routine in level_routines:
                     insert_level_routine(connection, obsday_id, catalog)
         except mysql.connector.errors.Error as e:
+            logger.error(e, exc_info=True)
             raise DatabaseError(e.msg)
+
+            raise e
     else:
         logger.info("skipped files results into database")
