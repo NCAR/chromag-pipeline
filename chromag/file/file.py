@@ -192,6 +192,8 @@ class ChroMagL1File:
             basename = (
                 f"{prefix}.chromag.{self.wave_region}.l1.{intermediate_step}.fits"
             )
+        else:
+            raise NameError(f"unknown filename type {name}")
 
         return os.path.join(output_dir, basename) if fullpath else basename
 
