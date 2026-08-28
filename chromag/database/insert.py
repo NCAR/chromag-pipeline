@@ -33,7 +33,9 @@ def insert_web(
 
     sw_id = get_sw_id(connection)
     iquv_id = get_producttype_id(connection, "IQUV")
+    i_id = get_producttype_id(connection, "I")
     fits_id = get_filetype_id(connection, "FITS")
+    png_id = get_filetype_id(connection, "PNG")
     level1_id = get_level_id(connection, "L1")
 
     wave_regions = available_waveregions()
@@ -46,26 +48,37 @@ def insert_web(
                 )
                 for f in cat:
                     l1_file = f.l1_file
-                    filename = l1_file.get_filename("filename")
-                    basename = os.path.basename(filename)
-                    # [TODO]: add other file/product types
-                    fields = {
-                        "filename": (f'"{basename}"', "s"),
-                        "l0_filename": (f'"{f.basename}"', "s"),
-                        "filesize": (os.path.getsize(filename), "d"),
-                        "date_obs": (f'"{datetime2dateobs(f.date_obs)}"', "s"),
-                        "obsday_id": (obsday_id, "d"),
-                        "wave_region": (f'"{f.wave_region}"', "s"),
-                        "wavelength": (f.wavelength, "0.3f"),
-                        "producttype_id": (iquv_id, "d"),
-                        "filetype_id": (fits_id, "d"),
-                        "level_id": (level1_id, "d"),
-                    }
-                    field_names = ",".join(fields.keys())
-                    field_values = ",".join([f"{v[0]:{v[1]}}" for v in fields.values()])
-                    cmd = f"insert into chromag_web ({field_names}) value ({field_values});"
-                    logger.debug(cmd)
-                    cursor.execute(cmd)
+                    for p in ["iquv", "i"]:
+                        for type in ["filename", f"{p}_quicklook"]:
+                            # don't have I only FITS files right now
+                            if type == "filename" and p == "i":
+                                continue
+
+                            filename = l1_file.get_filename(type)
+                            basename = os.path.basename(filename)
+
+                            filetype_id = fits_id if type == "filename" else png_id
+                            producttype_id = i_id if p == "i" else iquv_id
+
+                            fields = {
+                                "filename": (f'"{basename}"', "s"),
+                                "l0_filename": (f'"{f.basename}"', "s"),
+                                "filesize": (os.path.getsize(filename), "d"),
+                                "date_obs": (f'"{datetime2dateobs(f.date_obs)}"', "s"),
+                                "obsday_id": (obsday_id, "d"),
+                                "wave_region": (f'"{f.wave_region}"', "s"),
+                                "wavelength": (f.wavelength, "0.3f"),
+                                "producttype_id": (producttype_id, "d"),
+                                "filetype_id": (filetype_id, "d"),
+                                "level_id": (level1_id, "d"),
+                            }
+                            field_names = ",".join(fields.keys())
+                            field_values = ",".join(
+                                [f"{v[0]:{v[1]}}" for v in fields.values()]
+                            )
+                            cmd = f"insert into chromag_web ({field_names}) value ({field_values});"
+                            logger.debug(cmd)
+                            cursor.execute(cmd)
 
                     logger.debug(f"inserted {basename}")
             else:
