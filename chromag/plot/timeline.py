@@ -7,8 +7,11 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, FixedLocator
 from matplotlib.transforms import IdentityTransform
 
+from .. import mission_start
+
 from ..datetime import obsday_hours2str
-from ..lines import available_lines, line_property
+from ..waveregions import available_waveregions, waveregion_property
+from ..logging import logger
 
 START_TIME = 6  # 6 am HST
 END_TIME = 18  # 6 pm HST
@@ -36,7 +39,7 @@ def darken(color: str, factor: float = 0.5) -> str:
 
 def write_timeline(output_filename: str, catalog, binsize: int = 15):
     """Create a timeline of the observations for the day."""
-    wave_regions = available_lines()
+    wave_regions = available_waveregions()
     figsize = (7, 2)
     label_fontsize = 8
     edge_darkening_factor = 0.7
@@ -48,7 +51,8 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
 
     for i, w in enumerate(wave_regions):
         wave_files = catalog[catalog.wave_region == w]
-        wave_color = line_property(w, "color")
+        logger.info(f"{w}, color, {mission_start}")
+        wave_color = waveregion_property(w, "color", mission_start)
         # [TODO]: to add flats/cal files:
         # - change histtype to "stepfilled"
         # - pass [sci_files, flat_files, cal_files]

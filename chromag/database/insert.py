@@ -12,7 +12,7 @@ from . import DatabaseError, get_connection, get_obsday_id, get_sw_id
 
 from ..config import get_option
 from ..datetime import datetime2dateobs
-from ..lines import available_lines
+from ..waveregions import available_waveregions
 from ..logging import logger
 
 
@@ -24,7 +24,7 @@ def insert_web(
     """Update the chromag_web database table."""
 
     sw_id = get_sw_id(connection)
-    wave_regions = available_lines()
+    wave_regions = available_waveregions()
     with closing(connection.cursor()) as cursor:
         for w in wave_regions:
             if get_option(w, "publish_l1"):
@@ -97,7 +97,7 @@ def insert_level1(
     logger.info("inserting files into level 1 database...")
 
     sw_id = get_sw_id(connection)
-    wave_regions = available_lines()
+    wave_regions = available_waveregions()
     with closing(connection.cursor()) as cursor:
         for w in wave_regions:
             cat = catalog[catalog.is_science & (catalog.wave_region == w)]

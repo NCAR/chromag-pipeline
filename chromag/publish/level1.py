@@ -10,7 +10,7 @@ import shutil
 
 from ..config import get_option, get_basedir
 from ..datetime import decompose_date
-from ..lines import available_lines
+from ..waveregions import available_waveregions
 from ..logging import logger
 
 
@@ -37,7 +37,7 @@ def publish_l1(run):
         if not os.path.isdir(fullres_dir):
             os.makedirs(fullres_dir)
 
-    wave_regions = available_lines()
+    wave_regions = available_waveregions()
     for w in wave_regions:
         if get_option(w, "publish_l1"):
             wave_files = run.catalog[
@@ -72,7 +72,7 @@ def _clearday_l1type(run, type: str):
     else:
         logger.info(f"clearing {type} directory...")
 
-        for w in available_lines():
+        for w in available_waveregions():
             files = glob.glob(
                 os.path.join(
                     basedir, *decompose_date(run.observing_day), f"*.chromag.{w}.l1.*"

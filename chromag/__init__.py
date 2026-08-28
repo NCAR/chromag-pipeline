@@ -6,6 +6,8 @@ import importlib.metadata
 import os
 import subprocess
 
+mission_start = "2027-01-01"
+
 # find version and git revision:
 #
 # - add "-dev" to the version if there have been commits since the version was
