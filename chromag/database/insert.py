@@ -80,6 +80,8 @@ def insert_web(
                             logger.debug(cmd)
                             cursor.execute(cmd)
 
+                    filename = l1_file.get_filename("filename")
+                    basename = os.path.basename(filename)
                     logger.debug(f"inserted {basename}")
             else:
                 logger.info(f"skipped inserting {w} nm files to web database table")
