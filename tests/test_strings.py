@@ -5,7 +5,7 @@
 
 import pytest
 
-from chromag.string_helpers import truncate
+from chromag.strings import truncate
 
 
 def test_truncate_basic():
