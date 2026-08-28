@@ -51,7 +51,6 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
 
     for i, w in enumerate(wave_regions):
         wave_files = catalog[catalog.wave_region == w]
-        logger.info(f"{w}, color, {mission_start}")
         wave_color = waveregion_property(w, "color", mission_start)
         # [TODO]: to add flats/cal files:
         # - change histtype to "stepfilled"
