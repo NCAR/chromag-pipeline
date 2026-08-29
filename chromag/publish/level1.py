@@ -47,16 +47,20 @@ def publish_l1(run):
             for f in wave_files:
                 # [TODO]: check GBU file before publishing
                 if publish_to_webarchive:
-                    filename = f.l1_file.get_filename("filename")
-                    basename = os.path.basename(filename)
-                    shutil.copy(filename, os.path.join(webarchive_dir, basename))
-                    logger.debug(f"published {basename}")
+                    # there might not be a level 1 file because of quality
+                    if f.l1_file is not None:
+                        filename = f.l1_file.get_filename("filename")
+                        basename = os.path.basename(filename)
+                        shutil.copy(filename, os.path.join(webarchive_dir, basename))
+                        logger.debug(f"published {basename}")
                 if publish_to_fullres:
                     for p in ["i_quicklook", "iquv_quicklook"]:
-                        filename = f.l1_file.get_filename(p)
-                        basename = os.path.basename(filename)
-                        shutil.copy(filename, os.path.join(fullres_dir, basename))
-                        logger.debug(f"published {basename}")
+                        # there might not be a level 1 file because of quality
+                        if f.l1_file is not None:
+                            filename = f.l1_file.get_filename(p)
+                            basename = os.path.basename(filename)
+                            shutil.copy(filename, os.path.join(fullres_dir, basename))
+                            logger.debug(f"published {basename}")
 
         else:
             logger.info(f"skipped publishing {w} nm level 1 files")

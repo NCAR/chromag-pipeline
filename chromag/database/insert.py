@@ -48,41 +48,45 @@ def insert_web(
                 )
                 for f in cat:
                     l1_file = f.l1_file
-                    for p in ["iquv", "i"]:
-                        for type in ["filename", f"{p}_quicklook"]:
-                            # don't have I only FITS files right now
-                            if type == "filename" and p == "i":
-                                continue
+                    if l1_file is not None:
+                        for p in ["iquv", "i"]:
+                            for type in ["filename", f"{p}_quicklook"]:
+                                # don't have I only FITS files right now
+                                if type == "filename" and p == "i":
+                                    continue
 
-                            filename = l1_file.get_filename(type)
-                            basename = os.path.basename(filename)
+                                filename = l1_file.get_filename(type)
+                                basename = os.path.basename(filename)
 
-                            filetype_id = fits_id if type == "filename" else png_id
-                            producttype_id = i_id if p == "i" else iquv_id
+                                filetype_id = fits_id if type == "filename" else png_id
+                                producttype_id = i_id if p == "i" else iquv_id
 
-                            fields = {
-                                "filename": (f'"{basename}"', "s"),
-                                "l0_filename": (f'"{f.basename}"', "s"),
-                                "filesize": (os.path.getsize(filename), "d"),
-                                "date_obs": (f'"{datetime2dateobs(f.date_obs)}"', "s"),
-                                "obsday_id": (obsday_id, "d"),
-                                "wave_region": (f'"{f.wave_region}"', "s"),
-                                "wavelength": (f.wavelength, "0.3f"),
-                                "producttype_id": (producttype_id, "d"),
-                                "filetype_id": (filetype_id, "d"),
-                                "level_id": (level1_id, "d"),
-                            }
-                            field_names = ",".join(fields.keys())
-                            field_values = ",".join(
-                                [f"{v[0]:{v[1]}}" for v in fields.values()]
-                            )
-                            cmd = f"insert into chromag_web ({field_names}) value ({field_values});"
-                            logger.debug(cmd)
-                            cursor.execute(cmd)
+                                fields = {
+                                    "filename": (f'"{basename}"', "s"),
+                                    "l0_filename": (f'"{f.basename}"', "s"),
+                                    "filesize": (os.path.getsize(filename), "d"),
+                                    "date_obs": (
+                                        f'"{datetime2dateobs(f.date_obs)}"',
+                                        "s",
+                                    ),
+                                    "obsday_id": (obsday_id, "d"),
+                                    "wave_region": (f'"{f.wave_region}"', "s"),
+                                    "wavelength": (f.wavelength, "0.3f"),
+                                    "producttype_id": (producttype_id, "d"),
+                                    "filetype_id": (filetype_id, "d"),
+                                    "level_id": (level1_id, "d"),
+                                }
+                                field_names = ",".join(fields.keys())
+                                field_values = ",".join(
+                                    [f"{v[0]:{v[1]}}" for v in fields.values()]
+                                )
+                                cmd = f"insert into chromag_web ({field_names}) value ({field_values});"
+                                logger.debug(cmd)
+                                cursor.execute(cmd)
 
-                    filename = l1_file.get_filename("filename")
-                    basename = os.path.basename(filename)
-                    logger.debug(f"inserted {basename}")
+                        filename = l1_file.get_filename("filename")
+                        basename = os.path.basename(filename)
+                        logger.debug(f"inserted {basename}")
             else:
                 logger.info(f"skipped inserting {w} nm files to web database table")
 
@@ -136,27 +140,28 @@ def insert_level1(
             logger.info(f"inserting {len(cat)} {w} nm files into level 1 database...")
             for f in cat:
                 l1_file = f.l1_file
-                filename = l1_file.get_filename("filename")
-                basename = os.path.basename(filename)
-                fields = {
-                    "filename": (f'"{basename}"', "s"),
-                    "l0_filename": (f'"{f.basename}"', "s"),
-                    "filesize": (os.path.getsize(filename), "d"),
-                    "date_obs": (f'"{datetime2dateobs(f.date_obs)}"', "s"),
-                    "obsday_id": (obsday_id, "d"),
-                    "wave_region": (f'"{f.wave_region}"', "s"),
-                    "wavelength": (f.wavelength, "0.3f"),
-                    "exposure": (f.exposure, "0.3f"),
-                    "scan_i": (f.scan_i, "d"),
-                    "scan_n": (f.scan_n, "d"),
-                    "chromag_sw_id": (sw_id, "d"),
-                }
-                field_names = ",".join(fields.keys())
-                field_values = ",".join([f"{v[0]:{v[1]}}" for v in fields.values()])
-                cmd = f"insert into chromag_level1 ({field_names}) value ({field_values});"
-                cursor.execute(cmd)
+                if l1_file is not None:
+                    filename = l1_file.get_filename("filename")
+                    basename = os.path.basename(filename)
+                    fields = {
+                        "filename": (f'"{basename}"', "s"),
+                        "l0_filename": (f'"{f.basename}"', "s"),
+                        "filesize": (os.path.getsize(filename), "d"),
+                        "date_obs": (f'"{datetime2dateobs(f.date_obs)}"', "s"),
+                        "obsday_id": (obsday_id, "d"),
+                        "wave_region": (f'"{f.wave_region}"', "s"),
+                        "wavelength": (f.wavelength, "0.3f"),
+                        "exposure": (f.exposure, "0.3f"),
+                        "scan_i": (f.scan_i, "d"),
+                        "scan_n": (f.scan_n, "d"),
+                        "chromag_sw_id": (sw_id, "d"),
+                    }
+                    field_names = ",".join(fields.keys())
+                    field_values = ",".join([f"{v[0]:{v[1]}}" for v in fields.values()])
+                    cmd = f"insert into chromag_level1 ({field_names}) value ({field_values});"
+                    cursor.execute(cmd)
 
-                logger.debug(f"inserted {basename}")
+                    logger.debug(f"inserted {basename}")
 
     connection.commit()
 

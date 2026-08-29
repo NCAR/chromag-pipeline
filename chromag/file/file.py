@@ -48,6 +48,9 @@ class ChroMagRawFile:
     def __init__(self, filename: str, observing_day: str):
         self.filename = filename
         self.basename = os.path.basename(self.filename)
+
+        self.quality_bitmask = 0
+
         self.l1_file = None
         self._data = None
         self.observing_day = observing_day
