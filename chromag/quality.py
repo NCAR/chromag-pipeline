@@ -20,18 +20,34 @@ PASS = 0
 FAIL = 1
 
 
-def sci_condition1(l0_file: ChroMagRawFile):
-    import random
-
-    x = random.random()
-    return PASS if x < 0.90 else FAIL
+sgsloop_threshold = 0.99
 
 
-sci_condition1.name = "condition1"
-sci_condition1.description = "tests blah, blah"
+def check_sgsloop(l0_file: ChroMagRawFile):
+    """Check to make sure the SGS system was tracking the sun."""
+    sgsloop = l0_file.primary_header["SGSLOOP"]
+    if sgsloop is None:
+        return PASS
+    return PASS if sgsloop > sgsloop_threshold else FAIL
 
-science_conditions = [sci_condition1]
 
+check_sgsloop.name = "SGSLOOP"
+check_sgsloop.description = f"check SGSLOOP is > {sgsloop_threshold}"
+
+
+def check_inout(l0_file: ChroMagRawFile):
+    """Check to make sure hardward positions are either in or out."""
+    # [TODO]: need to know correct position range for science files
+    # potential keywords to check: CALP_POS, CAM_POS, COVR_POS, DIFF_POS,
+    # HRF_POS, OSF_POS, TT_XPOS, TT_XSTD, TT_YPOS, TT_YSTD
+    return PASS
+
+
+check_inout.name = "INOUT"
+check_inout.description = "check positions are in or out"
+
+
+science_conditions = [check_sgsloop, check_inout]
 science_quality_names = [c.name for c in science_conditions]
 science_quality_descriptions = [c.description for c in science_conditions]
 
