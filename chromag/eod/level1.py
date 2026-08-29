@@ -66,9 +66,7 @@ def process(run):
         raw_file.quality_bitmask = sci_quality_check(raw_file)
         if raw_file.quality_bitmask != 0:
             quality_name = sci_quality_name(raw_file.quality_bitmask)
-            logger.warn(
-                f"failed conditions {quality_name}, skipping level 1 processing"
-            )
+            logger.warn(f"failed quality {quality_name}, skipping L1")
             continue
 
         l1_file = ChroMagL1File(raw_file)
