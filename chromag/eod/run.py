@@ -21,7 +21,7 @@ from ..datetime import human_timedelta
 from ..logging import setup_logging, get_level
 from ..pipeline import Run
 from ..publish import publish_l1, publish_l2, publish_l3
-from ..quality import write_quality_files
+from ..quality import write_sci_quality_logs
 
 
 def run(observing_day: str, config_filename: str, reprocessing: bool = False):
@@ -70,7 +70,7 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
         logger.warning("process.caldir not set, not writing cal file")
 
     process_l1(date_run, skip=not get_option("level1", "process"))
-    write_quality_files(date_run.catalog, date_run.observing_day)
+    write_sci_quality_logs(date_run.catalog, date_run.observing_day)
 
     process_l2(date_run, skip=not get_option("level2", "process"))
 
