@@ -81,7 +81,6 @@ def insert_web(
                                     [f"{v[0]:{v[1]}}" for v in fields.values()]
                                 )
                                 cmd = f"insert into chromag_web ({field_names}) value ({field_values});"
-                                logger.debug(cmd)
                                 cursor.execute(cmd)
 
                         filename = l1_file.get_filename("filename")
