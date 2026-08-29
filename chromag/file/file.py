@@ -55,9 +55,7 @@ class ChroMagRawFile:
         self._data = None
         self.observing_day = observing_day
 
-        primary_header = read_rawheader(filename)
-
-        self.primary_header = primary_header
+        self.primary_header = read_rawheader(filename)
         self.date_obs = dateobs2datetime(self.primary_header["DATE-OBS"])
         self.obsday_hours = obsday_hours(self.date_obs)
 
@@ -68,34 +66,48 @@ class ChroMagRawFile:
 
         # possible values Scientific, Engineering, or Calibration
         self.datatype = (
-            primary_header["DATATYPE"] if "DATATYPE" in primary_header else None
+            self.primary_header["DATATYPE"]
+            if "DATATYPE" in self.primary_header
+            else None
         )
 
         self.wavelength = (
-            primary_header["WAVELNTH"] if "WAVELNTH" in primary_header else None
+            self.primary_header["WAVELNTH"]
+            if "WAVELNTH" in self.primary_header
+            else None
         )
         self.wave_region = (
-            str(int(float(primary_header["OSF_ID"])))
-            if "OSF_ID" in primary_header
+            str(int(float(self.primary_header["OSF_ID"])))
+            if "OSF_ID" in self.primary_header
             else None
         )
         self.exposure = (
-            primary_header["EXPTIME"] if "EXPTIME" in primary_header else None
+            self.primary_header["EXPTIME"] if "EXPTIME" in self.primary_header else None
         )
 
-        self.scan_i = primary_header["SCAN_I"] if "SCAN_I" in primary_header else None
-        self.scan_n = primary_header["SCAN_N"] if "SCAN_N" in primary_header else None
+        self.scan_i = (
+            self.primary_header["SCAN_I"] if "SCAN_I" in self.primary_header else None
+        )
+        self.scan_n = (
+            self.primary_header["SCAN_N"] if "SCAN_N" in self.primary_header else None
+        )
 
         self.obs_description = (
-            primary_header["OBS_DESC"] if "OBS_DESC" in primary_header else None
+            self.primary_header["OBS_DESC"]
+            if "OBS_DESC" in self.primary_header
+            else None
         )
 
         # possible values Sun, Diffuser, Dark, or Lamp
-        self.object = primary_header["OBJECT"] if "OBJECT" in primary_header else None
+        self.object = (
+            self.primary_header["OBJECT"] if "OBJECT" in self.primary_header else None
+        )
 
         # adding this 8/21 as synthetic flats have option in header called OFFSET
         # which can be "True" or "False", assuming now we do not know the offset
-        self.offset = primary_header["OFFSET"] if "OFFSET" in primary_header else None
+        self.offset = (
+            self.primary_header["OFFSET"] if "OFFSET" in self.primary_header else None
+        )
 
     @property
     def is_dark(self):
