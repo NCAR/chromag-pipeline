@@ -62,7 +62,7 @@ coverage: ## check code coverage quickly with the default Python
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/chromag.rst
+	rm -f docs/chromag*.rst
 	rm -f docs/modules.rst
 	sphinx-apidoc -o docs/ chromag
 	$(MAKE) -C docs clean
