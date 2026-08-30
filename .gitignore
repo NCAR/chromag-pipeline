@@ -1,5 +1,6 @@
 .coverage
 __pycache__
+/chromag.egg-info/
 /docs/_build
 /docs/chromag*.rst
 /docs/modules.rst
