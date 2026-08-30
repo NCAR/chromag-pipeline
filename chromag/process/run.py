@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Module defining the actions to perform in an eod run.
+"""Module defining the actions to perform in a processing/reprocessing run.
 """
 
 from collections import OrderedDict
