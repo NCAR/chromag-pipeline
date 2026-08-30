@@ -8,9 +8,10 @@ import datetime
 import os
 
 from .clearday import clearday
+from .gbu import gbu_check, write_gbu_logs
+from .inventory import run_inventory
 from .level1 import process as process_l1
 from .level2 import process as process_l2
-from .inventory import run_inventory
 
 from .. import __version__, __revision__
 from ..archive import archive_l0, archive_l1, archive_l2
@@ -73,6 +74,8 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
     write_sci_quality_logs(date_run.catalog, date_run.observing_day)
 
     process_l2(date_run, skip=not get_option("level2", "process"))
+    gbu_check(date_run.catalog)
+    write_gbu_logs(date_run.catalog, date_run.observing_day)
 
     publish_levels = {"level1": publish_l1, "level2": publish_l2, "level3": publish_l3}
     for level, publish_routine in publish_levels.items():

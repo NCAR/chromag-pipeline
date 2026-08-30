@@ -8,7 +8,11 @@ A bitmask indicates which conditions have failed the GBU process. If any
 condition fails, the file is not processd.
 """
 
+import os
+
+from ..config import get_basedir
 from ..file import ChroMagL1File
+from ..logging import logger
 from ..pipeline import step
 from ..waveregions import available_waveregions
 
@@ -60,10 +64,10 @@ def gbu_check(catalog):
                 continue
 
             gbu_bitmask = 0
-            for c, condition in enumerate(conditions):
+            for c, condition in enumerate(gbu_conditions):
                 gbu_bitmask |= condition(l1_file) * 2**c
 
-            l2_file.gbu_bitmask = gbu_bitmask
+            l1_file.gbu_bitmask = gbu_bitmask
 
 
 @step(top=True)
@@ -76,12 +80,16 @@ def write_gbu_log(catalog, wave_region: str, output_filename: str):
         f.write(
             f"{column_names[0]:{column_widths[0]}s}{column_names[1]:{column_widths[1]}s}\n"
         )
-        for file in catalog[catalog.is_science & (catalog.wave_region == wave_region)]:
-            components = [
-                f"{file.basename:{column_widths[0]}s}",
-                f"{file.gbu_bitmask:{column_widths[1]}d}",
-            ]
-            f.write("".join(components) + "\n")
+        for raw_file in catalog[
+            catalog.is_science & (catalog.wave_region == wave_region)
+        ]:
+            l1_file = raw_file.l1_file
+            if l1_file is not None:
+                components = [
+                    f"{l1_file.basename:{column_widths[0]}s}",
+                    f"{l1_file.gbu_bitmask:{column_widths[1]}d}",
+                ]
+                f.write("".join(components) + "\n")
         f.write("\nGBU bitmask codes\n")
         f.write("Code    Description\n")
         for i, description in enumerate(gbu_descriptions):
