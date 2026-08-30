@@ -12,7 +12,7 @@ Welcome to chromag's documentation!
 
    installation
    usage
-   api
+   modules
    contributing
 
 Indices and tables
