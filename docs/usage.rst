@@ -2,8 +2,8 @@
 Usage
 =====
 
-The functionality of the ChroMag pipeline is exposed from the ``chromag``
-command line utility. It has various subcommands to run the pipeline and perform
+The functionality of the ChroMag pipeline is exposed through the ``chromag``
+command line utility. It has many subcommands to run the pipeline and perform
 various ancillary actions related to pipeline outputs::
 
     $ chromag -h
@@ -33,8 +33,8 @@ Configuration file
 ------------------
 
 Several of the ``chromag`` utility subcommands require a configuration file to
-define required values, e.g., where raw data is found, where to put the
-processed data, etc.
+define required and optional values, e.g., where raw data is found, where to
+put the processed data, where to put the logs, etc.
 
 ``chromag/config/chromag.config.spec.cfg`` defines the options that are found in
 a configuration file. The minimal configuration file needed is::
