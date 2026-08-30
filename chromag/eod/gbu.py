@@ -85,8 +85,9 @@ def write_gbu_log(catalog, wave_region: str, output_filename: str):
         ]:
             l1_file = raw_file.l1_file
             if l1_file is not None:
+                l1_basename = os.path.basename(l1_file.get_filename("filename"))
                 components = [
-                    f"{l1_file.basename:{column_widths[0]}s}",
+                    f"{l1_basename:{column_widths[0]}s}",
                     f"{l1_file.gbu_bitmask:{column_widths[1]}d}",
                 ]
                 f.write("".join(components) + "\n")
