@@ -89,7 +89,7 @@ def sci_quality_check(l0_file: ChroMagRawFile):
 
 @step(top=True)
 def write_sci_quality_log(catalog, wave_region: str, output_filename: str):
-    """Write the quality file for the given wave region."""
+    """Write the quality log for the given wave region."""
     column_names = ["Filename", "Reason"]
     column_widths = [40, 6]
 
@@ -112,6 +112,7 @@ def write_sci_quality_log(catalog, wave_region: str, output_filename: str):
 
 @step(top=True)
 def write_sci_quality_logs(catalog, observing_day: str):
+    """Write the science quality logs."""
     for w in available_waveregions():
         basename = f"{observing_day}.chromag.{w}.quality.log"
         filename = os.path.join(
