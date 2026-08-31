@@ -47,7 +47,7 @@ def update_header(run, l1_file: ChroMagL1File):
     """Update the level 1 header once processing is complete."""
     now = datetime2dateobs(datetime.datetime.now())
     l1_file.primary_header["DATE"] = now
-    l1_file.primary_header["DATE_DP"] = now
+    l1_file.primary_header["DATE-L1"] = now
 
     l1_file.primary_header["L1SWID"] = f"{__version__} [{__revision__}]"
     l1_file.primary_header["CALWSID"] = f"{__version__} [{__revision__}]"
