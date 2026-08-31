@@ -55,7 +55,7 @@ def test_dateobs2datetime():
 def test_datetime2dateobs():
     d1 = datetime.datetime(2023, 10, 25, 10, 20, 35)
     assert datetime2dateobs(d1) == "2023-10-25T10:20:35.000"
-    assert datetime2dateobs(d1, no_milliseconds=True) == "2023-10-25T10:20:35"
+    assert datetime2dateobs(d1, milliseconds=False) == "2023-10-25T10:20:35"
 
 
 def test_ut2hst():

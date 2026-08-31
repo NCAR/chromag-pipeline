@@ -46,14 +46,14 @@ def dateobs2datetime(date_obs: str) -> datetime.datetime:
     return datetime.datetime.fromisoformat(date_obs)
 
 
-def datetime2dateobs(dt: datetime.datetime, no_milliseconds=False) -> str:
+def datetime2dateobs(dt: datetime.datetime, milliseconds=True) -> str:
     """Convert a Python datetime object to a string in DATE-OBS format, with
     milliseconds, or optionally without the milliseconds.
     """
-    if no_milliseconds:
-        return dt.isoformat(sep="T", timespec="seconds")
-    else:
+    if milliseconds:
         return dt.isoformat(sep="T", timespec="milliseconds")
+    else:
+        return dt.isoformat(sep="T", timespec="seconds")
 
 
 def ut2hst(ut_dt: datetime.datetime) -> datetime.datetime:

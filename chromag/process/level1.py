@@ -45,7 +45,7 @@ def dark_correct(run, l1_file: ChroMagL1File):
 @step()
 def update_header(run, l1_file: ChroMagL1File):
     """Update the level 1 header once processing is complete."""
-    now = datetime2dateobs(datetime.datetime.now())
+    now = datetime2dateobs(datetime.datetime.now(), milliseconds=False)
     l1_file.primary_header["DATE"] = now
     l1_file.primary_header["DATE-L1"] = now
 
