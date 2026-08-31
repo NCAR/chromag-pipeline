@@ -99,6 +99,7 @@ def gaincalib(
     deriv_kernel_y = np.array([-1, 8, 0, -8, 1], dtype=np.float32).reshape(1, 5) / 12.0
 
     t1 = time.time()
+    converged = False
 
     # 3. Optimization Iterations
     for iter_idx in range(1, maxiter + 1):
@@ -147,9 +148,11 @@ def gaincalib(
                 denom_y = np.sum(weight * (oj**2))
 
                 if denom_x > 0:
-                    x[k] -= np.sum(ob * oi) / denom_x
+                    dx = np.sum(ob * oi) / denom_x
+                    x[k] -= np.clip(dx, -1.0, 1.0)
                 if denom_y > 0:
-                    y[k] -= np.sum(ob * oj) / denom_y
+                    dy = np.sum(ob * oj) / denom_y
+                    y[k] -= np.clip(dy, -1.0, 1.0)
 
             aa += ob
             bb += weight
@@ -159,11 +162,25 @@ def gaincalib(
 
         error = np.max(np.abs(del_flat))
 
+        # check for nan or inf (non-convergence)
+        if not np.isfinite(error):
+            if not silent:
+                print(
+                    f"Iteration #{iter_idx}: Divergence detected (NaN/Inf). Aborting and returning best estimate."
+                )
+            break
+
         if not silent:
             print(f"Iteration #{iter_idx} = max(abs(dellogflat)) = {error:.6e}")
 
         if error <= 1.0e-8:
+            converged = True
             break
+
+    if not converged and not silent and np.isfinite(error):
+        print(
+            f"Warning: Reached maxiter ({maxiter}) without full convergence. Returning current flat state."
+        )
 
     # 4. Final Balance Tuning
     mean_flat = np.sum(flat) / total_pixels
@@ -181,6 +198,7 @@ def gaincalib(
 
 def get_flat(
     files,
+    dark,
     l=None,
     m=None,
     ndata_integ=1.0,
@@ -202,8 +220,7 @@ def get_flat(
     -----------
     files : list of str, or list/3D array of np.ndarray
         FITS file paths or pre-loaded image arrays of shape (NX, NY).
-    flat_file : str, optional
-        Path to write FITS file (if None, skipping FITS save).
+    dark: "master" dark matching exposure time of the flats
     l, m : np.ndarray, optional
         Initial x and y shifts.
     """
@@ -219,7 +236,7 @@ def get_flat(
         else:
             raw_tmp = np.array(files[k], dtype=np.float32)
 
-        tmp = raw_tmp / ndata_integ
+        tmp = raw_tmp / ndata_integ - dark
 
         if k == 0:
             s = tmp.shape  # (nx, ny)
@@ -315,13 +332,13 @@ def estimate_offsets(observations, reference_idx=0):
 
 
 # then need a function to get offsets and return the flat field (i.e. call both pieces)
-def flat_kll(observations):
+def kll_routine(observations, dark):
     """
     Function to:
     (1) estimate the offset from center of the frame for KLL flats
     (2) run the KLL algorithm to deduce the flat
 
-    input: observations (list of the KLL flats)
+    input: observations (list of the KLL flats) and dark (master dark matching)
     """
     estimated_offsets = estimate_offsets(observations)
     known_y = np.array([dy for dy, dx in estimated_offsets], dtype=np.float32)
@@ -329,6 +346,7 @@ def flat_kll(observations):
 
     derived_flat, derived_sun, c, solved_x, solved_y = get_flat(
         files=observations,
+        dark=dark,
         l=known_y,  # derived Y shifts
         m=known_x,  # derived X shifts
         shift_flag=2,
