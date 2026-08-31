@@ -4,4 +4,4 @@
 """
 
 from .email import send_email
-from .eod import notify_eod
+from .process import notify_process

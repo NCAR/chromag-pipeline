@@ -92,7 +92,8 @@ class LockException(Exception):
 
 class RunLock:
     """Context manager to handle locking a processing directory of a run while
-    processing is active so that two different processes overwriting each other.
+    processing is active so that two different processes don't overwrite each
+    other.
     """
 
     def __init__(self, lock_filename: str):

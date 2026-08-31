@@ -12,9 +12,9 @@ from .archive import add_archive_subcommand
 from .cat import add_cat_subcommand
 from .clearday import add_clearday_subcommand
 from .createdb import add_createdb_subcommand
-from .eod import add_eod_subcommand
 from .log import add_log_subcommand
 from .ls import add_ls_subcommand
+from .process import add_process_subcommand
 from .ps import add_ps_subcommand
 
 
@@ -45,8 +45,8 @@ def setup():
     add_ls_subcommand(subparsers)
     add_ps_subcommand(subparsers)
 
-    # processing: rt, eod, cal, reprocess
-    add_eod_subcommand(subparsers)
+    # processing: process, reprocess, realtime (rt), end-of-day (eod), cal
+    add_process_subcommand(subparsers)
 
     # testing: regress, simulate, validate
 

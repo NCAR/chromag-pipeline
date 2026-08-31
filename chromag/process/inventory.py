@@ -13,7 +13,7 @@ from ..file import ChroMagRawFile
 from ..logging import logger
 from ..pipeline import step
 from ..plot import write_timeline
-from ..string_helpers import truncate as truncate_string
+from ..strings import truncate as truncate_string
 
 
 class MissingRawData(Exception):

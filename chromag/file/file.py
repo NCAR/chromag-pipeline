@@ -15,18 +15,18 @@ from ..config import get_basedir
 from ..datetime import dateobs2datetime, obsday_hours
 
 
-l1_header_template = None
+l1b_header_template = None
 keyword_formats = None
 
 
 def initialize_l1_header():
     """Read the level 1 header template if it hasn't been read yet."""
-    global l1_header_template
-    if l1_header_template is None:
+    global l1b_header_template
+    if l1b_header_template is None:
         with open(
-            os.path.join(os.path.dirname(__file__), "l1_header_template.txt"), "r"
+            os.path.join(os.path.dirname(__file__), "l1b_header_template.txt"), "r"
         ) as f:
-            l1_header_template = f.read()
+            l1b_header_template = f.read()
 
 
 def initialize_keyword_formats():
@@ -48,13 +48,14 @@ class ChroMagRawFile:
     def __init__(self, filename: str, observing_day: str):
         self.filename = filename
         self.basename = os.path.basename(self.filename)
+
+        self.quality_bitmask = 0
+
         self.l1_file = None
         self._data = None
         self.observing_day = observing_day
 
-        primary_header = read_rawheader(filename)
-
-        self.primary_header = primary_header
+        self.primary_header = read_rawheader(filename)
         self.date_obs = dateobs2datetime(self.primary_header["DATE-OBS"])
         self.obsday_hours = obsday_hours(self.date_obs)
 
@@ -65,34 +66,48 @@ class ChroMagRawFile:
 
         # possible values Scientific, Engineering, or Calibration
         self.datatype = (
-            primary_header["DATATYPE"] if "DATATYPE" in primary_header else None
+            self.primary_header["DATATYPE"]
+            if "DATATYPE" in self.primary_header
+            else None
         )
 
         self.wavelength = (
-            primary_header["WAVELNTH"] if "WAVELNTH" in primary_header else None
+            self.primary_header["WAVELNTH"]
+            if "WAVELNTH" in self.primary_header
+            else None
         )
         self.wave_region = (
-            str(int(float(primary_header["OSF_ID"])))
-            if "OSF_ID" in primary_header
+            str(int(float(self.primary_header["OSF_ID"])))
+            if "OSF_ID" in self.primary_header
             else None
         )
         self.exposure = (
-            primary_header["EXPTIME"] if "EXPTIME" in primary_header else None
+            self.primary_header["EXPTIME"] if "EXPTIME" in self.primary_header else None
         )
 
-        self.scan_i = primary_header["SCAN_I"] if "SCAN_I" in primary_header else None
-        self.scan_n = primary_header["SCAN_N"] if "SCAN_N" in primary_header else None
+        self.scan_i = (
+            self.primary_header["SCAN_I"] if "SCAN_I" in self.primary_header else None
+        )
+        self.scan_n = (
+            self.primary_header["SCAN_N"] if "SCAN_N" in self.primary_header else None
+        )
 
         self.obs_description = (
-            primary_header["OBS_DESC"] if "OBS_DESC" in primary_header else None
+            self.primary_header["OBS_DESC"]
+            if "OBS_DESC" in self.primary_header
+            else None
         )
 
         # possible values Sun, Diffuser, Dark, or Lamp
-        self.object = primary_header["OBJECT"] if "OBJECT" in primary_header else None
+        self.object = (
+            self.primary_header["OBJECT"] if "OBJECT" in self.primary_header else None
+        )
 
         # adding this 8/21 as synthetic flats have option in header called OFFSET
         # which can be "True" or "False", assuming now we do not know the offset
-        self.offset = primary_header["OFFSET"] if "OFFSET" in primary_header else None
+        self.offset = (
+            self.primary_header["OFFSET"] if "OFFSET" in self.primary_header else None
+        )
 
     @property
     def is_dark(self):
@@ -160,8 +175,10 @@ class ChroMagL1File:
         self.wave_region = raw_file.wave_region
         self.exposure = raw_file.exposure
 
+        self.gbu_mask = 0
+
         self.primary_header = reorder_header(raw_file.primary_header)
-        self.primary_header["LEVEL"] = "L1"
+        self.primary_header["LEVEL"] = "1B"
 
         self._data = None
 
@@ -182,16 +199,18 @@ class ChroMagL1File:
         prefix = self.raw_file.basename.removesuffix(".fits")
 
         if name == "filename":
-            basename = f"{prefix}.chromag.{self.wave_region}.l1.fits"
+            basename = f"{prefix}.chromag.{self.wave_region}.l1b.fits"
         elif name == "i_quicklook":
-            basename = f"{prefix}.chromag.{self.wave_region}.l1.i.png"
+            basename = f"{prefix}.chromag.{self.wave_region}.l1b.i.png"
         elif name == "iquv_quicklook":
-            basename = f"{prefix}.chromag.{self.wave_region}.l1.iquv.png"
+            basename = f"{prefix}.chromag.{self.wave_region}.l1b.iquv.png"
         elif name == "intermediate":
             output_dir = os.path.join(output_dir, intermediate_step)
             basename = (
-                f"{prefix}.chromag.{self.wave_region}.l1.{intermediate_step}.fits"
+                f"{prefix}.chromag.{self.wave_region}.l1b.{intermediate_step}.fits"
             )
+        else:
+            raise NameError(f"unknown filename type {name}")
 
         return os.path.join(output_dir, basename) if fullpath else basename
 
@@ -252,14 +271,14 @@ Card._format_value = custom_format_value
 
 def reorder_header(header: fits.header.Header):
     """Create a new header with the layout of a template (from the file
-    l1_header_template.txt), but the values from the given header. Format the
+    l1a_header_template.txt), but the values from the given header. Format the
     floating point values using the format specifications in
     keyword_formats.cfg.
     """
     initialize_l1_header()
     initialize_keyword_formats()
 
-    h = fits.header.Header.fromstring(l1_header_template, sep="\n")
+    h = fits.header.Header.fromstring(l1b_header_template, sep="\n")
     for k, v in header.items():
         if k != "COMMENT" and k != "":
             if k in keyword_formats and v is not None:

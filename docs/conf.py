@@ -51,7 +51,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # -- Options for HTML output -------------------------------------------------
 
-htmlhelp_basename = "epochsdoc"
+htmlhelp_basename = "chromagdoc"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.

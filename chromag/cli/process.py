@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Create and handle end-of-day (eod) and reprocess sub-commands.
+"""Create and handle process and reprocess sub-commands.
 """
 
 import os
@@ -9,21 +9,21 @@ import sys
 from .helper import add_run_arguments, split_dates
 
 from ..config import read_config, get_basedir
-from ..eod import run, clearday
 from ..logging import logger
-from ..notifications import notify_eod
+from ..notifications import notify_process
 from ..pipeline import LockException, RunLock
+from ..process import run, clearday
 
 
-def process_eod(args):
-    """Main routine to handle keyword arguments and dispatch the end-of-day
-    work from either the eod or reprocess subcommand. The "reprocessing"
+def handle_process(args):
+    """Main routine to handle keyword arguments and dispatch the processing
+    work from either the process or reprocess subcommand. The "reprocessing"
     attribute of `args` is set when creating the argument parsers to the
     appropriate value and passed on to `run` routine.
 
     System status code is the number of failing date.
     """
-    subcommand = "reprocess" if args.reprocessing else "eod"
+    subcommand = "reprocess" if args.reprocessing else "process"
     dates = split_dates(",".join(args.dates), args.parser.error)
 
     if not os.path.isfile(args.configuration_filename):
@@ -53,19 +53,17 @@ def process_eod(args):
             )
             exit_code += 1
 
-        notify_eod(d, date_run)
+        notify_process(d, date_run, subcommand)
 
     sys.exit(exit_code)
 
 
-def add_eod_subcommand(subparsers):
-    """Add end-of-day (eod) and reprocess subcommands to the argparse subparsers."""
-    parser = subparsers.add_parser(
-        "end-of-day", aliases=["eod"], help="run end-of-day pipeline on the given dates"
-    )
+def add_process_subcommand(subparsers):
+    """Add process and reprocess subcommands to the argparse subparsers."""
+    parser = subparsers.add_parser("process", help="run pipeline on the given dates")
     add_run_arguments(parser)
-    parser.set_defaults(func=process_eod, parser=parser, reprocessing=False)
+    parser.set_defaults(func=handle_process, parser=parser, reprocessing=False)
 
     parser = subparsers.add_parser("reprocess", help="reprocess the given dates")
     add_run_arguments(parser)
-    parser.set_defaults(func=process_eod, parser=parser, reprocessing=True)
+    parser.set_defaults(func=handle_process, parser=parser, reprocessing=True)

@@ -12,9 +12,9 @@ from .helper import add_run_arguments, split_dates
 from .. import __version__, __revision__
 from ..config import read_config, get_option
 from ..datetime import human_timedelta
-from ..eod import clearday
 from ..logging import get_level, setup_logging
 from ..pipeline import Run
+from ..process import clearday
 
 
 def handle_clearday(args):

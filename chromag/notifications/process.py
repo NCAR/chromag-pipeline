@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""Module containing helper functions for notifications at the end of an eod
-run.
+"""Module containing helper functions for notifications at the end of a process
+or reprocessing run.
 """
 
 import os
@@ -17,14 +17,18 @@ from ..logging import logger, filter_log
 
 def get_template() -> str:
     """Get the end-of-day notification email template."""
-    with open(os.path.join(os.path.dirname(__file__), "eod-template.html"), "r") as f:
-        eod_template = f.read()
-    return eod_template
+    with open(
+        os.path.join(os.path.dirname(__file__), "process-template.html"), "r"
+    ) as f:
+        process_template = f.read()
+    return process_template
 
 
-def notify_eod(observing_day: str, date_run=None):
-    """Send notification at end of day. Returns whether it sent a
-    notification."""
+def notify_process(
+    observing_day: str, date_run: str = None, subcommand: str = "process"
+):
+    """Send notification at the completion of a process/reprocess. Returns
+    whether it sent a notification."""
     send_notifications = get_option("notifications", "send")
     if not send_notifications:
         logger.info("skipped sending notification")
@@ -38,7 +42,7 @@ def notify_eod(observing_day: str, date_run=None):
 
     date = short2hyphenated(observing_day)
     # [TODO]: add status (success, failure, incomplete, etc.) to subject?
-    subject = f"ChroMag end-of-day processing for {date}"
+    subject = f"ChroMag {subcommand}ing for {date}"
 
     plain_text = ""
 
@@ -78,11 +82,11 @@ def notify_eod(observing_day: str, date_run=None):
 
     html_text = get_template().format(
         n_raw_files=f"{len(date_run.catalog)} files" if date_run is not None else "—",
-        l1_processing_time_per_file=human_timedelta(
-            date_run.l1_processing_time_per_file
-        )
-        if date_run is not None
-        else "—",
+        l1_processing_time_per_file=(
+            human_timedelta(date_run.l1_processing_time_per_file)
+            if date_run is not None
+            else "—"
+        ),
         log_msgs=log_msgs,
         timeline_plot_html=timeline_plot_html,
         __version__=__version__,
@@ -99,6 +103,6 @@ def notify_eod(observing_day: str, date_run=None):
         attachments=attachments,
         html_text=html_text,
     )
-    logger.info(f"sent eod notification to {to}")
+    logger.info(f"sent {subcommand} notification to {to}")
 
     return True

@@ -9,6 +9,8 @@ import datetime
 
 import mysql.connector
 
+from . import DatabaseError
+
 from .. import __version__
 from .. import __revision__
 
@@ -67,3 +69,47 @@ def get_obsday_id(
             logger.debug(f"found obsday_id={obsday_id} for {date}")
 
     return obsday_id
+
+
+def _get_id(
+    connection: mysql.connector.connection_cext.CMySQLConnection,
+    type: str,
+    name: str,
+):
+    """Get ID given a name for any of the `chromag_{filetype,producttype,level}`
+    database tables."""
+    with closing(connection.cursor()) as cursor:
+        cmd = f'select {type}_id from chromag_{type} where {type}_name = "{name}" limit 1;'
+        cursor.execute(cmd)
+        result = cursor.fetchone()
+        if result is None:
+            raise DatabaseError(f"no {name} {type} found")
+        else:
+            db_id = result[0]
+            logger.debug(f"found {type}_id={db_id} for {name}")
+
+    return db_id
+
+
+def get_level_id(
+    connection: mysql.connector.connection_cext.CMySQLConnection, level_name: str
+):
+    """Retrieve level ID for a given level name. If `level_name` is not found,
+    raises a DatabaseError error."""
+    return _get_id(connection, "level", level_name)
+
+
+def get_filetype_id(
+    connection: mysql.connector.connection_cext.CMySQLConnection, filetype_name: str
+):
+    """Retrieve file type ID for a given file type name. If `filetype_name` is
+    not found, raises a DatabaseError error."""
+    return _get_id(connection, "filetype", filetype_name)
+
+
+def get_producttype_id(
+    connection: mysql.connector.connection_cext.CMySQLConnection, producttype_name: str
+):
+    """Retrieve product type ID for a given product type name. If
+    `producttype_name` is not found, raises a DatabaseError error."""
+    return _get_id(connection, "producttype", producttype_name)

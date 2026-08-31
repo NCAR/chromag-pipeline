@@ -11,7 +11,13 @@ class DatabaseError(Exception):
 
 
 from .connect import get_connection
-from .update import get_obsday_id, get_sw_id
+from .update import (
+    get_obsday_id,
+    get_sw_id,
+    get_level_id,
+    get_filetype_id,
+    get_producttype_id,
+)
 from .clearday import clearday
 from .initialize import initialize_tables
 from .insert import insert_files

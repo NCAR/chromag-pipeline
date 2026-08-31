@@ -1,0 +1,143 @@
+SIMPLE  =                    T / image conforms to FITS standard
+BITPIX  =                  -32 / floating point
+NAXIS   =                    3
+NAXIS1  =                 2560 / [pixels] image width
+NAXIS2  =                 2160 / [pixels] image height
+NAXIS3  =                    4 / polarization states: I, Q, U, V
+EXTEND  =                    T / may contain conforming extensions
+COMMENT --- Observatory ---
+ORIGIN  = 'NCAR/HAO'           / institution
+LOCATION= 'Boulder '           / location
+TELESCOP= 'COSMO ChroMag'      / telescope
+INSTRUME= 'COSMO ChroMag'      / instrument
+OBSERVER=                      / observer
+COMMENT --- Observable ---
+OBJECT  =
+DATATYPE= 'Calibration'        / Calibration, Science, or Engineering
+LEVEL   = '0       '           / processing level: 0, 1B, 2, 3
+WAVELNTH=                      / [nm] wavelength of the observation
+OBS_DESC=                      / description of the observation program
+SCANDESC=                      / description of the line scan
+SCAN_N  =                      / number of positions in the scan
+SCAN_I  =                      / position in the scan, zero-based
+COMMENT --- Time and exposure ---
+TIMESYS = 'UTC     '           / all times are specified in UTC
+DATE-OBS=                      / [UTC] observation start time
+DATE-END=                      / [UTC] observation end time
+DATE    =                      / [UTC] creation time of the HDU
+EXPTIME =                      / [ms] exposure time for each frame
+NUMSUM  =                    1 / number of modulation cycles summed
+COMMENT --- Instrument general ---
+OBSSWID = '1.0.0   '           / version of the observing software used
+INSTHLTH=                      / instrument health status
+COMMENT --- Calibration package---
+COVR_POS=                      / [mm] position of the telescope cover
+DIFF_POS=                      / [mm] position of the diffuser
+DIFF_ID =                      / ID of the current diffuser
+CALP_POS=                      / [mm] position of the calibration package
+POL_POS =                      / [deg] calibration polarizer angle
+POL_ID  =                      / ID of the calibration polarizer
+RET_POS =                      / [deg] calibration retarder angle
+RET_ID  =                      / ID of the calibration retarder
+COMMENT --- Tip-tilt system ---
+TT_V    =                      / [V] tip-tilt sensor sum voltage
+TT_XSET =                      / [V] tip-tilt X setpoint
+TT_XPOS =                      / [V] tip-tilt X position 1-s mean
+TT_XSTD =                      / [V] tip-tilt X position 1-s stddev
+TT_YSET =                      / [V] tip-tilt Y setpoint
+TT_YPOS =                      / [V] tip-tilt Y position 1-s mean
+TT_YSTD =                      / [V] tip-tilt Y position 1-s stddev
+TT_XDRV =                      / [V] tip-tilt X drive voltage 1-s mean
+TT_YDRV =                      / [V] tip-tilt Y drive voltage 1-s mean
+TT_LOOP =                      / tip-tilt closed loop fraction
+COMMENT --- Filter wheels ---
+HRF_POS =                      / position of the heat rejection filter
+HRF_ID  =                      / ID of the heat rejection filter
+HRF_T   =                      / [deg C] heat rejection filter wheel temperature
+OSF_POS =                      / position of the order-sorting filter
+OSF_T   =                      / [deg C] order-sorting filter temperature
+OSF_ID  =                      / ID of the order-sorting filter
+COMMENT --- Modulator and Lyot filter ---
+MOD_V1  =                      / [V] modulator FeLC 1 drive voltage
+MOD_V2  =                      / [V] modulator FeLC 2 drive voltage
+LY_T    =                      / [deg C] Lyot filter temperature
+LY_TS   =                      / [deg C] Lyot filter temperature setpoint
+LY_CAL  =                      / ID of the Lyot filter calibration
+LY_1_T  =                      / [deg C] Lyot filter element 1 temperature
+LY_1_V  =                      / [V] Lyot filter element 1 drive voltage
+LY_2_T  =                      / [deg C] Lyot filter element 2 temperature
+LY_2_V  =                      / [V] Lyot filter element 2 drive voltage
+LY_3_T  =                      / [deg C] Lyot filter element 3 temperature
+LY_3_V  =                      / [V] Lyot filter element 3 drive voltage
+LY_4_T  =                      / [deg C] Lyot filter element 4 temperature
+LY_4_V  =                      / [V] Lyot filter element 4 drive voltage
+LY_5_T  =                      / [deg C] Lyot filter element 5 temperature
+LY_5_V  =                      / [V] Lyot filter element 5 drive voltage
+LY_6_T  =                      / [deg C] Lyot filter element 6 temperature
+LY_6_V  =                      / [V] Lyot filter element 6 drive voltage
+COMMENT --- Temperature control ---
+LYB_T   =                      / [deg C] Lyot box temperature
+LYB_T_SP=                      / [deg C] Lyot box temperature setpoint
+LYA_T   =                      / [deg C] Lyot box air temperature
+LYA_T_SP=                      / [deg C] Lyot box air temperature setpoint
+OSFW_T  =                      / [deg C] order-sorting filter wheel temperature
+OSFW_T_S=                      / [deg C] order-sorting filter wheel temperature
+AO_T    =                      / [deg C] aft optics box temperature
+AO_T_SP =                      / [deg C] aft optics box temperature setpoint
+COMMENT --- Camera ---
+CAM_POS =                      / [mm] position of the camera focus
+CAM_ID  =                      / ID of the camera
+CAM_T   =                      / [deg C] focal plane temperature
+CAM_TS  =                      / [deg C] focal plane temperature setpoint
+COMMENT --- Spar guider system ---
+COMMENT The Spar Guider System (SGS) provides average and standard devision of
+        the sum, RA pointing error Dec pointing error signals, an estimate of
+        the seeing based on scintillation, and the fraction of time the
+        pointing loop was closed. The SGS Disk Intensity Monitor (DIM) provides
+        the Sun intensity signal.
+SGSDIMV =                      / [V] mean SGS DIM signal
+SGSDIMS =                      / [V] SGS DIM signal standard deviation
+SGSSUMV =                      / [V] mean SGS sum signal
+SGSSUMS =                      / [V] SGS sum signal standard deviation
+SGSRAV  =                      / [V] mean SGS RA error signal
+SGSRAS  =                      / [V] SGS RA error signal standard deviation
+SGSDECV =                      / [V] mean SGS Dec error signal
+SGSDECS =                      / [V] SGS Dec error signal standard deviation
+SGSSCINT=                      / [arcsec] SGS scintillation seeing estimate
+SGSLOOP =                      / SGS loop closed fraction
+SGSRAZR =                      / [arcsec] SGS RA zero-point offset
+SGSDECZR=                      / [arcsec] SGS Dec zero point offset
+COMMENT The COSMO ChroMag is a 13.5-cm aperature imaging spectro-polarimeter
+        that observes the solar photosphere and chromosphere. For detailed
+        information, see the COSMO ChroMag instrument paper (DOI:TBD) and the
+        HAO/COSMO website at https://www2.hao.ucar.edu/cosmo/chromag.
+COMMENT --- Coordinate ---
+CTYPE1  = 'HPLN-TAN'           / Helioprojective-cartesian westward angle
+CUNIT1  = 'arcsec'             /
+CRPIX1  =               1280.5 / [pixel] location of the reference pt on x-axis
+CRVAL1  =                  0.0 / [arcsec] disk center
+CDELT1  =                5.954 / [arcsec/pixel] pixel scale of the x-axis
+CRDER1  =                0.004 / [arcsec/pixel] random error in pixel scale
+CSYER1  =                0.030 / [arcsec/pixel] systemic error in pixel scale
+CTYPE2  = 'HPLN-TAN'           / Helioprojective-cartesian northward angle
+CUNIT2  = 'arcsec'             /
+CRPIX2  =               1080.5 / [pixel] location of the reference pt on y-axis
+CRVAL2  =                  0.0 / [arcsec] disk center
+CDELT2  =                5.954 / [arcsec/pixel] pixel scale of the y-axis
+CRDER2  =                0.004 / [arcsec/pixel] random error in pixel scale
+CSYER2  =                0.030 / [arcsec/pixel] systemic error in pixel scale
+CTYPE3  = 'STOKES'             /
+COMMENT --- Level 1B processing info ---
+DOI     =                      / Digital Object Identifier
+DATE-L1 =                      / [UT] L1 processing date/time
+L1SWID  =                      / Version of the Level 1 processing software
+CALID   =                      /
+CALWSID =                      / Version of the calibration reduction software
+CALFILE =                      / calibration file used
+DARK_COR=                    F / dark corrected
+DARKUSED=                      / index from netCDF file of the darks used
+LIN_COR =                    F / camera linearity corrected
+FLAT_COR=                    F / flat corrected
+FLATUSED=                      / index from netCDF file of the flats used
+DEMOD   =                    F / polarimetric demodulation performed
+DISTORT =                    F / image distortion corrected
