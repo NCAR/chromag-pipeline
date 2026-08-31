@@ -140,10 +140,14 @@ class Calibration:
                     f"producing KLL flat {i}/{n_unique_flats} from files {indices_str}"
                 )
 
+                # grab matching exp dark frame
+                exp = flat_kll_exposures[indices[0]]
+                dark, _ = self.get_dark(exp)
+
                 # collect raw frames for this specific group and call KLL algorithm
                 group_frames = [flat_kll_images[idx] for idx in indices]
                 self.flats_kll_used.append(indices)
-                self.flat_kll_images[i, :, :], _ = kll_routine(group_frames)
+                self.flat_kll_images[i, :, :], _ = kll_routine(group_frames, dark)
 
                 self.flat_kll_exposures[i] = flat_kll_exposures[indices[0]]
                 self.flat_kll_wavelengths[i] = flat_kll_wavelengths[indices[0]]
@@ -207,6 +211,10 @@ class Calibration:
                     )
                     exp_val = flat_exposures[indices[0]]
                     wv_val = flat_wavelengths[indices[0]]
+
+                    # find matching dark from exp and dark correct
+                    dark, _ = self.get_dark(exp_val)
+                    raw_mean_flat -= dark
 
                     # grab reference KLL flat matching (exposure, wavelength)
                     kll_ref_flat = np.squeeze(
