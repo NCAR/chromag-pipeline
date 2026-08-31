@@ -5,6 +5,7 @@
 
 import datetime
 import math
+import os
 
 
 def human_timedelta(timedelta: datetime.timedelta) -> str:
@@ -37,6 +38,12 @@ def human_timedelta(timedelta: datetime.timedelta) -> str:
 
     result = " ".join(parts)
     return f"{result}{before}"
+
+
+def filename2datetime(raw_filename: str) -> datetime.datetime:
+    """Convert a filename such as "20250813T215545.133Z.fits" to a datetime."""
+    basename = os.path.basename(raw_filename)
+    return datetime.datetime.strptime(basename[0:20], "%Y%m%dT%H%M%S.%fZ")
 
 
 def dateobs2datetime(date_obs: str) -> datetime.datetime:

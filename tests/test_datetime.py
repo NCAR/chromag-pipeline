@@ -9,6 +9,7 @@ import pytest
 
 from chromag.datetime import (
     human_timedelta,
+    filename2datetime,
     dateobs2datetime,
     datetime2dateobs,
     obsday_hours2str,
@@ -46,6 +47,11 @@ def test_no_seconds():
     assert human_timedelta(datetime.timedelta(days=1, hours=5)) == "1 day 5 hrs"
 
 
+def test_filename2datetime():
+    dt = filename2datetime("20250813T215545.133Z.fits")
+    assert dt == dateobs2datetime("2025-08-13T21:55:45.133")
+
+
 def test_dateobs2datetime():
     d1 = datetime.datetime(2023, 10, 25, 10, 20, 35)
     assert d1 == dateobs2datetime("2023-10-25T10:20:35.000")
@@ -59,7 +65,8 @@ def test_datetime2dateobs():
 
 
 def test_ut2hst():
-    pass
+    d1 = datetime.datetime(2023, 10, 25, 10, 20, 35)
+    assert dateobs2datetime("2023-10-25T00:20:35") == ut2hst(d1)
 
 
 def test_obsday_hours2str():
