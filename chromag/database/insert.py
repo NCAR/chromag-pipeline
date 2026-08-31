@@ -36,7 +36,7 @@ def insert_web(
     i_id = get_producttype_id(connection, "I")
     fits_id = get_filetype_id(connection, "FITS")
     png_id = get_filetype_id(connection, "PNG")
-    level1_id = get_level_id(connection, "L1")
+    level1_id = get_level_id(connection, "1B")
 
     wave_regions = available_waveregions()
     with closing(connection.cursor()) as cursor:

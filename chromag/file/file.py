@@ -178,7 +178,7 @@ class ChroMagL1File:
         self.gbu_mask = 0
 
         self.primary_header = reorder_header(raw_file.primary_header)
-        self.primary_header["LEVEL"] = "L1"
+        self.primary_header["LEVEL"] = "1B"
 
         self._data = None
 
@@ -199,15 +199,15 @@ class ChroMagL1File:
         prefix = self.raw_file.basename.removesuffix(".fits")
 
         if name == "filename":
-            basename = f"{prefix}.chromag.{self.wave_region}.l1.fits"
+            basename = f"{prefix}.chromag.{self.wave_region}.l1b.fits"
         elif name == "i_quicklook":
-            basename = f"{prefix}.chromag.{self.wave_region}.l1.i.png"
+            basename = f"{prefix}.chromag.{self.wave_region}.l1b.i.png"
         elif name == "iquv_quicklook":
-            basename = f"{prefix}.chromag.{self.wave_region}.l1.iquv.png"
+            basename = f"{prefix}.chromag.{self.wave_region}.l1b.iquv.png"
         elif name == "intermediate":
             output_dir = os.path.join(output_dir, intermediate_step)
             basename = (
-                f"{prefix}.chromag.{self.wave_region}.l1.{intermediate_step}.fits"
+                f"{prefix}.chromag.{self.wave_region}.l1b.{intermediate_step}.fits"
             )
         else:
             raise NameError(f"unknown filename type {name}")
