@@ -198,6 +198,7 @@ def gaincalib(
 
 def get_flat(
     files,
+    dark,
     l=None,
     m=None,
     ndata_integ=1.0,
@@ -219,8 +220,7 @@ def get_flat(
     -----------
     files : list of str, or list/3D array of np.ndarray
         FITS file paths or pre-loaded image arrays of shape (NX, NY).
-    flat_file : str, optional
-        Path to write FITS file (if None, skipping FITS save).
+    dark: "master" dark matching exposure time of the flats
     l, m : np.ndarray, optional
         Initial x and y shifts.
     """
@@ -236,7 +236,7 @@ def get_flat(
         else:
             raw_tmp = np.array(files[k], dtype=np.float32)
 
-        tmp = raw_tmp / ndata_integ
+        tmp = raw_tmp / ndata_integ - dark
 
         if k == 0:
             s = tmp.shape  # (nx, ny)
@@ -332,13 +332,13 @@ def estimate_offsets(observations, reference_idx=0):
 
 
 # then need a function to get offsets and return the flat field (i.e. call both pieces)
-def kll_routine(observations):
+def kll_routine(observations, dark):
     """
     Function to:
     (1) estimate the offset from center of the frame for KLL flats
     (2) run the KLL algorithm to deduce the flat
 
-    input: observations (list of the KLL flats)
+    input: observations (list of the KLL flats) and dark (master dark matching)
     """
     estimated_offsets = estimate_offsets(observations)
     known_y = np.array([dy for dy, dx in estimated_offsets], dtype=np.float32)
@@ -346,6 +346,7 @@ def kll_routine(observations):
 
     derived_flat, derived_sun, c, solved_x, solved_y = get_flat(
         files=observations,
+        dark=dark,
         l=known_y,  # derived Y shifts
         m=known_x,  # derived X shifts
         shift_flag=2,
