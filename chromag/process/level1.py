@@ -18,11 +18,13 @@ from ..quality import sci_quality_check, sci_quality_name
 
 @step()
 def quality_check(run, raw_file: ChroMagRawFile):
+    """Performs quality check on the raw file. Returns whether it passed, i.e.,
+    True if quality_bitmask is 0, False otherwise."""
     raw_file.quality_bitmask = sci_quality_check(raw_file)
     if raw_file.quality_bitmask != 0:
         quality_name = sci_quality_name(raw_file.quality_bitmask)
         logger.warn(f"failed quality {quality_name}, skipping L1")
-    return raw_file.quality_bitmask
+    return raw_file.quality_bitmask == 0
 
 
 @step()
@@ -47,12 +49,25 @@ def update_header(run, l1_file: ChroMagL1File):
     l1_file.primary_header["DATE"] = now
     l1_file.primary_header["DATE_DP"] = now
 
-    l1_file.primary_header["DPSWID"] = f"{__version__} [{__revision__}]"
+    l1_file.primary_header["L1SWID"] = f"{__version__} [{__revision__}]"
+    l1_file.primary_header["CALWSID"] = f"{__version__} [{__revision__}]"
 
-    cal_basename = (
-        run.calibration.basename
-    ) = f"{run.observing_day}.chromag.calibration.{__version__}.nc"
-    l1_file.primary_header["CALFILE"] = cal_basename
+    l1_file.primary_header["CALFILE"] = run.calibration.basename
+
+    # HISTORY section thta is not part of template, added at the end of the
+    # header
+    steps = []
+    if l1_file.primary_header["DARK_COR"]:
+        steps.append("dark current subtracted")
+    if l1_file.primary_header["FLAT_COR"]:
+        steps.append("gain correctin applied")
+    if l1_file.primary_header["DEMOD"]:
+        steps.append("polarimetric demodulation performed")
+    if l1_file.primary_header["DISTORT"]:
+        steps.append("image distortion corrected")
+
+    history = "Level 1 processing performed: " + ",".join(steps)
+    l1_file.primary_header["HISTORY"] = history
 
 
 @step(top=True)
@@ -77,7 +92,7 @@ def process(run):
         logger.info(f"processing {i+1}/{n_science_files}: {raw_file.basename}...")
 
         # initial quality check: do not process really bad data
-        if quality_check(run, raw_file):
+        if not quality_check(run, raw_file):
             continue
 
         l1_file = ChroMagL1File(raw_file)
