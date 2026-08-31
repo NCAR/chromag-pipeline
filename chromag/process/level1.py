@@ -42,11 +42,16 @@ def dark_correct(run, l1_file: ChroMagL1File):
 
 @step()
 def update_header(run, l1_file: ChroMagL1File):
-    l1_file.primary_header["DATE_DP"] = datetime2dateobs(datetime.datetime.now())
+    """Update the level 1 header once processing is complete."""
+    now = datetime2dateobs(datetime.datetime.now())
+    l1_file.primary_header["DATE"] = now
+    l1_file.primary_header["DATE_DP"] = now
+
     l1_file.primary_header["DPSWID"] = f"{__version__} [{__revision__}]"
 
-    # [TODO]: should really get this from the calibration object
-    cal_basename = f"{run.observing_day}.chromag.calibration.{__version__}.nc"
+    cal_basename = (
+        run.calibration.basename
+    ) = f"{run.observing_day}.chromag.calibration.{__version__}.nc"
     l1_file.primary_header["CALFILE"] = cal_basename
 
 
