@@ -26,7 +26,7 @@ def read_config(config_filename):
     global cp
     if cp is None:
         config_root = os.path.dirname(os.path.abspath(__file__))
-        config_spec = os.path.join(config_root, "chromag.config.spec.cfg")
+        config_spec = os.path.join(config_root, "config.spec.cfg")
         cp = epochs.ConfigParser(config_spec)
         cp.read(config_filename)
     return cp.is_valid()
