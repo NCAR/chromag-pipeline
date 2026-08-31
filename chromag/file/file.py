@@ -15,18 +15,18 @@ from ..config import get_basedir
 from ..datetime import dateobs2datetime, obsday_hours
 
 
-l1_header_template = None
+l1b_header_template = None
 keyword_formats = None
 
 
 def initialize_l1_header():
     """Read the level 1 header template if it hasn't been read yet."""
-    global l1_header_template
-    if l1_header_template is None:
+    global l1b_header_template
+    if l1b_header_template is None:
         with open(
-            os.path.join(os.path.dirname(__file__), "l1_header_template.txt"), "r"
+            os.path.join(os.path.dirname(__file__), "l1b_header_template.txt"), "r"
         ) as f:
-            l1_header_template = f.read()
+            l1b_header_template = f.read()
 
 
 def initialize_keyword_formats():
@@ -271,14 +271,14 @@ Card._format_value = custom_format_value
 
 def reorder_header(header: fits.header.Header):
     """Create a new header with the layout of a template (from the file
-    l1_header_template.txt), but the values from the given header. Format the
+    l1a_header_template.txt), but the values from the given header. Format the
     floating point values using the format specifications in
     keyword_formats.cfg.
     """
     initialize_l1_header()
     initialize_keyword_formats()
 
-    h = fits.header.Header.fromstring(l1_header_template, sep="\n")
+    h = fits.header.Header.fromstring(l1b_header_template, sep="\n")
     for k, v in header.items():
         if k != "COMMENT" and k != "":
             if k in keyword_formats and v is not None:
