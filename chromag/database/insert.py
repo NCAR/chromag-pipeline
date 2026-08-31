@@ -81,11 +81,16 @@ def insert_web(
                                     [f"{v[0]:{v[1]}}" for v in fields.values()]
                                 )
                                 cmd = f"insert into chromag_web ({field_names}) value ({field_values});"
-                                cursor.execute(cmd)
-
-                        filename = l1_file.get_filename("filename")
-                        basename = os.path.basename(filename)
-                        logger.debug(f"inserted {basename}")
+                                try:
+                                    cursor.execute(cmd)
+                                    filename = l1_file.get_filename("filename")
+                                    basename = os.path.basename(filename)
+                                    logger.debug(f"inserted {basename}")
+                                except mysql.connector.errors.Error as e:
+                                    logger.error(e.msg)
+                                    logger.error(
+                                        f"error inserting {basename} into chromag_web"
+                                    )
             else:
                 logger.info(f"skipped inserting {w} nm files to web database table")
 
@@ -117,8 +122,12 @@ def insert_level0(
             field_names = ",".join(fields.keys())
             field_values = ",".join([f"{v[0]:{v[1]}}" for v in fields.values()])
             cmd = f"insert into chromag_level0 ({field_names}) value ({field_values});"
-            cursor.execute(cmd)
-            logger.debug(f"inserted {f.basename}")
+            try:
+                cursor.execute(cmd)
+                logger.debug(f"inserted {f.basename}")
+            except mysql.connector.errors.Error as e:
+                logger.error(e.msg)
+                logger.error(f"error inserting {f.basename} into chromag_level0")
 
     connection.commit()
 
@@ -158,9 +167,12 @@ def insert_level1(
                     field_names = ",".join(fields.keys())
                     field_values = ",".join([f"{v[0]:{v[1]}}" for v in fields.values()])
                     cmd = f"insert into chromag_level1 ({field_names}) value ({field_values});"
-                    cursor.execute(cmd)
-
-                    logger.debug(f"inserted {basename}")
+                    try:
+                        cursor.execute(cmd)
+                        logger.debug(f"inserted {basename}")
+                    except mysql.connector.errors.Error as e:
+                        logger.error(e.msg)
+                        logger.error(f"error inserting {basename} into chromag_level1")
 
     connection.commit()
 
