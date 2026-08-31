@@ -11,9 +11,18 @@ from ..config import get_basedir, get_option
 from ..datetime import datetime2dateobs, human_timedelta
 from ..display import write_intensity_image, write_iquv_image
 from ..pipeline import step
-from ..file import ChroMagL1File, write_l1_file, create_dir
+from ..file import ChroMagRawFile, ChroMagL1File, write_l1_file, create_dir
 from ..logging import logger
 from ..quality import sci_quality_check, sci_quality_name
+
+
+@step()
+def quality_check(run, raw_file: ChroMagRawFile):
+    raw_file.quality_bitmask = sci_quality_check(raw_file)
+    if raw_file.quality_bitmask != 0:
+        quality_name = sci_quality_name(raw_file.quality_bitmask)
+        logger.warn(f"failed quality {quality_name}, skipping L1")
+    return raw_file.quality_bitmask
 
 
 @step()
@@ -62,16 +71,11 @@ def process(run):
     for i, raw_file in enumerate(science_files):
         logger.info(f"processing {i+1}/{n_science_files}: {raw_file.basename}...")
 
-        # initial quality check: discard really bad data
-        raw_file.quality_bitmask = sci_quality_check(raw_file)
-        if raw_file.quality_bitmask != 0:
-            quality_name = sci_quality_name(raw_file.quality_bitmask)
-            logger.warn(f"failed quality {quality_name}, skipping L1")
+        # initial quality check: do not process really bad data
+        if quality_check(run, raw_file):
             continue
 
         l1_file = ChroMagL1File(raw_file)
-
-        # apply non-linearity camera correction (if necessary)
 
         # apply camera corrections, i.e., hot pixels, etc.
 
@@ -79,7 +83,11 @@ def process(run):
             run, l1_file, intermediate=get_option("intermediate", "dark_correction")
         )
 
-        # apply gain
+        # apply non-linearity camera correction (if necessary)
+
+        # apply flat
+
+        # apply transmission
 
         # demodulation
 
