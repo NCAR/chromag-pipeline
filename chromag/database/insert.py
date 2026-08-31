@@ -184,6 +184,8 @@ def insert_level2(
 ):
     """Update the chromag_level2 database table."""
     logger.info("inserting files into level 2 database...")
+
+    # [TODO]: implement
     logger.warning("chromag_level2 insertion not implemented")
 
 
@@ -194,6 +196,8 @@ def insert_level3(
 ):
     """Update the chromag_level3 database table."""
     logger.info("inserting files into level 3 database...")
+
+    # [TODO]: implement
     logger.warning("chromag_level3 insertion not implemented")
 
 
