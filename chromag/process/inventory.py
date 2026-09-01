@@ -8,7 +8,8 @@ import os
 import numpy as np
 
 from ..config import get_option, get_basedir
-from ..datetime import decompose_date
+from ..datetime import decompose_date, filename2datetime
+from ..epochs import get_epochvalue
 from ..file import ChroMagRawFile
 from ..logging import logger
 from ..pipeline import step
@@ -92,9 +93,13 @@ def run_inventory(run):
     catalog = Catalog()
 
     for f in filenames:  # pylint: disable=invalid-name
-        file = ChroMagRawFile(f, run.observing_day)
-        logger.debug(str(file))
-        catalog.add_file(file)
+        process = get_epochvalue("process", filename2datetime(f))
+        if process:
+            file = ChroMagRawFile(f, run.observing_day)
+            logger.debug(str(file))
+            catalog.add_file(file)
+        else:
+            logger.warn(f"skipping {os.path.basename(f)}")
 
     logger.info(f"created catalog with {catalog.n_files} files")
     logger.info("writing inventory files...")
