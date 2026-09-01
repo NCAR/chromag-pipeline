@@ -66,30 +66,25 @@ def publish_l1(run):
             logger.info(f"skipped publishing {w} nm level 1 files")
 
 
-def _clearday_l1type(run, type: str):
-    """Clear a directory starting from a given basedir of all files of the
-    form `*.chromag.WWWW.l1.*`.
-    """
-    basedir = get_option("results", f"{type}_basedir")
-    if basedir is None:
-        logger.info(f"no {type} directory specified, not clearing")
-    else:
-        logger.info(f"clearing {type} directory...")
-
-        for w in available_waveregions():
-            files = glob.glob(
-                os.path.join(
-                    basedir, *decompose_date(run.observing_day), f"*.chromag.{w}.l1.*"
-                )
-            )
-            logger.info(f"removing {len(files)} {w} nm files in {type}")
-            for f in files:
-                os.remove(f)
-
-
 def clearday_l1(run):
     """Remove published level 1 files from the web archive and fullres
-    directories.
+    directories. Files removed are of the form `*.chromag.WWWW.l1.*`.
     """
     for type in ["webarchive", "fullres"]:
-        _clearday_l1type(run, type)
+        basedir = get_option("results", f"{type}_basedir")
+        if basedir is None:
+            logger.info(f"no {type} directory specified, not clearing")
+        else:
+            logger.info(f"clearing {type} directory...")
+
+            for w in available_waveregions():
+                files = glob.glob(
+                    os.path.join(
+                        basedir,
+                        *decompose_date(run.observing_day),
+                        f"*.chromag.{w}.l1.*",
+                    )
+                )
+                logger.info(f"removing {len(files)} {w} nm files in {type}")
+                for f in files:
+                    os.remove(f)
