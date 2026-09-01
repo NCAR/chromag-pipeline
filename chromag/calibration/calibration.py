@@ -358,30 +358,33 @@ class Calibration:
         dark_exposures = dark_group.createVariable("exposures", "f4", ("n_darks",))
         dark_exposures[:] = self.dark_exposures
 
-        flat_group = root_group.createGroup("Flats")
-        n_flats = flat_group.createDimension("n_flats", len(self.flat_exposures))
-        flat_images = flat_group.createVariable(
-            "images",
-            "f4",
-            (
-                "n_flats",
-                "ysize",
-                "xsize",
-            ),
-        )
-        if len(self.flat_images) > 0:
-            flat_images[:] = self.flat_images
+        if len(self.flat_files) > 0:
+            flat_group = root_group.createGroup("Flats")
+            n_flats = flat_group.createDimension("n_flats", len(self.flat_exposures))
+            flat_images = flat_group.createVariable(
+                "images",
+                "f4",
+                (
+                    "n_flats",
+                    "ysize",
+                    "xsize",
+                ),
+            )
+            if len(self.flat_images) > 0:
+                flat_images[:] = self.flat_images
 
-        flat_exposures = flat_group.createVariable("exposures", "f4", ("n_flats",))
-        flat_exposures[:] = self.flat_exposures
+            flat_exposures = flat_group.createVariable("exposures", "f4", ("n_flats",))
+            flat_exposures[:] = self.flat_exposures
 
-        flat_wavelengths = flat_group.createVariable("wavelengths", "f4", ("n_flats",))
-        flat_wavelengths[:] = self.flat_wavelengths
+            flat_wavelengths = flat_group.createVariable(
+                "wavelengths", "f4", ("n_flats",)
+            )
+            flat_wavelengths[:] = self.flat_wavelengths
 
-        flat_scale_factors = flat_group.createVariable(
-            "scale_factors", "f4", ("n_flats",)
-        )
-        flat_scale_factors[:] = self.flat_scale_factors
+            flat_scale_factors = flat_group.createVariable(
+                "scale_factors", "f4", ("n_flats",)
+            )
+            flat_scale_factors[:] = self.flat_scale_factors
 
         demod_group = root_group.createGroup("Demodulation")
 
