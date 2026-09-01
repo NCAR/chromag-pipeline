@@ -9,10 +9,9 @@ from astropy.io import fits
 from astropy.io.fits.card import Card, _format_float
 import numpy as np
 
-from .fileio import read_rawheader, read_rawdata
-
 from ..config import get_basedir
-from ..datetime import dateobs2datetime, obsday_hours
+from ..datetime import filename2datetime, dateobs2datetime, obsday_hours
+from ..epochs import get_epochvalue
 
 
 l1b_header_template = None
@@ -159,6 +158,39 @@ class ChroMagRawFile:
     @data.deleter
     def data(self):
         del self._data
+
+
+from .repair import repair
+
+
+def read_rawheader(filename: str):
+    """Read the primary header of a raw ChroMag FITS file."""
+    with fits.open(filename) as f:
+        primary_header = f[0].header
+
+    dt = filename2datetime(filename)
+    repair_routines = get_epochvalue("header_repair_routines", dt).split(",")
+
+    # careful: "".split(",") == [""]
+    if len(repair_routines) > 1 or len(repair_routines[0]) > 0:
+        repair(primary_header, repair_routines)
+
+    return primary_header
+
+
+def read_rawdata(filename: str):
+    """Read the data from raw ChroMag FITS file."""
+    with fits.open(filename) as f:
+        data = f[0].data.astype(np.float32)
+
+    dt = filename2datetime(filename)
+    repair_routines = get_epochvalue("data_repair_routines", dt).split(",")
+
+    # careful: "".split(",") == [""]
+    if len(repair_routines) > 1 or len(repair_routines[0]) > 0:
+        repair(data, repair_routines)
+
+    return data
 
 
 class ChroMagL1File:
