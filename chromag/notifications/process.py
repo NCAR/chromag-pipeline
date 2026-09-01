@@ -44,6 +44,9 @@ def notify_process(
     # [TODO]: add status (success, failure, incomplete, etc.) to subject?
     subject = f"ChroMag {subcommand}ing for {date}"
 
+    if date_run is None:
+        subject += " (crash)"
+
     plain_text = ""
 
     # [TODO]: add run statistics
