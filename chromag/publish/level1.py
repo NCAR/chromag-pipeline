@@ -68,7 +68,7 @@ def publish_l1(run):
 
 def clearday_l1(run):
     """Remove published level 1 files from the web archive and fullres
-    directories. Files removed are of the form `*.chromag.WWWW.l1.*`.
+    directories. Files removed are of the form `*.chromag.WWWW.l1b.*`.
     """
     for type in ["webarchive", "fullres"]:
         basedir = get_option("results", f"{type}_basedir")
@@ -82,7 +82,7 @@ def clearday_l1(run):
                     os.path.join(
                         basedir,
                         *decompose_date(run.observing_day),
-                        f"*.chromag.{w}.l1.*",
+                        f"*.chromag.{w}.l1b.*",
                     )
                 )
                 logger.info(f"removing {len(files)} {w} nm files in {type}")
