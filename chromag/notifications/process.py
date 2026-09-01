@@ -40,8 +40,8 @@ def notify_process(
         return False
     from_email = get_option("notifications", "from")
 
+    plain_text = ""
     date = short2hyphenated(observing_day)
-    # [TODO]: add status (success, failure, incomplete, etc.) to subject?
     run_status = "crash" if date_run is None else "success"
     subject = f"ChroMag {subcommand}ing for {date} ({run_status})"
 
