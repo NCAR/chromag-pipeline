@@ -42,12 +42,8 @@ def notify_process(
 
     date = short2hyphenated(observing_day)
     # [TODO]: add status (success, failure, incomplete, etc.) to subject?
-    subject = f"ChroMag {subcommand}ing for {date}"
-
-    if date_run is None:
-        subject += " (crash)"
-
-    plain_text = ""
+    run_status = "crash" if date_run is None else "success"
+    subject = f"ChroMag {subcommand}ing for {date} ({run_status})"
 
     # [TODO]: add run statistics
 
