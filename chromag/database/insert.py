@@ -24,6 +24,15 @@ from ..waveregions import available_waveregions
 from ..logging import logger
 
 
+def db_safe(value: float, format: str):
+    """Format the float with the given format, also setting None and NaN values
+    as NULL."""
+    if value is None:
+        return "NULL"
+    else:
+        return f"{value:{format}}"
+
+
 def insert_web(
     connection: mysql.connector.connection_cext.CMySQLConnection,
     obsday_id: int,
@@ -78,7 +87,7 @@ def insert_web(
                                 }
                                 field_names = ",".join(fields.keys())
                                 field_values = ",".join(
-                                    [f"{v[0]:{v[1]}}" for v in fields.values()]
+                                    [f"{db_safe(v[0], v[1])}" for v in fields.values()]
                                 )
                                 cmd = f"insert into chromag_web ({field_names}) value ({field_values});"
                                 try:
@@ -118,9 +127,21 @@ def insert_level0(
                 "exposure": (f.exposure, "0.3f"),
                 "scan_i": (f.scan_i, "d"),
                 "scan_n": (f.scan_n, "d"),
+                "sgsdimv": (f.primary_header["SGSDIMV"], "0.3f"),
+                "sgsdims": (f.primary_header["SGSDIMS"], "0.3f"),
+                "sgssumv": (f.primary_header["SGSSUMV"], "0.3f"),
+                "sgssums": (f.primary_header["SGSSUMS"], "0.3f"),
+                "sgsrav": (f.primary_header["SGSRAV"], "0.3f"),
+                "sgsras": (f.primary_header["SGSRAS"], "0.3f"),
+                "sgsdecv": (f.primary_header["SGSDECV"], "0.3f"),
+                "sgsdecs": (f.primary_header["SGSDECS"], "0.3f"),
+                "sgsscint": (f.primary_header["SGSSCINT"], "0.3f"),
+                "sgsloop": (f.primary_header["SGSLOOP"], "0.2f"),
+                "sgsrazr": (f.primary_header["SGSRAZR"], "0.1f"),
+                "sgsdeczr": (f.primary_header["SGSDECZR"], "0.1f"),
             }
             field_names = ",".join(fields.keys())
-            field_values = ",".join([f"{v[0]:{v[1]}}" for v in fields.values()])
+            field_values = ",".join([f"{db_safe(v[0], v[1])}" for v in fields.values()])
             cmd = f"insert into chromag_level0 ({field_names}) value ({field_values});"
             try:
                 cursor.execute(cmd)
@@ -165,7 +186,9 @@ def insert_level1(
                         "chromag_sw_id": (sw_id, "d"),
                     }
                     field_names = ",".join(fields.keys())
-                    field_values = ",".join([f"{v[0]:{v[1]}}" for v in fields.values()])
+                    field_values = ",".join(
+                        [f"{db_safe(v[0], v[1])}" for v in fields.values()]
+                    )
                     cmd = f"insert into chromag_level1 ({field_names}) value ({field_values});"
                     try:
                         cursor.execute(cmd)

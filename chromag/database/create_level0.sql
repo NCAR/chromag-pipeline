@@ -18,6 +18,19 @@ create table chromag_level0 (
   scan_i                                int,
   scan_n                                int,
 
+  sgsdimv                               float,
+  sgsdims                               float,
+  sgssumv                               float,
+  sgssums                               float,
+  sgsrav                                float,
+  sgsras                                float,
+  sgsdecv                               float,
+  sgsdecs                               float,
+  sgsscint                              float,
+  sgsloop                               float,
+  sgsrazr                               float,
+  sgsdeczr                              float,
+
   -- [TODO]: level 0 specific information
 
   index (filename),
