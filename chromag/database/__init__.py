@@ -12,10 +12,12 @@ class DatabaseError(Exception):
 
 from .connect import get_connection
 from .update import (
+    ProcessStatus,
     get_obsday_id,
     get_sw_id,
     get_level_id,
     get_filetype_id,
+    get_process_id,
     get_producttype_id,
 )
 from .clearday import clearday

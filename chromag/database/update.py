@@ -4,6 +4,8 @@
 created if they are not already there.
 """
 
+from enum import StrEnum
+
 from contextlib import closing
 import datetime
 
@@ -16,6 +18,11 @@ from .. import __revision__
 
 from ..datetime import short2hyphenated
 from ..logging import logger
+
+
+ProcessStatus = StrEnum(
+    "ProcessStatus", [("PROCESSED", "PROCESSED"), ("PROCESSING", "PROCESSING")]
+)
 
 
 def get_sw_id(connection: mysql.connector.connection_cext.CMySQLConnection):
@@ -69,6 +76,37 @@ def get_obsday_id(
             logger.debug(f"found obsday_id={obsday_id} for {date}")
 
     return obsday_id
+
+
+def get_process_id(
+    connection: mysql.connector.connection_cext.CMySQLConnection,
+    obsday_id: int,
+    status: ProcessStatus = ProcessStatus.PROCESSED,
+):
+    """Retrieve the process identifier given the "observing day", i.e.,
+    the HST date of the observations. If there isn't a row for it yet, create a
+    new row for the observing day.
+    """
+
+    with closing(connection.cursor()) as cursor:
+        date = short2hyphenated(obs_date)
+
+        cmd = f'select process_id from chromag_process where obsday_id = "{obsday_id}" limit 1;'
+        cursor.execute(cmd)
+        result = cursor.fetchone()
+        if result is None:
+            logger.debug(f"inserting {obsday_id} into chromag_process...")
+            sw_id = get_sw_id(connection)
+            cmd = f"insert into chromag_process (obsday_id, chromag_sw_id, status) values ({obsday_id}, {sw_id}, {status})"
+            cursor.execute(cmd)
+            process_id = cursor.lastrowid
+            logger.debug(f"inserted process_id={process_id} for {obsday_id}")
+            connection.commit()
+        else:
+            process_id = result[0]
+            logger.debug(f"found process_id={process_id} for {obsday_id}")
+
+    return process_id
 
 
 def _get_id(

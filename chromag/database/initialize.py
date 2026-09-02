@@ -56,7 +56,16 @@ def initialize_tables(config_filename: str, config_section: str):
     """Delete any existing tables and then re-create new tables and initialize
     them."""
 
-    table_names = ["sw", "level", "filetype", "producttype", "level0", "level1", "web"]
+    table_names = [
+        "sw",
+        "process",
+        "level",
+        "filetype",
+        "producttype",
+        "level0",
+        "level1",
+        "web",
+    ]
 
     try:
         with closing(get_connection(config_filename, config_section)) as connection:
