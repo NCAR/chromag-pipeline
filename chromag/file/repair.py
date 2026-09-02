@@ -19,6 +19,41 @@ def null_header(header: fits.header.Header):
     return header
 
 
+def fake_sgs(header: fits.header.Header):
+    """Example repair routine that doesn't do anything."""
+    import math
+    import random
+    from ..datetime import dateobs2datetime, obsday_hours
+    from .file import FormattedFloat
+
+    logger.warn("setting fake SGS values")
+    dt = dateobs2datetime(header["DATE-OBS"])
+    ohrs = obsday_hours(dt)
+
+    header["SGSDIMV"] = FormattedFloat(
+        8.0 / (1.0 + math.exp(-(ohrs - 6.0))) + random.gauss(0.0, 0.1), "0.3f"
+    )
+    header["SGSDIMS"] = FormattedFloat(
+        0.00125 * (ohrs - 6.0) + 0.01 + random.gauss(0.0, 0.005), "%0.3f"
+    )
+    header["SGSSUMV"] = FormattedFloat(random.random(), "%0.3f")
+    header["SGSSUMS"] = FormattedFloat(random.random(), "%0.3f")
+    header["SGSRAV"] = FormattedFloat(random.random(), "%0.3f")
+    header["SGSRAS"] = FormattedFloat(random.random(), "%0.3f")
+    header["SGSDECV"] = FormattedFloat(random.random(), "%0.3f")
+    header["SGSDECS"] = FormattedFloat(random.random(), "%0.3f")
+    header["SGSSCINT"] = FormattedFloat(
+        0.8125 * (ohrs - 6.0) + 1.5 + random.gauss(0.0, 0.1), "%0.3f"
+    )
+    header["SGSLOOP"] = FormattedFloat(
+        min(0.999 + random.gauss(0.0, 0.001), 1.0), "%0.2f"
+    )
+    header["SGSRAZR"] = FormattedFloat(random.gauss(-10.0, 1.0), "%0.1f")
+    header["SGSDECZR"] = FormattedFloat(random.gauss(20.0, 1.0), "%0.1f")
+
+    return header
+
+
 # ---- data repair routines ----
 
 
