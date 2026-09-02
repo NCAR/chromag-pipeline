@@ -110,10 +110,10 @@ def process(run):
     n_science_files = len(science_files)
 
     start_dt = datetime.datetime.now()
-    format = f"{int(math.log(len(science_files), 10)) + 1}d"
+    i_format = f"{int(math.log(len(science_files), 10)) + 1}d"
     for i, raw_file in enumerate(science_files):
         logger.info(
-            f"processing {i+1:{format}}/{n_science_files}: {raw_file.basename}..."
+            f"processing {i+1:{i_format}}/{n_science_files}: {raw_file.basename}..."
         )
 
         # initial quality check: do not process really bad data
