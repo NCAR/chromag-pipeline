@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 
-"""Handle plotting."""
+"""Handle plotting. There are three types of engineering plots created:
+
+- daily, representing the data for an observing day;
+- rolling, representing the data from the last `n` days observations; and
+- mission, representing the data from the entire misson.
+
+These plots are grouped in the daily, rolling, and mission submodules.
+"""
 
 
 from ..pipeline import step
