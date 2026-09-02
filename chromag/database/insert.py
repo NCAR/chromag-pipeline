@@ -9,6 +9,7 @@ import os
 import mysql.connector
 
 from . import (
+    ProcessStatus,
     DatabaseError,
     get_connection,
     get_obsday_id,
@@ -16,6 +17,7 @@ from . import (
     get_level_id,
     get_filetype_id,
     get_producttype_id,
+    set_process_id,
 )
 
 from ..config import get_option
@@ -245,6 +247,7 @@ def insert_files(run, catalog):
                 obsday_id = get_obsday_id(connection, run.observing_day)
                 for insert_level_routine in level_routines:
                     insert_level_routine(connection, obsday_id, catalog)
+                set_process_id(connection, obsday_id, ProcessStatus.PROCESSED)
         except mysql.connector.errors.Error as e:
             logger.error(e, exc_info=True)
             raise DatabaseError(e.msg)

@@ -17,8 +17,8 @@ from .update import (
     get_sw_id,
     get_level_id,
     get_filetype_id,
-    get_process_id,
     get_producttype_id,
+    set_process_id,
 )
 from .clearday import clearday
 from .initialize import initialize_tables

@@ -7,7 +7,13 @@ from contextlib import closing
 
 import mysql.connector
 
-from . import DatabaseError, get_connection, get_obsday_id
+from . import (
+    DatabaseError,
+    get_connection,
+    get_obsday_id,
+    set_process_id,
+    ProcessStatus,
+)
 
 from ..config import get_option
 from ..logging import logger
@@ -38,6 +44,7 @@ def clearday(date_run):
         try:
             with closing(get_connection(config_filename, config_section)) as connection:
                 obsday_id = get_obsday_id(connection, date_run.observing_day)
+                set_process_id(connection, obsday_id, ProcessStatus.PROCESSING)
                 for t in table_names:
                     clear_table(connection, obsday_id, t)
         except mysql.connector.errors.Error as e:

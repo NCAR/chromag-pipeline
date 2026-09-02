@@ -21,7 +21,7 @@ from ..logging import logger
 
 
 ProcessStatus = StrEnum(
-    "ProcessStatus", [("PROCESSED", "PROCESSED"), ("PROCESSING", "PROCESSING")]
+    "ProcessStatus", [("PROCESSED", "processed"), ("PROCESSING", "processing")]
 )
 
 
@@ -42,11 +42,11 @@ def get_sw_id(connection: mysql.connector.connection_cext.CMySQLConnection):
             cmd = f'insert into chromag_sw (release_date, version, revision) values ("{release_date}", "{__version__}", "{__revision__}");'
             cursor.execute(cmd)
             sw_id = cursor.lastrowid
-            connection.commit()
         else:
             sw_id = result[0]
             logger.debug(f"found sw_id={sw_id} for {__version__} [{__revision__}]")
 
+    connection.commit()
     return sw_id
 
 
@@ -70,15 +70,15 @@ def get_obsday_id(
             cursor.execute(cmd)
             obsday_id = cursor.lastrowid
             logger.debug(f"inserted obsday_id={obsday_id} for {date}")
-            connection.commit()
         else:
             obsday_id = result[0]
             logger.debug(f"found obsday_id={obsday_id} for {date}")
 
+    connection.commit()
     return obsday_id
 
 
-def get_process_id(
+def set_process_id(
     connection: mysql.connector.connection_cext.CMySQLConnection,
     obsday_id: int,
     status: ProcessStatus = ProcessStatus.PROCESSED,
@@ -89,22 +89,24 @@ def get_process_id(
     """
 
     with closing(connection.cursor()) as cursor:
-        date = short2hyphenated(obs_date)
-
         cmd = f'select process_id from chromag_process where obsday_id = "{obsday_id}" limit 1;'
         cursor.execute(cmd)
         result = cursor.fetchone()
         if result is None:
-            logger.debug(f"inserting {obsday_id} into chromag_process...")
+            logger.debug(f"inserting {obsday_id} into chromag_process as {status}...")
             sw_id = get_sw_id(connection)
-            cmd = f"insert into chromag_process (obsday_id, chromag_sw_id, status) values ({obsday_id}, {sw_id}, {status})"
+            cmd = f'insert into chromag_process (obsday_id, chromag_sw_id, status) values ({obsday_id}, {sw_id}, "{status}")'
             cursor.execute(cmd)
             process_id = cursor.lastrowid
             logger.debug(f"inserted process_id={process_id} for {obsday_id}")
-            connection.commit()
         else:
             process_id = result[0]
-            logger.debug(f"found process_id={process_id} for {obsday_id}")
+            cmd = f'update chromag_process set status="{status}" where process_id={process_id}'
+            cursor.execute(cmd)
+            logger.debug(cmd)
+            logger.debug(f"updated process_id={process_id} for {obsday_id} to {status}")
+
+    connection.commit()
 
     return process_id
 
