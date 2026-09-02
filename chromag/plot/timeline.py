@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, FixedLocator
 from matplotlib.transforms import IdentityTransform
 
-from .. import mission_start
+from .daily import obsday_hours_formatter
 
-from ..datetime import obsday_hours2str
+from .. import mission_start
 from ..waveregions import available_waveregions, waveregion_property
 from ..logging import logger
 
@@ -18,13 +18,6 @@ END_TIME = 18  # 6 pm HST
 BINS_PER_HOUR = 6  # bins are 10 minutes
 MAX_WAVE_FILES_PER_BIN = 100
 MAX_DARK_FILES_PER_BIN = 10
-
-
-def obsday_hours_formatter(obsday_hours: float, pos: float) -> str:
-    """Format an obsday_hours (fractional hours) value into a formatted
-    string.
-    """
-    return obsday_hours2str(obsday_hours)
 
 
 def darken(color: str, factor: float = 0.5) -> str:

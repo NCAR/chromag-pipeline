@@ -21,6 +21,7 @@ from ..database import DatabaseError, insert_files
 from ..datetime import human_timedelta
 from ..logging import setup_logging, get_level
 from ..pipeline import Run
+from ..plot import engineering_plots
 from ..publish import publish_l1, publish_l2, publish_l3
 from ..quality import write_sci_quality_logs
 
@@ -92,6 +93,8 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
         archive_l0(date_run)
     archive_l1(date_run)
     archive_l2(date_run)
+
+    engineering_plots(date_run)
 
     end_dt = datetime.datetime.now()
     time_interval = end_dt - start_dt
