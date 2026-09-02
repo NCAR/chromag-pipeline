@@ -36,12 +36,20 @@ def fake_sgs(header: fits.header.Header):
     header["SGSDIMS"] = FormattedFloat(
         0.00125 * (ohrs - 6.0) + 0.01 + random.gauss(0.0, 0.005), "%0.3f"
     )
-    header["SGSSUMV"] = FormattedFloat(random.random(), "%0.3f")
-    header["SGSSUMS"] = FormattedFloat(random.random(), "%0.3f")
-    header["SGSRAV"] = FormattedFloat(random.random(), "%0.3f")
-    header["SGSRAS"] = FormattedFloat(random.random(), "%0.3f")
-    header["SGSDECV"] = FormattedFloat(random.random(), "%0.3f")
-    header["SGSDECS"] = FormattedFloat(random.random(), "%0.3f")
+    header["SGSSUMV"] = FormattedFloat(
+        8.0 / (1.0 + math.exp(-(ohrs - 6.0))) + random.gauss(0.0, 0.1), "0.3f"
+    )
+    header["SGSSUMS"] = FormattedFloat(
+        0.00125 * (ohrs - 6.0) + 0.01 + random.gauss(0.0, 0.005), "%0.3f"
+    )
+    header["SGSRAV"] = FormattedFloat(0.999 + random.gauss(0.0, 0.001), "%0.3f")
+    header["SGSRAS"] = FormattedFloat(
+        0.0025 * (ohrs - 6.0) + 0.01 + random.gauss(0.0, 0.005), "%0.3f"
+    )
+    header["SGSDECV"] = FormattedFloat(0.999 + random.gauss(0.0, 0.001), "%0.3f")
+    header["SGSDECS"] = FormattedFloat(
+        0.0025 * (ohrs - 6.0) + 0.01 + random.gauss(0.0, 0.005), "%0.3f"
+    )
     header["SGSSCINT"] = FormattedFloat(
         0.8125 * (ohrs - 6.0) + 1.5 + random.gauss(0.0, 0.1), "%0.3f"
     )
