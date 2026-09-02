@@ -20,7 +20,8 @@ def null_header(header: fits.header.Header):
 
 
 def fake_sgs(header: fits.header.Header):
-    """Example repair routine that doesn't do anything."""
+    """Header repair that inserts synthetic SGS values into the header. Useful
+    for testing when no real SGS values are available."""
     import math
     import random
     from ..datetime import dateobs2datetime, obsday_hours
@@ -54,7 +55,7 @@ def fake_sgs(header: fits.header.Header):
         0.8125 * (ohrs - 6.0) + 1.5 + random.gauss(0.0, 0.1), "%0.3f"
     )
     header["SGSLOOP"] = FormattedFloat(
-        min(0.999 + random.gauss(0.0, 0.001), 1.0), "%0.2f"
+        min(0.999 + random.gauss(0.0, 0.005), 1.0), "%0.2f"
     )
     header["SGSRAZR"] = FormattedFloat(random.gauss(-10.0, 1.0), "%0.1f")
     header["SGSDECZR"] = FormattedFloat(random.gauss(20.0, 1.0), "%0.1f")
