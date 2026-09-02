@@ -38,6 +38,9 @@ class Catalog:
         self.catalog.append(file)
         self.n_files += 1
 
+    def get_headervalues(self, keyword_name: str):
+        return [f.primary_header[keyword_name] for f in self.catalog]
+
     def __len__(self):
         return len(self.catalog)
 
