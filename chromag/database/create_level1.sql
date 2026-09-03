@@ -18,6 +18,7 @@ create table chromag_level1 (
   scan_n                                int,
 
   -- [TODO]: level 1 specific information
+  imagescale                            float,
 
   chromag_sw_id                         int,
 
