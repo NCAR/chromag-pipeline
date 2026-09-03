@@ -21,7 +21,6 @@ def process_createdb(args):
         args.parser.error(
             f"configuration file not found: {args.configuration_filename}"
         )
-        sys.exit(1)
 
     read_config(args.configuration_filename)
 
@@ -39,6 +38,8 @@ def process_createdb(args):
         except NoSectionError as e:
             args.parser.error(f"section {config_section} not found in config file")
         except DatabaseError as e:
+            args.parser.error(e)
+        except Exception as e:
             args.parser.error(e)
 
 

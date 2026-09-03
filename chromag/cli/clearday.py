@@ -29,7 +29,6 @@ def handle_clearday(args):
         args.parser.error(
             f"configuration file not found: {args.configuration_filename}"
         )
-        sys.exit(1)
 
     read_config(args.configuration_filename)
 
@@ -48,7 +47,12 @@ def handle_clearday(args):
         logger.info(f"pipeline version {__version__} [{__revision__}]")
         start_dt = datetime.datetime.now()
 
-        clearday(date_run)
+        try:
+            clearday(date_run)
+        except DatabaseError as e:
+            args.parser.error(e)
+        except Exception as e:
+            args.parser.error(e)
 
         human_time = human_timedelta(datetime.datetime.now() - start_dt)
         logger.info(f"done: {human_time}")
