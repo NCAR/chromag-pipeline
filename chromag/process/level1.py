@@ -12,9 +12,16 @@ from ..config import get_basedir, get_option
 from ..datetime import datetime2dateobs, human_timedelta
 from ..display import write_intensity_image, write_iquv_image
 from ..pipeline import step
-from ..file import ChroMagRawFile, ChroMagL1File, write_l1_file, create_dir
+from ..file import (
+    ChroMagRawFile,
+    ChroMagL1File,
+    FormattedFloat,
+    write_l1_file,
+    create_dir,
+)
 from ..logging import logger
 from ..quality import sci_quality_check, sci_quality_name
+from ..waveregions import waveregion_property
 
 
 @step()
@@ -75,6 +82,12 @@ def update_header(run, l1_file: ChroMagL1File):
     l1_file.primary_header["CALWSID"] = f"{__version__} [{__revision__}]"
 
     l1_file.primary_header["CALFILE"] = run.calibration.basename
+
+    platescale = waveregion_property(
+        l1_file.wave_region, "platescale", l1_file.date_obs
+    )
+    l1_file.primary_header["CDELT1"] = FormattedFloat(platescale, "0.3f")
+    l1_file.primary_header["CDELT2"] = FormattedFloat(platescale, "0.3f")
 
     # HISTORY section thta is not part of template, added at the end of the
     # header
