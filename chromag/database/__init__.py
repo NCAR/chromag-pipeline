@@ -23,5 +23,6 @@ from .update import (
 from .clearday import clearday
 from .initialize import initialize_tables
 from .insert import insert_files
+from .query import query
 
 from ..logging import logger
