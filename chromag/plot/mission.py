@@ -11,7 +11,6 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter, MonthLocator
 
-# from matplotlib.transforms import IdentityTransform
 import mysql.connector
 import numpy as np
 
@@ -29,6 +28,7 @@ DATE_FORMAT = "%Y-%m"
 
 def _mission_time_series(
     output_filename: str,
+    observing_day: str,
     datetimes: list[datetime.datetime],
     datasets: list[np.ndarray],
     titles: list[str],
@@ -37,11 +37,19 @@ def _mission_time_series(
 ):
     """Make a generic daily time series plot with potentially many panels."""
     n_plots = len(datasets)
-    last_datetime = datetimes[-1]
+
+    xrange = tuple(
+        datetime.date.fromisoformat(d) for d in [mission_start, observing_day]
+    )
 
     label_fontsize = 8.0
     figsize = (8.0, 2.25 * n_plots)
     fig, axes = plt.subplots(n_plots, 1, figsize=figsize, layout="constrained")
+
+    # handle the case when plt.subplots returns an axes object instead of an
+    # array of axes
+    if n_plots == 1:
+        axes = [axes]
 
     for ax, d, t, yt, yr in zip(axes, datasets, titles, ytitles, yranges):
         ax.scatter(datetimes, d, c="b", marker="o", s=1.0)
@@ -51,7 +59,7 @@ def _mission_time_series(
         ax.spines["top"].set_visible(False)
         ax.spines["left"].set_visible(False)
         ax.spines["right"].set_visible(False)
-        ax.set_xlim((mission_start, last_datetime))
+        ax.set_xlim(xrange)
         ax.xaxis.set_major_locator(MonthLocator(bymonth=[4, 8, 12]))
         ax.xaxis.set_major_formatter(DateFormatter(DATE_FORMAT))
         ax.set_xlabel("Date [UT]", fontsize=label_fontsize)
@@ -66,32 +74,37 @@ def _mission_time_series(
 def write_imagescale_plot(
     imagescale_plot_filename: str,
     connection: mysql.connector.connection_cext.CMySQLConnection,
+    observing_day: str,
     wave_region: str,
 ):
-    sql_cmd = "select date_obs, imagescale from chromag_level1 where wave_region='{wave_region}' order by date_obs;"
+    sql_cmd = f"select date_obs, imagescale from chromag_level1 where wave_region='{wave_region}' order by date_obs;"
+    logger.debug(sql_cmd)
     results = query(connection, sql_cmd)
-    if results is None:
-        logger.debug("no image scale values found, skipped")
+    if results is None or len(results) == 0:
+        logger.debug(f"no image scale values for {wave_region} nm found, skipped")
         return
-    logger.debug(f"retrieved {len(results)} image scale values")
-    datetimes = np.array([r[0] for r in results])
-    imagescales = np.array([r[1] for r in results])
+
+    logger.debug(f"retrieved {len(results)} image scale values for {wave_region} nm")
+    datetimes = [r[0] for r in results]
+    imagescales = np.array([np.nan if r[1] is None else r[1] for r in results])
+
     _mission_time_series(
         imagescale_plot_filename,
+        observing_day,
         datetimes,
         [imagescales],
         [f"Image scale for {wave_region} nm"],
-        ["Image scale [arcsec/pixel"],
+        ["Image scale [arcsec/pixel]"],
         [(5.0, 6.0)],
     )
 
 
 @step(top=True)
-def write_mission_plots(date_run):
+def write_mission_plots(observing_day: str):
     """Write the mission plots."""
     eng_basedir = get_option("engineering", "basedir")
     if eng_basedir is not None:
-        eng_dir = os.path.join(eng_basedir, *decompose_date(date_run.observing_day))
+        eng_dir = os.path.join(eng_basedir, *decompose_date(observing_day))
         if not os.path.isdir(eng_dir):
             os.makedirs(eng_dir)
     else:
@@ -106,9 +119,10 @@ def write_mission_plots(date_run):
                     write_imagescale_plot(
                         os.path.join(
                             eng_dir,
-                            f"{date_run.observing_day}.chromag.{w}.imagescale.mission.png",
+                            f"{observing_day}.chromag.{w}.imagescale.mission.png",
                         ),
                         connection,
+                        observing_day,
                         w,
                     )
         except mysql.connector.errors.Error as e:

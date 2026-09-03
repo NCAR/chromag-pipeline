@@ -31,4 +31,4 @@ from .mission import write_mission_plots
 def write_engineering_plots(date_run):
     write_daily_plots(date_run)
     write_rolling_plots(date_run)
-    write_mission_plots(date_run)
+    write_mission_plots(date_run.observing_day)
