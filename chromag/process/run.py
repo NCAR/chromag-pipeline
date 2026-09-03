@@ -94,7 +94,7 @@ def run(observing_day: str, config_filename: str, reprocessing: bool = False):
     archive_l1(date_run)
     archive_l2(date_run)
 
-    write_engineering_plots(date_run)
+    write_engineering_plots(date_run.observing_day, date_run.catalog)
 
     end_dt = datetime.datetime.now()
     time_interval = end_dt - start_dt

@@ -15,11 +15,11 @@ from ..pipeline import step
 
 
 @step(top=True)
-def write_rolling_plots(date_run):
+def write_rolling_plots(observing_day: str):
     """Write the rolling plots."""
     eng_basedir = get_option("engineering", "basedir")
     if eng_basedir is not None:
-        eng_dir = os.path.join(eng_basedir, *decompose_date(date_run.observing_day))
+        eng_dir = os.path.join(eng_basedir, *decompose_date(observing_day))
         if not os.path.isdir(eng_dir):
             os.makedirs(eng_dir)
     else:

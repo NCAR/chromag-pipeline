@@ -69,10 +69,8 @@ def _daily_time_series(
 
 
 @step()
-def write_seeing_plot(output_filename: str, date_run):
+def write_seeing_plot(output_filename: str, catalog):
     """Write 3 panel seeing plot with SGSDIMV, SGSDIMS, and SGSSCINT."""
-
-    catalog = date_run.catalog
 
     times = catalog.obsday_hours
     dimv = catalog.get_headervalues("SGSDIMV")
@@ -90,21 +88,19 @@ def write_seeing_plot(output_filename: str, date_run):
 
 
 @step(top=True)
-def write_daily_plots(date_run):
+def write_daily_plots(observing_day: str, catalog):
     """Write the daily plots."""
     eng_basedir = get_option("engineering", "basedir")
     if eng_basedir is not None:
-        eng_dir = os.path.join(eng_basedir, *decompose_date(date_run.observing_day))
+        eng_dir = os.path.join(eng_basedir, *decompose_date(observing_day))
         if not os.path.isdir(eng_dir):
             os.makedirs(eng_dir)
     else:
         logger.warn("engineering.basedir not set, skipping daily plots")
 
-    seeing_filename = os.path.join(
-        eng_dir, f"{date_run.observing_day}.chromag.seeing.daily.png"
-    )
+    seeing_filename = os.path.join(eng_dir, f"{observing_day}.chromag.seeing.daily.png")
 
-    write_seeing_plot(seeing_filename, date_run)
+    write_seeing_plot(seeing_filename, catalog)
 
 
 def write_timeline(output_filename: str, catalog, binsize: int = 15):
