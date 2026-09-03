@@ -52,7 +52,10 @@ def get_connection(config_filename: str, config_section: str):
     host, user, password, database = get_db_info(config_filename, config_section)
 
     connection = mysql.connector.connect(
-        host=host, user=user, password=password, database=database
+        host=host,
+        user=user,
+        password=password,
+        database=database,
     )
 
     return connection
