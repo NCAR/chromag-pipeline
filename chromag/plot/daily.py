@@ -16,6 +16,7 @@ from .. import mission_start
 from ..config import get_option
 from ..datetime import obsday_hours2str, decompose_date
 from ..logging import logger
+from ..pipeline import step
 from ..waveregions import available_waveregions, waveregion_property
 
 START_TIME = 6  # 6 am HST
@@ -67,6 +68,7 @@ def _daily_time_series(
     logger.info(f"wrote {os.path.basename(output_filename)}")
 
 
+@step()
 def write_seeing_plot(output_filename: str, date_run):
     """Write 3 panel seeing plot with SGSDIMV, SGSDIMS, and SGSSCINT."""
 
@@ -87,6 +89,7 @@ def write_seeing_plot(output_filename: str, date_run):
     )
 
 
+@step(top=True)
 def write_daily_plots(date_run):
     """Write the daily plots."""
     eng_basedir = get_option("engineering", "basedir")
@@ -98,7 +101,7 @@ def write_daily_plots(date_run):
         logger.warn("engineering.basedir not set, skipping daily plots")
 
     seeing_filename = os.path.join(
-        eng_dir, f"{date_run.observing_day}.chromag.seeing.png"
+        eng_dir, f"{date_run.observing_day}.chromag.seeing.daily.png"
     )
 
     write_seeing_plot(seeing_filename, date_run)
