@@ -60,7 +60,7 @@ def _daily_time_series(
         ax.set_xlim((START_TIME, END_TIME))
         ax.xaxis.set_major_locator(FixedLocator(range(START_TIME, END_TIME + 1, 1)))
         ax.xaxis.set_major_formatter(FuncFormatter(obsday_hours_formatter))
-        ax.set_xlabel("observing day [HST]", fontsize=label_fontsize)
+        ax.set_xlabel("Observing day time [HST]", fontsize=label_fontsize)
         ax.set_title(t)
 
     plt.savefig(output_filename)
@@ -173,7 +173,7 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
     )
     axes[dark_index].xaxis.set_major_formatter(FuncFormatter(obsday_hours_formatter))
 
-    axes[dark_index].set_xlabel("observing day time [HST]", fontsize=label_fontsize)
+    axes[dark_index].set_xlabel("Observing day time [HST]", fontsize=label_fontsize)
 
     binsize_msg = f"max {TIMELINE_MAX_WAVE_FILES_PER_BIN} in wave region, {TIMELINE_MAX_DARK_FILES_PER_BIN} dark files per {60 // TIMELINE_BINS_PER_HOUR:d} min bin"
     annotation = fig.text(
