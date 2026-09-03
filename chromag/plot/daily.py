@@ -173,7 +173,7 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
     )
     axes[dark_index].xaxis.set_major_formatter(FuncFormatter(obsday_hours_formatter))
 
-    axes[dark_index].set_xlabel("observing day [HST]", fontsize=label_fontsize)
+    axes[dark_index].set_xlabel("observing day time [HST]", fontsize=label_fontsize)
 
     binsize_msg = f"max {TIMELINE_MAX_WAVE_FILES_PER_BIN} in wave region, {TIMELINE_MAX_DARK_FILES_PER_BIN} dark files per {60 // TIMELINE_BINS_PER_HOUR:d} min bin"
     annotation = fig.text(
