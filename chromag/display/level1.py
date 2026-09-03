@@ -8,7 +8,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .. import mission_start
+from .. import MISSION_START
 
 from ..datetime import datetime2dateobs
 from ..file import ChroMagL1File, create_dir
@@ -131,7 +131,7 @@ def write_iquv_image(
     state_name = ["I", "Q", "U", "V"]
     display_name = {"I": "i", "Q": "qu", "U": "qu", "V": "v"}
 
-    ionization = waveregion_property(l1_file.wave_region, "ionization", mission_start)
+    ionization = waveregion_property(l1_file.wave_region, "ionization", MISSION_START)
 
     dpi = 100.0
     px = 1.0 / dpi

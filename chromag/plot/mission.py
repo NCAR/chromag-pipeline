@@ -14,7 +14,7 @@ from matplotlib.dates import DateFormatter, MonthLocator
 import mysql.connector
 import numpy as np
 
-from .. import mission_start
+from .. import MISSION_START
 from ..config import get_option
 from ..database import DatabaseError, query, get_connection
 from ..datetime import decompose_date
@@ -39,7 +39,7 @@ def _mission_time_series(
     n_plots = len(datasets)
 
     xrange = tuple(
-        datetime.date.fromisoformat(d) for d in [mission_start, observing_day]
+        datetime.date.fromisoformat(d) for d in [MISSION_START, observing_day]
     )
 
     label_fontsize = 8.0
@@ -77,8 +77,9 @@ def write_imagescale_plot(
     observing_day: str,
     wave_region: str,
 ):
+    """Write the mission image scale plot. Results come from the database and
+    are plotted from `chromag.MISSION_START` until `observing_day`."""
     sql_cmd = f"select date_obs, imagescale from chromag_level1 where wave_region='{wave_region}' order by date_obs;"
-    logger.debug(sql_cmd)
     results = query(connection, sql_cmd)
     if results is None or len(results) == 0:
         logger.debug(f"no image scale values for {wave_region} nm found, skipped")

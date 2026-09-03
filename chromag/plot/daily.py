@@ -12,7 +12,7 @@ import numpy as np
 
 from . import darken
 
-from .. import mission_start
+from .. import MISSION_START
 from ..config import get_option
 from ..datetime import obsday_hours2str, decompose_date
 from ..logging import logger
@@ -117,7 +117,7 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
 
     for i, w in enumerate(wave_regions):
         wave_files = catalog[catalog.wave_region == w]
-        wave_color = waveregion_property(w, "color", mission_start)
+        wave_color = waveregion_property(w, "color", MISSION_START)
         # [TODO]: to add flats/cal files:
         # - change histtype to "stepfilled"
         # - pass [sci_files, flat_files, cal_files]

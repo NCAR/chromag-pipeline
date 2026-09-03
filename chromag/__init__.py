@@ -6,7 +6,7 @@ import importlib.metadata
 import os
 import subprocess
 
-mission_start = "2025-01-01"
+MISSION_START = "2025-01-01"
 
 # find version and git revision:
 #
