@@ -9,7 +9,6 @@
 These plots are grouped in the daily, rolling, and mission submodules.
 """
 
-
 from ..pipeline import step
 
 
@@ -24,8 +23,12 @@ def darken(color: str, factor: float = 0.5) -> str:
 
 
 from .daily import write_daily_plots, write_timeline
+from .rolling import write_rolling_plots
+from .mission import write_mission_plots
 
 
 @step(top=True)
 def write_engineering_plots(date_run):
     write_daily_plots(date_run)
+    write_rolling_plots(date_run)
+    write_mission_plots(date_run)
