@@ -32,7 +32,9 @@ def send_email(
 
     msg = MIMEMultipart("alternative" if len(html_text) > 0 else "mixed")
     msg["Subject"] = subject
-    msg["From"] = f"{user}@ucar.edu" if from_email is None else from_email
+    msg["From"] = (
+        f"ChroMag pipeline <{user}@ucar.edu>" if from_email is None else from_email
+    )
     msg["To"] = to_email
 
     msg.attach(MIMEText(plain_text, "plain"))
