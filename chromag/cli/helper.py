@@ -5,7 +5,8 @@ import datetime
 import re
 
 
-def increment_date(date):
+def increment_date(date: str):
+    """Increment a date by a day when the date in in the format "YYYYMMDD"."""
     format = "%Y%m%d"
     d = datetime.datetime.strptime(date, format)
     d += datetime.timedelta(days=1)
@@ -13,10 +14,14 @@ def increment_date(date):
 
 
 def split_dates(date_expr: str, error: Callable[[str], None]):
+    """Split a date expression into a list of date strings of the format
+    "YYYYMMDD"."""
     dates = []
     date_re = re.compile("^[12][0-9]{7}$")
     date_range_re = re.compile("^[12][0-9]{7}-[12][0-9]{7}$")
     for d in date_expr.split(","):
+        if d == "":
+            continue
         if date_re.match(d):
             dates.append(d)
         elif date_range_re.match(d):
