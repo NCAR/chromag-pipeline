@@ -21,13 +21,28 @@ PASS = 0
 FAIL = 1
 
 
+def quality_bitmask(quality_name: str, quality_names: list[str]) -> int:
+    """Convert a string of quality condition names separated with "|" to a
+    quality bitmask."""
+    if quality_name == "":
+        return 0
+
+    bitmask = 0
+    for name in quality_name.split("|"):
+        try:
+            bitmask |= 1 << science_quality_names.index(name)
+        except ValueError as e:
+            logger.error(f"{name} is not in {'|'.join(quality_names)}")
+    return bitmask
+
+
 def quality_name(quality_bitmask: int, quality_names: list[str]) -> str:
     """Convert a quality bitmask into a string name."""
     name = "|".join(
         [
             condition_name
             for i, condition_name in enumerate(quality_names)
-            if quality_bitmask & 2**i
+            if quality_bitmask & (1 << i)
         ]
     )
     return name
@@ -39,7 +54,7 @@ def quality_check(
     """Perform quality check for a raw file."""
     quality_bitmask = 0
     for c, condition in enumerate(conditions):
-        quality_bitmask |= condition(l0_file) * 2**c
+        quality_bitmask |= condition(l0_file) * (1 << c)
 
     return quality_bitmask
 
@@ -106,7 +121,7 @@ def write_sci_quality_log(catalog, wave_region: str, output_filename: str):
         f.write("\nQuality bitmask codes\n")
         f.write("Code    Description\n")
         for i, description in enumerate(science_quality_descriptions):
-            f.write(f"{2**i:5d}   {description}\n")
+            f.write(f"{1<<i:5d}   {description}\n")
     logger.info(f"wrote {os.path.basename(output_filename)}")
 
 
@@ -126,7 +141,7 @@ cal_quality_names = [c.name for c in cal_conditions]
 cal_quality_descriptions = [c.description for c in cal_conditions]
 
 
-def cal_quality_name(quality_bitmask: int, quality_names: list[str]) -> str:
+def cal_quality_name(quality_bitmask: int) -> str:
     """Convert a science quality bitmask into a string name."""
     return quality_name(quality_bitmask, cal_quality_names)
 
@@ -134,7 +149,7 @@ def cal_quality_name(quality_bitmask: int, quality_names: list[str]) -> str:
 @step()
 def cal_quality_check(l0_file: ChroMagRawFile):
     """Perform quality check for a raw calibration file."""
-    return quality_check(ChroMagRawFile, cal_conditions)
+    return quality_check(l0_file, cal_conditions)
 
 
 @step(top=True)
@@ -157,5 +172,5 @@ def write_cal_quality_log(catalog, wave_region: str, output_filename: str):
         f.write("\nQuality bitmask codes\n")
         f.write("Code    Description\n")
         for i, description in enumerate(cal_quality_descriptions):
-            f.write(f"{2**i:5d}   {description}\n")
+            f.write(f"{1<<i:5d}   {description}\n")
     logger.info(f"wrote {os.path.basename(output_filename)}")
