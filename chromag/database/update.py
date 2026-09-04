@@ -4,10 +4,10 @@
 created if they are not already there.
 """
 
-from enum import StrEnum
-
 from contextlib import closing
 import datetime
+from enum import StrEnum
+import socket
 
 import mysql.connector
 
@@ -88,20 +88,22 @@ def set_process_id(
     new row for the observing day.
     """
 
+    hostname = socket.gethostname()
+    sw_id = get_sw_id(connection)
+
     with closing(connection.cursor()) as cursor:
         cmd = f'select process_id from chromag_process where obsday_id = "{obsday_id}" limit 1;'
         cursor.execute(cmd)
         result = cursor.fetchone()
         if result is None:
             logger.debug(f"inserting {obsday_id} into chromag_process as {status}...")
-            sw_id = get_sw_id(connection)
-            cmd = f'insert into chromag_process (obsday_id, chromag_sw_id, status) values ({obsday_id}, {sw_id}, "{status}")'
+            cmd = f'insert into chromag_process (obsday_id, chromag_sw_id, status, hostname) values ({obsday_id}, {sw_id}, "{status}", "{hostname}")'
             cursor.execute(cmd)
             process_id = cursor.lastrowid
             logger.debug(f"inserted process_id={process_id} for {obsday_id}")
         else:
             process_id = result[0]
-            cmd = f'update chromag_process set status="{status}" where process_id={process_id}'
+            cmd = f'update chromag_process set chromag_sw_id="{sw_id}", status="{status}", hostname="{hostname}" where process_id={process_id}'
             cursor.execute(cmd)
             logger.debug(cmd)
             logger.debug(f"updated process_id={process_id} for {obsday_id} to {status}")

@@ -5,6 +5,7 @@ create table chromag_process (
   obsday_id                             mediumint(5) not null,
   chromag_sw_id                         int not null,
   status                                enum("processed", "processing"),
+  hostname                              varchar(50),
 
   index (obsday_id),
 
