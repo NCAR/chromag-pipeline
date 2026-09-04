@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from collections.abc import Callable
 import datetime
 import re
 
@@ -11,7 +12,7 @@ def increment_date(date):
     return d.strftime(format)
 
 
-def split_dates(date_expr, error):
+def split_dates(date_expr: str, error: Callable[[str], None]):
     dates = []
     date_re = re.compile("^[12][0-9]{7}$")
     date_range_re = re.compile("^[12][0-9]{7}-[12][0-9]{7}$")
