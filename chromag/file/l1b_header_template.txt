@@ -24,6 +24,8 @@ COMMENT --- Time and exposure ---
 TIMESYS = 'UTC     '           / all times are specified in UTC
 DATE-OBS=                      / [UTC] observation start time
 DATE-END=                      / [UTC] observation end time
+MJD-OBS =                      / [days] modified Julian date
+MJD-END =                      / [days] modified Julian date
 DATE    =                      / [UTC] creation time of the HDU
 EXPTIME =                      / [ms] exposure time for each frame
 NUMSUM  =                    1 / number of modulation cycles summed

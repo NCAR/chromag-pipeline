@@ -80,18 +80,23 @@ def update_header(run, l1_file: ChroMagL1File):
     """Update the level 1 header once processing is complete."""
 
     # update ephemeris information
-    dt = l1_file.date_obs
-    t = Time(dt, scale="utc")
-    obs_longitude = get_epochvalue("obs_longitude", dt)
-    l1_file.primary_header["SOLAR_P0"] = FormattedFloat(sun.P(dt).value, "0.3f")
-    l1_file.primary_header["SOLAR_B0"] = FormattedFloat(sun.B0(dt).value, "0.3f")
+    date_obs = l1_file.date_obs
+    date_end = l1_file.primary_header["DATE-END"]
+    t_obs = Time(date_obs, scale="utc")
+    t_end = Time(date_end, scale="utc")
+
+    l1_file.primary_header["MJD-OBS"] = FormattedFloat(t_obs.mjd, "0.9f")
+    l1_file.primary_header["MJD-END"] = FormattedFloat(t_end.mjd, "0.9f")
+
+    l1_file.primary_header["SOLAR_P0"] = FormattedFloat(sun.P(date_obs).value, "0.3f")
+    l1_file.primary_header["SOLAR_B0"] = FormattedFloat(sun.B0(date_obs).value, "0.3f")
     l1_file.primary_header["SID_TIME"] = FormattedFloat(
-        t.sidereal_time("mean", "greenwich").value / 24.0, "0.5f"
+        t_obs.sidereal_time("mean", "greenwich").value / 24.0, "0.5f"
     )
-    l1_file.primary_header["CAR_ROT"] = int(sun.carrington_rotation_number(dt))
-    l1_file.primary_header["JUL_DATE"] = FormattedFloat(t.jd, "0.9f")
+    l1_file.primary_header["CAR_ROT"] = int(sun.carrington_rotation_number(date_obs))
+    l1_file.primary_header["JUL_DATE"] = FormattedFloat(t_obs.jd, "0.9f")
     l1_file.primary_header["RSUN_OBS"] = FormattedFloat(
-        sun.angular_radius(dt).value, "0.2f"
+        sun.angular_radius(date_obs).value, "0.2f"
     )
 
     # update L1 processing information
