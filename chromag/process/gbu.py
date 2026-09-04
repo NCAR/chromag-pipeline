@@ -20,6 +20,34 @@ from ..waveregions import available_waveregions
 PASS = 0
 FAIL = 1
 
+
+def gbu_bitmask(gbu_name: str, gbu_names: list[str]) -> int:
+    """Convert a string of GBU condition names separated with "|" to a GBU
+    bitmask."""
+    if gbu_name == "":
+        return 0
+
+    bitmask = 0
+    for name in gbu_names.split("|"):
+        try:
+            bitmask |= 1 << gbu_names.index(name)
+        except ValueError as e:
+            logger.error(f"{name} is not in {'|'.join(gbu_names)}")
+    return bitmask
+
+
+def gbu_name(gbu_bitmask: int) -> str:
+    """Convert a GBU bitmask into a string name."""
+    name = "|".join(
+        [
+            condition_name
+            for i, condition_name in enumerate(gbu_names)
+            if gbu_bitmask & (1 << i)
+        ]
+    )
+    return name
+
+
 # [TODO]: example GBU condition
 
 # [TODO]: whatever this should be
@@ -41,18 +69,6 @@ gbu_names = [c.name for c in gbu_conditions]
 gbu_descriptions = [c.description for c in gbu_conditions]
 
 
-def gbu_name(gbu_bitmask: int) -> str:
-    """Convert a GBU bitmask into a string name."""
-    name = "|".join(
-        [
-            condition_name
-            for i, condition_name in enumerate(gbu_names)
-            if gbu_bitmask & 2**i
-        ]
-    )
-    return name
-
-
 @step(top=True)
 def gbu_check(catalog):
     """Perform GBU check for a level 1 file."""
@@ -65,7 +81,7 @@ def gbu_check(catalog):
 
             gbu_bitmask = 0
             for c, condition in enumerate(gbu_conditions):
-                gbu_bitmask |= condition(l1_file) * 2**c
+                gbu_bitmask |= condition(l1_file) * (1 << c)
 
             l1_file.gbu_bitmask = gbu_bitmask
 
@@ -94,7 +110,7 @@ def write_gbu_log(catalog, wave_region: str, output_filename: str):
         f.write("\nGBU bitmask codes\n")
         f.write("Code    Description\n")
         for i, description in enumerate(gbu_descriptions):
-            f.write(f"{2**i:5d}   {description}\n")
+            f.write(f"{1<<i:5d}   {description}\n")
     logger.info(f"wrote {os.path.basename(output_filename)}")
 
 
