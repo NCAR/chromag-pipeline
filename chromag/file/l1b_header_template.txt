@@ -127,6 +127,17 @@ CDELT2  =                      / [arcsec/pixel] pixel scale of the y-axis
 CRDER2  =                0.004 / [arcsec/pixel] random error in pixel scale
 CSYER2  =                0.030 / [arcsec/pixel] systemic error in pixel scale
 CTYPE3  = 'STOKES'             /
+COMMENT --- Ephemeris info ---
+COMMENT Ephemeris calculations sunpy at time of DATE-OBS
+SOLAR_P0=                      / [deg] solar P angle applied (image has N up)
+SOLAR_B0=                      / [deg] solar B-Angle
+SECANT_Z=                      / secant of the Zenith Distance
+SID_TIME=                      / [day fraction] GMST sidereal time
+CAR_ROT =                      / Carrington Rotation Number
+JUL_DATE=                      / [days] Julian date
+RSUN_OBS=                      / [arcsec] TODO
+R_SUN   =                      / [pixel] solar radius
+RSUN_REF=                      / [m] TODO
 COMMENT --- Level 1B processing info ---
 DOI     =                      / Digital Object Identifier
 DATE-L1 =                      / [UT] L1 processing date/time

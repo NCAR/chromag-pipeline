@@ -6,6 +6,8 @@ import datetime
 import math
 import os
 
+import sunpy.coordinates.sun as sun
+
 from .. import __version__
 from .. import __revision__
 from ..config import get_basedir, get_option
@@ -74,13 +76,22 @@ def flat_correct(run, l1_file: ChroMagL1File):
 @step()
 def update_header(run, l1_file: ChroMagL1File):
     """Update the level 1 header once processing is complete."""
+
+    # update ephemeris information
+    dt = l1_file.date_obs
+    l1_file.primary_header["SOLAR_P0"] = FormattedFloat(sun.P(dt).value, "0.3f")
+    l1_file.primary_header["SOLAR_B0"] = FormattedFloat(sun.B0(dt).value, "0.3f")
+    l1_file.primary_header["CAR_ROT"] = int(sun.carrington_rotation_number(dt))
+    l1_file.primary_header["RSUN_OBS"] = FormattedFloat(
+        sun.angular_radius(dt).value, "0.2f"
+    )
+
+    # update L1 processing information
     now = datetime2dateobs(datetime.datetime.now(), milliseconds=False)
     l1_file.primary_header["DATE"] = now
     l1_file.primary_header["DATE-L1"] = now
-
     l1_file.primary_header["L1SWID"] = f"{__version__} [{__revision__}]"
     l1_file.primary_header["CALWSID"] = f"{__version__} [{__revision__}]"
-
     l1_file.primary_header["CALFILE"] = run.calibration.basename
 
     platescale = waveregion_property(
@@ -89,7 +100,7 @@ def update_header(run, l1_file: ChroMagL1File):
     l1_file.primary_header["CDELT1"] = FormattedFloat(platescale, "0.3f")
     l1_file.primary_header["CDELT2"] = FormattedFloat(platescale, "0.3f")
 
-    # HISTORY section thta is not part of template, added at the end of the
+    # HISTORY section that is not part of template, added at the end of the
     # header
     steps = []
     if l1_file.primary_header["DARK_COR"]:
