@@ -20,6 +20,7 @@ def split_dates(date_expr: str, error: Callable[[str], None]):
     date_re = re.compile("^[12][0-9]{7}$")
     date_range_re = re.compile("^[12][0-9]{7}-[12][0-9]{7}$")
     for d in date_expr.split(","):
+        d = d.strip(" ")
         if d == "":
             continue
         if date_re.match(d):
