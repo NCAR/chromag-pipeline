@@ -53,5 +53,10 @@ def test_split_dates_badexpr():
         pass
 
 
+def test_split_dates_empty():
+    dates = helper.split_dates("", fake_error_handler)
+    assert len(dates) == 0
+
+
 def test_increment_date():
     assert helper.increment_date("20251231") == "20260101"
