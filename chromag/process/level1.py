@@ -6,6 +6,7 @@ import datetime
 import math
 import os
 
+from astropy.time import Time
 import sunpy.coordinates.sun as sun
 
 from .. import __version__
@@ -13,6 +14,7 @@ from .. import __revision__
 from ..config import get_basedir, get_option
 from ..datetime import datetime2dateobs, human_timedelta
 from ..display import write_intensity_image, write_iquv_image
+from ..epochs import get_epochvalue
 from ..pipeline import step
 from ..file import (
     ChroMagRawFile,
@@ -79,9 +81,15 @@ def update_header(run, l1_file: ChroMagL1File):
 
     # update ephemeris information
     dt = l1_file.date_obs
+    t = Time(dt, scale="utc")
+    obs_longitude = get_epochvalue("obs_longitude", dt)
     l1_file.primary_header["SOLAR_P0"] = FormattedFloat(sun.P(dt).value, "0.3f")
     l1_file.primary_header["SOLAR_B0"] = FormattedFloat(sun.B0(dt).value, "0.3f")
+    l1_file.primary_header["SID_TIME"] = FormattedFloat(
+        t.sidereal_time("mean", "greenwich").value / 24.0, "0.5f"
+    )
     l1_file.primary_header["CAR_ROT"] = int(sun.carrington_rotation_number(dt))
+    l1_file.primary_header["JUL_DATE"] = FormattedFloat(t.jd, "0.9f")
     l1_file.primary_header["RSUN_OBS"] = FormattedFloat(
         sun.angular_radius(dt).value, "0.2f"
     )
