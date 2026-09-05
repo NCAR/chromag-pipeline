@@ -95,7 +95,7 @@ def handle_versions(args):
 def add_versions_subcommand(subparsers):
     """Add versions subcommand to the argparse subparsers."""
     versions_parser = subparsers.add_parser(
-        "versions", help="find versions for the given date(s)"
+        "versions", aliases=["version"], help="find versions for the given date(s)"
     )
     versions_parser.add_argument(
         "-v", "--verbose", help="set to show full output", action="store_true"
