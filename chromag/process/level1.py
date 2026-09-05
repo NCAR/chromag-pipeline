@@ -113,8 +113,8 @@ def update_header(run, l1_file: ChroMagL1File):
     l1_file.primary_header["CDELT1"] = FormattedFloat(platescale, "0.3f")
     l1_file.primary_header["CDELT2"] = FormattedFloat(platescale, "0.3f")
 
-    # HISTORY section that is not part of template, added at the end of the
-    # header
+    # HISTORY section that is not part of template, dynamically added at the
+    # end of the header for the steps that were actually performed
     steps = []
     if l1_file.primary_header["DARK_COR"]:
         steps.append("dark current subtracted")
