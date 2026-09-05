@@ -90,6 +90,7 @@ def set_process_id(
 
     hostname = socket.gethostname()
     sw_id = get_sw_id(connection)
+    now = datetime.datetime.now()
 
     with closing(connection.cursor()) as cursor:
         cmd = f'select process_id from chromag_process where obsday_id = "{obsday_id}" limit 1;'
@@ -97,13 +98,13 @@ def set_process_id(
         result = cursor.fetchone()
         if result is None:
             logger.debug(f"inserting {obsday_id} into chromag_process as {status}...")
-            cmd = f'insert into chromag_process (obsday_id, chromag_sw_id, status, hostname) values ({obsday_id}, {sw_id}, "{status}", "{hostname}")'
+            cmd = f'insert into chromag_process (obsday_id, chromag_sw_id, date_processed, status, hostname) values ({obsday_id}, {sw_id}, "{now}", "{status}", "{hostname}")'
             cursor.execute(cmd)
             process_id = cursor.lastrowid
             logger.debug(f"inserted process_id={process_id} for {obsday_id}")
         else:
             process_id = result[0]
-            cmd = f'update chromag_process set chromag_sw_id="{sw_id}", status="{status}", hostname="{hostname}" where process_id={process_id}'
+            cmd = f'update chromag_process set chromag_sw_id="{sw_id}", date_processed="{now}", status="{status}", hostname="{hostname}" where process_id={process_id}'
             cursor.execute(cmd)
             logger.debug(cmd)
             logger.debug(f"updated process_id={process_id} for {obsday_id} to {status}")
