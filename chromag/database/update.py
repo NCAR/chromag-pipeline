@@ -104,9 +104,8 @@ def set_process_id(
             logger.debug(f"inserted process_id={process_id} for {obsday_id}")
         else:
             process_id = result[0]
-            cmd = f'update chromag_process set chromag_sw_id="{sw_id}", date_processed="{now}", status="{status}", hostname="{hostname}" where process_id={process_id}'
+            cmd = f'update chromag_process set chromag_sw_id={sw_id}, date_processed="{now}", status="{status}", hostname="{hostname}" where process_id={process_id}'
             cursor.execute(cmd)
-            logger.debug(cmd)
             logger.debug(f"updated process_id={process_id} for {obsday_id} to {status}")
 
     connection.commit()
