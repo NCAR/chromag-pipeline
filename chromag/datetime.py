@@ -91,7 +91,7 @@ def obsday_hours(ut_dt: datetime.datetime) -> float:
 
 def short2hyphenated(short_date: str) -> str:
     """Convert a "short date", like "20240409", to a hyphenated date, like
-    "2024-04-9".
+    "2024-04-09".
     """
     return f"{short_date[0:4]}-{short_date[4:6]}-{short_date[6:8]}"
 
