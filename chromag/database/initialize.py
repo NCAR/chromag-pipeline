@@ -56,6 +56,8 @@ def initialize_tables(config_filename: str, config_section: str):
     """Delete any existing tables and then re-create new tables and initialize
     them."""
 
+    # table names in the order they need to be created in (they will be deleted
+    # in the reverse order)
     table_names = [
         "sw",
         "process",
