@@ -16,6 +16,7 @@ from .log import add_log_subcommand
 from .ls import add_ls_subcommand
 from .process import add_process_subcommand
 from .ps import add_ps_subcommand
+from .versions import add_versions_subcommand
 
 
 def print_help(args):
@@ -44,6 +45,7 @@ def setup():
     add_log_subcommand(subparsers)
     add_ls_subcommand(subparsers)
     add_ps_subcommand(subparsers)
+    add_versions_subcommand(subparsers)
 
     # processing: process, reprocess, realtime (rt), end-of-day (eod), cal
     add_process_subcommand(subparsers)
