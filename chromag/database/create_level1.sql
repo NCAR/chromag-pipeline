@@ -19,6 +19,7 @@ create table chromag_level1 (
 
   -- [TODO]: level 1 specific information
   imagescale                            float,
+  gbu_bitmask                           bigint,
 
   chromag_sw_id                         int,
 

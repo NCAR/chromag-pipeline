@@ -141,6 +141,7 @@ def insert_level0(
                 "sgsloop": (f.primary_header["SGSLOOP"], "0.2f"),
                 "sgsrazr": (f.primary_header["SGSRAZR"], "0.1f"),
                 "sgsdeczr": (f.primary_header["SGSDECZR"], "0.1f"),
+                "quality_bitmask": (f.quality_bitmask, "d"),
             }
             field_names = ",".join(fields.keys())
             field_values = ",".join([f"{db_safe(v[0], v[1])}" for v in fields.values()])
@@ -185,6 +186,7 @@ def insert_level1(
                         "exposure": (f.exposure, "0.3f"),
                         "scan_i": (f.scan_i, "d"),
                         "scan_n": (f.scan_n, "d"),
+                        "gbu_bitmask": (l1_file.gbu_bitmask, "d"),
                         "chromag_sw_id": (sw_id, "d"),
                     }
                     field_names = ",".join(fields.keys())

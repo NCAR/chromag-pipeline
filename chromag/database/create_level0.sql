@@ -32,6 +32,7 @@ create table chromag_level0 (
   sgsdeczr                              float,
 
   -- [TODO]: level 0 specific information
+  quality_bitmask                       bigint,
 
   index (filename),
   index (date_obs),
