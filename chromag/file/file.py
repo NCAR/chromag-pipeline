@@ -207,7 +207,7 @@ class ChroMagL1File:
         self.wave_region = raw_file.wave_region
         self.exposure = raw_file.exposure
 
-        self.gbu_mask = 0
+        self.gbu_bitmask = 0
 
         self.primary_header = reorder_header(raw_file.primary_header)
         self.primary_header["LEVEL"] = "1B"
