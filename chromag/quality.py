@@ -91,6 +91,11 @@ science_quality_names = [c.name for c in science_conditions]
 science_quality_descriptions = [c.description for c in science_conditions]
 
 
+def sci_quality_bitmask(quality_name: str) -> int:
+    """Convert a science quality name into a bitmask."""
+    return quality_bitmask(quality_name, science_quality_names)
+
+
 def sci_quality_name(quality_bitmask: int) -> str:
     """Convert a science quality bitmask into a string name."""
     return quality_name(quality_bitmask, science_quality_names)
@@ -139,6 +144,11 @@ def write_sci_quality_logs(catalog, observing_day: str):
 cal_conditions = [check_sgsloop, check_positions]
 cal_quality_names = [c.name for c in cal_conditions]
 cal_quality_descriptions = [c.description for c in cal_conditions]
+
+
+def cal_quality_bitmask(quality_name: str) -> int:
+    """Convert a cal quality name into a bitmask."""
+    return quality_bitmask(quality_name, cal_quality_names)
 
 
 def cal_quality_name(quality_bitmask: int) -> str:
