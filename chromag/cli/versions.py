@@ -24,6 +24,17 @@ inner join chromag_sw on chromag_sw_id=chromag_sw.sw_id
 where mlso_numfiles.obs_day="{obs_day}" limit 1;
 """
 
+summary_query = """
+select chromag_sw.version, count(*)
+from chromag_process
+inner join chromag_sw on chromag_sw_id=chromag_sw.sw_id
+where obsday_id in (
+    select day_id from mlso_numfiles where obs_day in ({date_list})
+)
+group by chromag_sw_id
+order by chromag_sw.version;
+"""
+
 processing_query = """
 select hostname, mlso_numfiles.obs_day, chromag_sw.version
 from chromag_process
@@ -41,6 +52,16 @@ def handle_processing(cursor):
     for r in processing_result:
         d = r[1].strftime("%Y%m%d")
         print(f"{d}: {r[0]} [{r[2]}]")
+
+
+def handle_summary(cursor, dates: list[str]):
+    date_list = ", ".join([f'"{short2hyphenated(d)}"' for d in dates])
+    cursor.execute(summary_query.format(date_list=date_list))
+    summary_result = cursor.fetchall()
+    if summary_result is None:
+        return
+    for s in summary_result:
+        print(f"{s[0]}: {s[1]}")
 
 
 def handle_versions(args):
@@ -78,17 +99,19 @@ def handle_versions(args):
                         ).strftime("%Y%m%d")
                         date_expr = f"{mission_start}-{tomorrow}"
                     dates = split_dates(date_expr, args.parser.error)
-
-                    for d in dates:
-                        obs_day = short2hyphenated(d)
-                        cursor.execute(versions_query.format(obs_day=obs_day))
-                        versions_result = cursor.fetchone()
-                        if versions_result is None:
-                            continue
-                        output = f"{d}: {versions_result[0]}"
-                        if args.verbose:
-                            output += f" [{versions_result[1]}, {versions_result[2]:%Y-%m-%dT%H:%M:%S}]"
-                        print(output)
+                    if args.summary:
+                        handle_summary(cursor, dates)
+                    else:
+                        for d in dates:
+                            obs_day = short2hyphenated(d)
+                            cursor.execute(versions_query.format(obs_day=obs_day))
+                            versions_result = cursor.fetchone()
+                            if versions_result is None:
+                                continue
+                            output = f"{d}: {versions_result[0]}"
+                            if args.verbose:
+                                output += f" [{versions_result[1]}, {versions_result[2]:%Y-%m-%dT%H:%M:%S}]"
+                            print(output)
             except DatabaseError as e:
                 args.parser.error(e)
             except Exception as e:
@@ -102,6 +125,9 @@ def add_versions_subcommand(subparsers):
     )
     versions_parser.add_argument(
         "-v", "--verbose", help="set to show full output", action="store_true"
+    )
+    versions_parser.add_argument(
+        "-s", "--summary", help="set to show a summary of versions", action="store_true"
     )
     versions_parser.add_argument(
         "-p",
