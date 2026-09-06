@@ -11,10 +11,11 @@ The format is based on [Keep a Changelog] and this project adheres to
 
 - Make an averaged dark to apply to science images.
 - Apply dark correction to science images.
-- Write level 1 FITS file.
+- Write level 1B FITS file.
 - Write intensity and IQUV quicklooks.
+- Add quality/GBU systems and begin with rudimentary checks.
 - Lock processing directory when starting eod/reprocess run.
-- Add reprocess and clearday CLI subcommands.
+- Add reprocess, clearday, versions, and ps CLI subcommands.
 - Add ability to save intermediate FITS file after each processing step.
 - Add completion notification emails.
 - Create database tables (and createdb CLI subcommand).
