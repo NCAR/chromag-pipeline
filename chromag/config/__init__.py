@@ -21,15 +21,27 @@ import epochs
 cp = None
 
 
-def read_config(config_filename):
-    """Read a configuration file."""
+def read_config(config_filename: str):
+    """Read a configuration file. If `config_filename` does not exist as a
+    regular path, looks in `~/.chromag/chromag.{config_filename}.cfg`. Returns
+    a tuple of bools: whether the config file was found and whether it was
+    valid."""
     global cp
     if cp is None:
         config_root = os.path.dirname(os.path.abspath(__file__))
         config_spec = os.path.join(config_root, "config.spec.cfg")
         cp = epochs.ConfigParser(config_spec)
-        cp.read(config_filename)
-    return cp.is_valid()
+        if not os.path.isfile(config_filename):
+            config_dirname = os.path.expanduser("~/.chromag")
+            config_basename = f"chromag.{config_filename}.cfg"
+            config_filename = os.path.join(config_dirname, config_basename)
+        else:
+            config_filename = os.path.abspath(config_filename)
+        filename_read = cp.read(config_filename)
+        read_correct = len(filename_read) == 1 and (filename_read[0] == config_filename)
+    else:
+        read_correct = True
+    return read_correct, cp.is_valid()
 
 
 def get_option(section_name, option_name):
