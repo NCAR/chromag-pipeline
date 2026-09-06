@@ -25,13 +25,15 @@ def handle_archive(args):
     """
     dates = split_dates(",".join(args.dates), args.parser.error)
 
-    if not os.path.isfile(args.configuration_filename):
+    found, is_valid = read_config(args.configuration_filename)
+    if not found:
         args.parser.error(
             f"configuration file not found: {args.configuration_filename}"
         )
-        sys.exit(1)
-
-    read_config(args.configuration_filename)
+    if not is_valid:
+        args.parser.error(
+            f"configuration file not valid: {args.configuration_filename}"
+        )
 
     log_basedir = get_option("logging", "basedir")
     log_level = get_level(get_option("logging", "level"))

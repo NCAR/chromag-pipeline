@@ -49,12 +49,15 @@ def handle_versions(args):
     System status code is 0 for a valid run, 1 if configuration file is not
     found.
     """
-    if not os.path.isfile(args.configuration_filename):
+    found, is_valid = read_config(args.configuration_filename)
+    if not found:
         args.parser.error(
             f"configuration file not found: {args.configuration_filename}"
         )
-
-    read_config(args.configuration_filename)
+    if not is_valid:
+        args.parser.error(
+            f"configuration file not valid: {args.configuration_filename}"
+        )
 
     db_config_filename = get_option("database", "config_filename")
     db_config_section = get_option("database", "config_section")
