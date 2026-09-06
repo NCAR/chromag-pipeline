@@ -21,14 +21,14 @@ PASS = 0
 FAIL = 1
 
 
-def gbu_bitmask(gbu_name: str, gbu_names: list[str]) -> int:
+def gbu_bitmask(gbu_name: str) -> int:
     """Convert a string of GBU condition names separated with "|" to a GBU
     bitmask."""
     if gbu_name == "":
         return 0
 
     bitmask = 0
-    for name in gbu_names.split("|"):
+    for name in gbu_name.split("|"):
         try:
             bitmask |= 1 << gbu_names.index(name)
         except ValueError as e:
