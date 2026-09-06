@@ -101,6 +101,7 @@ def add_versions_subcommand(subparsers):
         "-v", "--verbose", help="set to show full output", action="store_true"
     )
     versions_parser.add_argument(
+        "-p",
         "--processing",
         help="set to show dates that are currently processing",
         action="store_true",
