@@ -30,16 +30,21 @@ def human_bytes(n_bytes: int, n_decimals: int = 1) -> str:
 def create_dir(dir: str, /, *, basepath: str = None):
     """Create directory, making sure is in the cordyn group. If present,
     `basepath` specifies the base of the `dir` name that can be omitted in the
-    log messages.
+    log messages. Doesn't create directory if it already exists.
     """
-    if basepath is not None:
-        dirname = dir.removeprefix(basepath)
-    else:
-        dirname = dir
-    os.mkdir(dir)
-    gid = grp.getgrnam("cordyn").gr_gid
-    os.chown(dir, -1, gid)
-    logger.debug(f"created ~~~{dirname}")
+    if not os.path.isdir(dir):
+        if basepath is not None:
+            dirname = dir.removeprefix(basepath)
+        else:
+            dirname = dir
+        os.mkdir(dir)
+        logger.debug(f"created ~~~{dirname}")
+
+    group_id = os.stat(dir).st_gid
+    cordyn_id = grp.getgrnam("cordyn").gr_gid
+    if group_id != cordyn_id:
+        os.chown(dir, -1, gid)
+        logger.debug(f"changed group ID from {group_id} to {cordyn_id}")
 
 
 def make_tarball(tarball_filename: str, basedir: str, directory: str):
