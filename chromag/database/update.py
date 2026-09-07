@@ -93,7 +93,7 @@ def set_process_id(
     now = datetime.datetime.now()
 
     with closing(connection.cursor()) as cursor:
-        cmd = f'select process_id from chromag_process where obsday_id = "{obsday_id}" limit 1;'
+        cmd = f'select process_id, date_processed from chromag_process where obsday_id = "{obsday_id}" limit 1;'
         cursor.execute(cmd)
         result = cursor.fetchone()
         if result is None:
@@ -104,7 +104,12 @@ def set_process_id(
             logger.debug(f"inserted process_id={process_id} for {obsday_id}")
         else:
             process_id = result[0]
-            cmd = f'update chromag_process set chromag_sw_id={sw_id}, date_processed="{now}", status="{status}", hostname="{hostname}" where process_id={process_id}'
+            if status == ProcessStatus.PROCESSED:
+                date_processed = result[1]
+                processing_time = (now - result[1]).seconds
+                cmd = f'update chromag_process set chromag_sw_id={sw_id}, date_processed="{now}", processing_time={processing_time}, status="{status}", hostname="{hostname}" where process_id={process_id}'
+            else:
+                cmd = f'update chromag_process set chromag_sw_id={sw_id}, date_processed="{now}", status="{status}", hostname="{hostname}" where process_id={process_id}'
             cursor.execute(cmd)
             logger.debug(f"updated process_id={process_id} for {obsday_id} to {status}")
 
