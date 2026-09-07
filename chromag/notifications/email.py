@@ -42,6 +42,10 @@ def send_email(
         msg.attach(MIMEText(html_text, "html"))
 
     for f, name in attachments or []:
+        if not os.path.exists(f):
+            logger.error(f'attachment "{name}" does not exist')
+            continue
+
         with open(f, "rb") as file:
             part = MIMEApplication(file.read(), Name=name)
 
