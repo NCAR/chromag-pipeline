@@ -9,6 +9,7 @@ import sys
 from .helper import add_run_arguments, split_dates
 
 from ..config import read_config, get_basedir
+from ..file import create_dir
 from ..logging import logger
 from ..notifications import notify_process
 from ..pipeline import LockException, RunLock
@@ -40,7 +41,12 @@ def handle_process(args):
     date_run = None
     for d in dates:
         try:
-            lock_filename = os.path.join(get_basedir(d, "process"), d, ".lock")
+            process_basedir = get_basedir(d, "process")
+            create_dir(process_basedir)
+            process_dir = os.path.join(process_basedir, d)
+            create_dir(process_dir, basepath=process_basedir)
+
+            lock_filename = os.path.join(process_dir, ".lock")
             with RunLock(lock_filename) as lock:
                 date_run = run(
                     d, args.configuration_filename, reprocessing=args.reprocessing
