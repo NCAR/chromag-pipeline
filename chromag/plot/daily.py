@@ -6,7 +6,7 @@
 import os
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter, FixedLocator
+from matplotlib.ticker import FuncFormatter, FixedLocator, NullLocator
 from matplotlib.transforms import IdentityTransform
 import numpy as np
 
@@ -136,13 +136,18 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
         )
         axes[i].set_ylim(0, TIMELINE_MAX_WAVE_FILES_PER_BIN)
         axes[i].tick_params(
-            left=False, bottom=False, labelleft=False, labelbottom=False
+            which="both",
+            left=False,
+            bottom=False,
+            labelleft=False,
+            labelbottom=False,
         )
         axes[i].spines["top"].set_visible(False)
         axes[i].spines["left"].set_visible(False)
         axes[i].spines["right"].set_visible(False)
         axes[i].spines["bottom"].set_color("#d0d0d0")
         axes[i].set_ylabel(f"{w} nm", fontsize=label_fontsize, rotation=0)
+        axes[i].xaxis.set_minor_locator(NullLocator())
 
     dark_files = catalog[catalog.is_dark]
     dark_index = len(wave_regions)
@@ -167,6 +172,17 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
     axes[dark_index].xaxis.set_major_locator(
         FixedLocator(range(START_TIME, END_TIME + 1, 1))
     )
+    axes[dark_index].xaxis.set_minor_locator(
+        FixedLocator(
+            list(
+                t / TIMELINE_BINS_PER_HOUR
+                for t in range(
+                    TIMELINE_BINS_PER_HOUR * START_TIME,
+                    TIMELINE_BINS_PER_HOUR * END_TIME + 1,
+                )
+            )
+        )
+    )
     axes[dark_index].xaxis.set_major_formatter(FuncFormatter(obsday_hours_formatter))
 
     axes[dark_index].set_xlabel("Observing day time [HST]", fontsize=label_fontsize)
@@ -175,6 +191,7 @@ def write_timeline(output_filename: str, catalog, binsize: int = 15):
     annotation = fig.text(
         5.0, 5.0, binsize_msg, transform=IdentityTransform(), fontsize=6, color="grey"
     )
+    # don't adjust other elements to make room for this annotation
     annotation.set_in_layout(False)
 
     plt.savefig(output_filename)
