@@ -12,7 +12,7 @@ from .helper import add_run_arguments, split_dates
 
 from .. import MISSION_START
 from ..config import read_config, get_option
-from ..datetime import short2hyphenated
+from ..datetime import short2hyphenated, human_timedelta
 from ..database import DatabaseError, get_connection
 
 
@@ -43,8 +43,32 @@ inner join chromag_sw on chromag_sw_id=chromag_sw.sw_id
 where status="processing";
 """
 
+duration_query = """
+select processing_time
+from chromag_process
+inner join mlso_numfiles on obsday_id=mlso_numfiles.day_id
+where obsday_id in (
+    select day_id from mlso_numfiles where obs_day in ({date_list})
+);
+"""
+
+
+def handle_list_versions(cursor, dates, /, *, verbose=False):
+    """List versions for the given dates."""
+    for d in dates:
+        obs_day = short2hyphenated(d)
+        cursor.execute(versions_query.format(obs_day=obs_day))
+        versions_result = cursor.fetchone()
+        if versions_result is None:
+            continue
+        output = f"{d}: {versions_result[0]}"
+        if verbose:
+            output += f" [{versions_result[1]}, {versions_result[2]:%Y-%m-%dT%H:%M:%S}]"
+        print(output)
+
 
 def handle_processing(cursor):
+    """Handle the `--processing` flag."""
     cursor.execute(processing_query)
     processing_result = cursor.fetchall()
     if processing_result is None:
@@ -55,6 +79,7 @@ def handle_processing(cursor):
 
 
 def handle_summary(cursor, dates: list[str]):
+    """Handle the `--summary` flag."""
     date_list = ", ".join([f'"{short2hyphenated(d)}"' for d in dates])
     cursor.execute(summary_query.format(date_list=date_list))
     summary_result = cursor.fetchall()
@@ -62,6 +87,19 @@ def handle_summary(cursor, dates: list[str]):
         return
     for s in summary_result:
         print(f"{s[0]}: {s[1]}")
+
+
+def handle_duration(cursor, dates: list[str]):
+    """Handle the `--duration` flag."""
+    date_list = ", ".join([f'"{short2hyphenated(d)}"' for d in dates])
+    cursor.execute(duration_query.format(date_list=date_list))
+    duration_result = cursor.fetchall()
+    if len(duration_result) > 0:
+        total_seconds = sum(r[0] for r in duration_result)
+    else:
+        total_seconds = 0
+    td = datetime.timedelta(seconds=total_seconds)
+    print(human_timedelta(td))
 
 
 def handle_versions(args):
@@ -101,17 +139,10 @@ def handle_versions(args):
                     dates = split_dates(date_expr, args.parser.error)
                     if args.summary:
                         handle_summary(cursor, dates)
+                    elif args.duration:
+                        handle_duration(cursor, dates)
                     else:
-                        for d in dates:
-                            obs_day = short2hyphenated(d)
-                            cursor.execute(versions_query.format(obs_day=obs_day))
-                            versions_result = cursor.fetchone()
-                            if versions_result is None:
-                                continue
-                            output = f"{d}: {versions_result[0]}"
-                            if args.verbose:
-                                output += f" [{versions_result[1]}, {versions_result[2]:%Y-%m-%dT%H:%M:%S}]"
-                            print(output)
+                        handle_list_versions(cursor, dates, verbose=args.verbose)
             except DatabaseError as e:
                 args.parser.error(e)
             except Exception as e:
@@ -133,6 +164,12 @@ def add_versions_subcommand(subparsers):
         "-p",
         "--processing",
         help="set to show dates that are currently processing",
+        action="store_true",
+    )
+    versions_parser.add_argument(
+        "-d",
+        "--duration",
+        help="set to show the full processing time for the given dates",
         action="store_true",
     )
     add_run_arguments(versions_parser)  # -f and dates
