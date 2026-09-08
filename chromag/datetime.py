@@ -18,7 +18,7 @@ def human_timedelta(timedelta: datetime.timedelta) -> str:
         before = " before"
     else:
         before = ""
-    decimals = max(0, -math.ceil(math.log10(secs)) + 3)
+    decimals = 1 if secs == 0.0 else max(0, -math.ceil(math.log10(secs)) + 3)
     secs_format = f"%0.{decimals}f"
 
     # secs_format = "%0.3f" if secs < 1.0 else "%0.2f" if secs < 10.0 else "%0.1f"
