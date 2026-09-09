@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+
+from email.mime.text import MIMEText
+import os
+import pwd
+import re
+import smtplib
+
+
+template = """ChroMag pipeline {version} were released on {release_date}. Changes for this version include:
+
+{version_notes}
+- ChroMag developer team"""
+
+
+def get_username():
+    return pwd.getpwuid(os.getuid())[0]
+
+
+def main():
+    # get email addresses of people to notify about the release
+    release_notifier_filename = os.path.expanduser("~/.chromag_release_notifiers")
+    with open(release_notifier_filename, "r") as f:
+        notifiers = f.read().split()
+
+    # read release notes
+    releases_filename = "CHANGELOG.md"
+    with open(releases_filename, "r") as f:
+        release_notes = f.read()
+
+    # find release notes of current release
+    expr = r"## \[(\d+\.\d+\.\d+)\] - (\d{4}-\d{2}-\d{2})"
+    matches = re.finditer(expr, release_notes, re.MULTILINE)
+    start_location = None
+    for m in matches:
+        if start_location is None:
+            version = m.group(1)
+            release_date = m.group(2)
+            start_location = m.span()[0]
+        else:
+            end_location = m.span()[0]
+            version_notes = release_notes[start_location:end_location]
+            break
+
+    version_notes = template.format(
+        version=version, release_date=release_date, version_notes=version_notes
+    )
+
+    # send email of release notes to notifier emails
+    me = f"ChroMag pipeline <{get_username()}@ucar.edu>"
+    msg = MIMEText(version_notes)
+    msg["Subject"] = f"Release notes for ChroMag pipeline {version}"
+    msg["From"] = me
+    msg["To"] = ", ".join(notifiers)
+
+    s = smtplib.SMTP("localhost")
+    s.sendmail(me, notifiers, msg.as_string())
+    s.quit()
+
+
+if __name__ == "__main__":
+    main()
