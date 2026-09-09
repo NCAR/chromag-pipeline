@@ -13,15 +13,23 @@ template = """ChroMag pipeline {version} were released on {release_date}. Change
 - ChroMag developer team"""
 
 
+NOTIFIER_LIST = "~/.chromag_release_notifiers"
+
+
 def get_username():
     return pwd.getpwuid(os.getuid())[0]
 
 
 def main():
     # get email addresses of people to notify about the release
-    release_notifier_filename = os.path.expanduser("~/.chromag_release_notifiers")
-    with open(release_notifier_filename, "r") as f:
-        notifiers = f.read().split()
+    release_notifier_filename = os.path.expanduser(NOTIFIER_LIST)
+    try:
+        with open(release_notifier_filename, "r") as f:
+            notifiers = f.read().split()
+    except FileNotFoundError as e:
+        print(e)
+        print("create space-delimited list of emails to notify")
+        return
 
     # read release notes
     releases_filename = "CHANGELOG.md"
