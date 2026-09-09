@@ -10,15 +10,15 @@ assignees: mgalloy
 ### Pre-release check
 
 - [ ] check to make sure no changes to the production config files are needed
-- [ ] add date/link to version line in `CHANGELOG.md`
-- [ ] check that version to release in `CHNAGELOG.md` matches version in `pyproject.toml`
+- [ ] add version/link/date to new release title line in `CHANGELOG.md`
+- [ ] check that version to release in `CHANGELOG.md` matches version in `pyproject.toml`
 
 ### Release to production
 
-- [ ] merge main to production
-- [ ] push production to origin
+- [ ] merge main to production: `git checkout production; git merge main`
+- [ ] push production to origin: `git push`
 - [ ] tag production with name: `git tag -a vX.Y.Z`
-- [ ] push tags: `git push --tags`
+- [ ] push tags: `git push --tags; git checkout main`
 
 ### Install production
 
