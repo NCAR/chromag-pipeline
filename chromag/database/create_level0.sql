@@ -6,7 +6,8 @@ create table chromag_level0 (
   filename                              varchar(80) not null,
   filesize                              int,   -- bytes
 
-  date_obs                              datetime not null,
+  date_obs                              datetime(3) not null,
+  date_end                              datetime(3) not null,
   obsday_id                             mediumint(5) not null,
 
   datatype                              char(12),
