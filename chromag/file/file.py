@@ -56,6 +56,7 @@ class ChroMagRawFile:
 
         self.primary_header = read_rawheader(filename)
         self.date_obs = dateobs2datetime(self.primary_header["DATE-OBS"])
+        self.date_end = dateobs2datetime(self.primary_header["DATE-END"])
         self.obsday_hours = obsday_hours(self.date_obs)
 
         # [TODO]: what should be done if required FITS keywords are
@@ -202,6 +203,7 @@ class ChroMagL1File:
 
         self.observing_day = raw_file.observing_day
         self.date_obs = raw_file.date_obs
+        self.date_end = raw_file.date_end
 
         self.wavelength = raw_file.wavelength
         self.wave_region = raw_file.wave_region
