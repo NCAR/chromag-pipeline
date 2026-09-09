@@ -7,7 +7,7 @@ pro chromag_make_darks
 
   data = readfits(template_filename, header)
 
-  date_format = '(C(CYI, "-", CMoI2.2, "-", CDI2.2, "T", CHI2.2, ":", CMI2.2, ":", CSF6.3))'
+  date_format = '(C(CYI, "-", CMoI2.2, "-", CDI2.2, "T", CHI2.2, ":", CMI2.2, ":", CSF06.3))'
   obs_time = 15.3D / 60.0D / 60.0D / 24.0D   ; seconds
 
   ; update DATATYPE, OBJECT, WAVELNTH, DATE-OBS, DATE, DATE-END, SCAN_N
