@@ -53,7 +53,7 @@ def dateobs2datetime(date_obs: str) -> datetime.datetime:
     return datetime.datetime.fromisoformat(date_obs)
 
 
-def datetime2dateobs(dt: datetime.datetime, milliseconds=True) -> str:
+def datetime2dateobs(dt: datetime.datetime, milliseconds: bool = True) -> str:
     """Convert a Python datetime object to a string in DATE-OBS format, with
     milliseconds, or optionally without the milliseconds.
     """
