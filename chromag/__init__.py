@@ -23,22 +23,24 @@ try:
         .decode("ascii")
         .strip()
     )
-except CalledProcessError as e:
+except subprocess.CalledProcessError as e:
     __revision__ = "N/A"
 
 # add a "*" to the revision if there are uncommitted changes
-p = subprocess.run(["git", "-C", repo_dir, "diff-index", "--quiet", "HEAD", "--"])
+p = subprocess.run(
+    ["git", "-C", repo_dir, "diff-index", "--quiet", "HEAD", "--"], check=False
+)
 if p.returncode != 0:
     __revision__ += "*"
 
 try:
-    description = (
+    DESCRIPTION = (
         subprocess.check_output(["git", "-C", repo_dir, "describe"])
         .decode("ascii")
         .strip()
     )
-except CalledProcessError as e:
-    description = f"v{__version__}"
+except subprocess.CalledProcessError as e:
+    DESCRIPTION = f"v{__version__}"
 
-if description != f"v{__version__}":
+if DESCRIPTION != f"v{__version__}":
     __version__ = f"{__version__}-dev"

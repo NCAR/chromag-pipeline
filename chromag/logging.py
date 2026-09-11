@@ -46,11 +46,11 @@ LEVEL_NAMES = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 DATE_FORMAT = "%Y%m%d.%H%M%S"
 
 
-def null_logger_func(msg, **extra):
+# pylint: disable=unused-argument
+def null_logger_func(msg: str, **extra) -> None:
     """Function that takes the same arguments as logger.info, etc., but does
     nothing.
     """
-    pass
 
 
 class FileHandler(logging.FileHandler):
@@ -118,10 +118,11 @@ class WrappedFormatter(logging.Formatter):
     it exists.
     """
 
-    def format(self, record: logging.LogRecord):
+    def format(self, record: logging.LogRecord) -> str:
+        """Set `funcName` to the name of the function in the `func` attribute."""
         if hasattr(record, "func"):
             record.funcName = record.func.__name__
-        return super(WrappedFormatter, self).format(record)
+        return super().format(record)
 
 
 def setup_logging(
@@ -176,14 +177,13 @@ def filter_log(logfile: str, level_index: int):
     """
     loglevel_filter = "|".join(LEVEL_NAMES[level_index:])
     loglevel_prog = re.compile(f".*({loglevel_filter}):.*")
-    logstart_prog = re.compile(r"(\[\d+\] )?\d{8}.\d{6}")
 
     matched_last_line = False
 
     results = []
 
     try:
-        with open(logfile, "r") as f:
+        with open(logfile, "r", encoding="utf-8") as f:
             for line in f:
                 if loglevel_prog.match(line):
                     matched_last_line = True
