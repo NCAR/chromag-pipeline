@@ -9,6 +9,7 @@ import sys
 from .helper import add_run_arguments, split_dates
 
 from ..config import read_config, get_basedir
+from ..control import is_running
 from ..file import create_dir
 from ..logging import logger
 from ..notifications import notify_process
@@ -40,6 +41,9 @@ def handle_process(args):
     exit_code = 0
     date_run = None
     for d in dates:
+        if not is_running():
+            print("processing is stopped, exiting...")
+            break
         try:
             process_basedir = get_basedir(d, "process")
             create_dir(process_basedir)
