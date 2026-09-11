@@ -68,7 +68,7 @@ class FileHandler(logging.FileHandler):
         os.fsync(self.stream.fileno())
 
 
-def rotate_logs(basename: str, max_version: Optional[int] = None):
+def rotate_logs(basename: str, max_version: Optional[int] = None) -> None:
     """Rotate logs to allow a new log to be written as basename. If
     max_version is given, delete logs with given basename and versions
     beyond the max_version.
@@ -104,12 +104,9 @@ def rotate_logs(basename: str, max_version: Optional[int] = None):
         os.rename(basename, f"{basename}.1")
 
 
-def get_level(level_name: str):
-    """Convert a string name to a logging level constant value.
-
-    level_name : str
-      case insensitive level name: CRITICAL, ERROR, WARNING, INFO, DEBUG
-    """
+def get_level(level_name: str) -> int:
+    """Convert a string name to a logging level constant value. The level name
+    must be one of "CRITICAL", "ERROR", "WARNING", "INFO", or "DEBUG"."""
     return LEVELS[level_name.upper()]
 
 
@@ -158,7 +155,7 @@ def setup_logging(
     return logger
 
 
-def begins_with_date(line, fmt):
+def begins_with_date(line: str, fmt: str) -> bool:
     """Determine if a line starts with a date of the given format."""
     # use current date/time to determine the length of a date/time with the
     # given format
@@ -171,7 +168,7 @@ def begins_with_date(line, fmt):
         return False
 
 
-def filter_log(logfile: str, level_index: int):
+def filter_log(logfile: str, level_index: int) -> str:
     """Filter a given log file at the given level (DEBUG, INFO, WARNING, ERROR,
     or CRITICAL).
     """
