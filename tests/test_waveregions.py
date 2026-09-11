@@ -5,6 +5,7 @@
 
 import pytest
 
+import chromag.waveregions
 from chromag.waveregions import available_waveregions, waveregion_property, _get_spec
 
 
@@ -12,6 +13,7 @@ standard_waveregions = ["587", "617", "656", "854", "1083"]
 
 
 def test_available_waveregions():
+    chromag.waveregions.cps = None
     wave_regions = available_waveregions()
     assert len(wave_regions) == 5
 
@@ -20,6 +22,7 @@ def test_available_waveregions():
 
 
 def test_waveregion_property():
+    chromag.waveregions.cps = None
     tolerance = 0.0001
     center_wavelength = waveregion_property("617", "center_wavelength", "2026-08-28")
     assert type(center_wavelength) == float
@@ -30,6 +33,8 @@ def test_waveregion_properties():
     """Determine if all the wave regions have the same parameters. This is a
     test of the wave region configuration files, not the code.
     """
+    chromag.waveregions.cps = None
+
     cw = standard_waveregions[0]
     comparison_parameters = _get_spec(cw).specification.defaults().keys()
     n_comps = len(comparison_parameters)
