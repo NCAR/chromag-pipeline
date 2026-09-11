@@ -51,8 +51,11 @@ def add_createdb_subcommand(subparsers):
     createdb_parser = subparsers.add_parser(
         "createdb", help="create the ChroMag database tables"
     )
-    flags_help = """Configuration filename"""
     createdb_parser.add_argument(
-        "-f", "--configuration-filename", type=str, help=flags_help, default=None
+        "-f",
+        "--configuration-filename",
+        type=str,
+        help="configuration filename",
+        default=None,
     )
     createdb_parser.set_defaults(func=process_createdb, parser=createdb_parser)
