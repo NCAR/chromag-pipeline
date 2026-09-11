@@ -33,5 +33,5 @@ repos:
         types: [python]
         args:
           [
-            "--fail-under=7",
+            "--fail-under=8.85",
           ]
