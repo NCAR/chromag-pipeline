@@ -11,6 +11,7 @@ from .. import __revision__
 from .archive import add_archive_subcommand
 from .cat import add_cat_subcommand
 from .clearday import add_clearday_subcommand
+from .control import add_control_subcommand
 from .createdb import add_createdb_subcommand
 from .log import add_log_subcommand
 from .ls import add_ls_subcommand
@@ -37,10 +38,11 @@ def setup():
 
     subparsers = parser.add_subparsers(help="sub-command help")
 
-    # helpers: archive, cat, clearday, createdb, ls, log, ps, versions
+    # helpers: archive, cat, clearday, control, createdb, ls, log, ps, versions
     add_archive_subcommand(subparsers)
     add_cat_subcommand(subparsers)
     add_clearday_subcommand(subparsers)
+    add_control_subcommand(subparsers)
     add_createdb_subcommand(subparsers)
     add_log_subcommand(subparsers)
     add_ls_subcommand(subparsers)
