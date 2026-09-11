@@ -5,7 +5,6 @@
 
 import datetime
 import functools
-import logging
 import os
 import socket
 
@@ -39,19 +38,19 @@ def step(top=False):
             if skip:
                 logger_func(f"skipped {func.__name__}", extra=e)
                 return None
-            else:
-                logger_func(f"starting {func.__name__}...", extra=e)
-                start_dt = datetime.datetime.now()
 
-                value = func(*args, **kwargs)
-                if intermediate:
-                    write_l1_intermediate(args[1], func.__name__)
+            logger_func(f"starting {func.__name__}...", extra=e)
+            start_dt = datetime.datetime.now()
 
-                end_dt = datetime.datetime.now()
-                time_interval = end_dt - start_dt
-                human_time = human_timedelta(time_interval)
-                logger_func(f"done with {func.__name__}: {human_time}", extra=e)
-                return value
+            value = func(*args, **kwargs)
+            if intermediate:
+                write_l1_intermediate(args[1], func.__name__)
+
+            end_dt = datetime.datetime.now()
+            time_interval = end_dt - start_dt
+            human_time = human_timedelta(time_interval)
+            logger_func(f"done with {func.__name__}: {human_time}", extra=e)
+            return value
 
         return func_wrapper
 
@@ -71,6 +70,7 @@ class Run:
 
     @property
     def catalog(self):
+        """Access the catalog of files for the run."""
         return self._catalog
 
     @catalog.setter
@@ -79,6 +79,8 @@ class Run:
 
     @property
     def calibration(self):
+        """Access the photometric/polarimetric calibration artifacts needed to
+        calibrate the science files in the run."""
         return self._calibration
 
     @calibration.setter
@@ -106,7 +108,7 @@ class RunLock:
         if os.path.exists(self.lock_filename):
             raise LockException("lockfile already exists")
 
-        with open(self.lock_filename, "w") as f:
+        with open(self.lock_filename, "w", encoding="utf-8") as f:
             hostname = socket.gethostname()
             f.write(f"{hostname} {os.getpid()}")
         return self
