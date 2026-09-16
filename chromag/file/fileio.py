@@ -20,30 +20,36 @@ def human_bytes(n_bytes: int, n_decimals: int = 1) -> str:
     """
     if n_bytes == 0:
         return "0B"
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-    i = int(math.floor(math.log(n_bytes, 1024)))
-    p = math.pow(1024, i)
-    s = round(n_bytes / p, n_decimals)
-    return f"{s} {size_name[i]}"
+    sizenames = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+    n_sizes = len(sizenames)
+    i = math.floor(math.log(n_bytes, 1024))
+    p = 1 << (10 * i)  # 1024^i = (2^10)^i = 2^(10*i), 2^n = 1 << n
+    if i >= n_sizes:
+        s = round(n_bytes / p * 1024 ** (n_sizes - i + 1), n_decimals)
+        units = sizenames[-1]
+    else:
+        s = round(n_bytes / p, n_decimals)
+        units = sizenames[i]
+    return f"{s} {units}"
 
 
-def create_dir(dir: str, /, *, basepath: str = None):
+def create_dir(cdir: str, /, *, basepath: str = None):
     """Create directory, making sure is in the cordyn group. If present,
     `basepath` specifies the base of the `dir` name that can be omitted in the
     log messages. Doesn't create directory if it already exists.
     """
-    if not os.path.isdir(dir):
+    if not os.path.isdir(cdir):
         if basepath is not None:
-            dirname = dir.removeprefix(basepath)
+            dirname = cdir.removeprefix(basepath)
         else:
-            dirname = dir
+            dirname = cdir
         os.mkdir(dir)
         logger.debug(f"created ~~~{dirname}")
 
-    group_id = os.stat(dir).st_gid
+    group_id = os.stat(cdir).st_gid
     cordyn_id = grp.getgrnam("cordyn").gr_gid
     if group_id != cordyn_id:
-        os.chown(dir, -1, gid)
+        os.chown(dir, -1, cordyn_id)
         logger.debug(f"changed group ID from {group_id} to {cordyn_id}")
 
 
@@ -64,7 +70,7 @@ def make_tarlist(tar_filename: str, tarlist_filename: str):
     """
     with tarfile.open(tar_filename) as f:
         names = f.getnames()
-    with open(tarlist_filename, "w") as f:
+    with open(tarlist_filename, "w", encoding="utf-8") as f:
         for n in names:
             f.write(f"{n}\n")
 
