@@ -19,7 +19,7 @@ def human_bytes(n_bytes: int, n_decimals: int = 1) -> str:
     KB, MB, GB, etc.
     """
     if n_bytes == 0:
-        return "0B"
+        return "0 B"
     sizenames = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     n_sizes = len(sizenames)
     i = math.floor(math.log(n_bytes, 1024))
