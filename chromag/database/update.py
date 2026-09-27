@@ -25,7 +25,7 @@ ProcessStatus = StrEnum(
 )
 
 
-def get_sw_id(connection: mysql.connector.connection_cext.CMySQLConnection):
+def get_sw_id(connection: mysql.connector.connection.MySQLConnection):
     """Update the versions table with the version of the this code."""
 
     with closing(connection.cursor()) as cursor:
@@ -51,7 +51,7 @@ def get_sw_id(connection: mysql.connector.connection_cext.CMySQLConnection):
 
 
 def get_obsday_id(
-    connection: mysql.connector.connection_cext.CMySQLConnection, obs_date: str
+    connection: mysql.connector.connection.MySQLConnection, obs_date: str
 ):
     """Retrieve the observing day identifier given the "observing day", i.e.,
     the HST date of the observations. If there isn't a row for it yet, create a
@@ -79,7 +79,7 @@ def get_obsday_id(
 
 
 def set_process_id(
-    connection: mysql.connector.connection_cext.CMySQLConnection,
+    connection: mysql.connector.connection.MySQLConnection,
     obsday_id: int,
     status: ProcessStatus = ProcessStatus.PROCESSED,
 ):
@@ -105,7 +105,6 @@ def set_process_id(
         else:
             process_id = result[0]
             if status == ProcessStatus.PROCESSED:
-                date_processed = result[1]
                 processing_time = (now - result[1]).seconds
                 cmd = f'update chromag_process set chromag_sw_id={sw_id}, date_processed="{now}", processing_time={processing_time}, status="{status}", hostname="{hostname}" where process_id={process_id}'
             else:
@@ -119,27 +118,27 @@ def set_process_id(
 
 
 def _get_id(
-    connection: mysql.connector.connection_cext.CMySQLConnection,
-    type: str,
+    connection: mysql.connector.connection.MySQLConnection,
+    typename: str,
     name: str,
 ):
     """Get ID given a name for any of the `chromag_{filetype,producttype,level}`
     database tables."""
     with closing(connection.cursor()) as cursor:
-        cmd = f'select {type}_id from chromag_{type} where {type}_name = "{name}" limit 1;'
+        cmd = f'select {typename}_id from chromag_{typename} where {typename}_name = "{name}" limit 1;'
         cursor.execute(cmd)
         result = cursor.fetchone()
         if result is None:
-            raise DatabaseError(f"no {name} {type} found")
-        else:
-            db_id = result[0]
-            logger.debug(f"found {type}_id={db_id} for {name}")
+            raise DatabaseError(f"no {name} {typename} found")
+
+        db_id = result[0]
+        logger.debug(f"found {typename}_id={db_id} for {name}")
 
     return db_id
 
 
 def get_level_id(
-    connection: mysql.connector.connection_cext.CMySQLConnection, level_name: str
+    connection: mysql.connector.connection.MySQLConnection, level_name: str
 ):
     """Retrieve level ID for a given level name. If `level_name` is not found,
     raises a DatabaseError error."""
@@ -147,7 +146,7 @@ def get_level_id(
 
 
 def get_filetype_id(
-    connection: mysql.connector.connection_cext.CMySQLConnection, filetype_name: str
+    connection: mysql.connector.connection.MySQLConnection, filetype_name: str
 ):
     """Retrieve file type ID for a given file type name. If `filetype_name` is
     not found, raises a DatabaseError error."""
@@ -155,7 +154,7 @@ def get_filetype_id(
 
 
 def get_producttype_id(
-    connection: mysql.connector.connection_cext.CMySQLConnection, producttype_name: str
+    connection: mysql.connector.connection.MySQLConnection, producttype_name: str
 ):
     """Retrieve product type ID for a given product type name. If
     `producttype_name` is not found, raises a DatabaseError error."""

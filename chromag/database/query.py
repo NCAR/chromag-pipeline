@@ -11,7 +11,7 @@ from ..logging import logger
 
 
 def query(
-    connection: mysql.connector.connection_cext.CMySQLConnection,
+    connection: mysql.connector.connection.MySQLConnection,
     sql_cmd: str,
 ):
     with closing(connection.cursor()) as cursor:

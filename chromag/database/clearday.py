@@ -20,7 +20,7 @@ from ..logging import logger
 
 
 def clear_table(
-    connection: mysql.connector.connection_cext.CMySQLConnection,
+    connection: mysql.connector.connection.MySQLConnection,
     obsday_id: int,
     table_name: str,
 ):

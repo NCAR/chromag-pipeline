@@ -73,7 +73,7 @@ def _mission_time_series(
 @step()
 def write_imagescale_plot(
     imagescale_plot_filename: str,
-    connection: mysql.connector.connection_cext.CMySQLConnection,
+    connection: mysql.connector.connection.MySQLConnection,
     observing_day: str,
     wave_region: str,
 ):

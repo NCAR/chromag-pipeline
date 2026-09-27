@@ -27,7 +27,7 @@ def get_sql_cmds(table_name: str, type: str) -> str:
 
 
 def delete_table(
-    cursor: mysql.connector.cursor_cext.CMySQLCursor, table_name: str
+    cursor: mysql.connector.connection.MySQLCursor, table_name: str
 ) -> None:
     """Deletes a database table of the given name, e.g., "chromag_level0", if
     it exists.
@@ -37,7 +37,7 @@ def delete_table(
 
 
 def create_table(
-    cursor: mysql.connector.cursor_cext.CMySQLCursor, table_name: str
+    cursor: mysql.connector.connection.MySQLCursor, table_name: str
 ) -> None:
     """Creates a database table of the given name, e.g., "chromag_level0"."""
     table_definition = get_sql_cmds(table_name, "create")
@@ -45,9 +45,7 @@ def create_table(
     cursor.execute(table_definition)
 
 
-def init_table(
-    cursor: mysql.connector.cursor_cext.CMySQLCursor, table_name: str
-) -> None:
+def init_table(cursor: mysql.connector.connection.MySQLCursor, table_name: str) -> None:
     """Creates a database table of the given name, e.g., "chromag_level0"."""
     table_initialization = get_sql_cmds(table_name, "init")
     if table_initialization is not None:

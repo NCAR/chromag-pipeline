@@ -36,7 +36,7 @@ def db_safe(value: float, format: str):
 
 
 def insert_web(
-    connection: mysql.connector.connection_cext.CMySQLConnection,
+    connection: mysql.connector.connection.MySQLConnection,
     obsday_id: int,
     catalog,
 ):
@@ -113,7 +113,7 @@ def insert_web(
 
 
 def insert_level0(
-    connection: mysql.connector.connection_cext.CMySQLConnection,
+    connection: mysql.connector.connection.MySQLConnection,
     obsday_id: int,
     catalog,
 ):
@@ -162,7 +162,7 @@ def insert_level0(
 
 
 def insert_level1(
-    connection: mysql.connector.connection_cext.CMySQLConnection,
+    connection: mysql.connector.connection.MySQLConnection,
     obsday_id: int,
     catalog,
 ):
@@ -211,7 +211,7 @@ def insert_level1(
 
 
 def insert_level2(
-    connection: mysql.connector.connection_cext.CMySQLConnection,
+    connection: mysql.connector.connection.MySQLConnection,
     obsday_id: int,
     catalog,
 ):
@@ -223,7 +223,7 @@ def insert_level2(
 
 
 def insert_level3(
-    connection: mysql.connector.connection_cext.CMySQLConnection,
+    connection: mysql.connector.connection.MySQLConnection,
     obsday_id: int,
     catalog,
 ):
