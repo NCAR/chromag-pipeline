@@ -43,7 +43,7 @@ def create_dir(cdir: str, /, *, basepath: str = None):
             dirname = cdir.removeprefix(basepath)
         else:
             dirname = cdir
-        os.mkdir(dir)
+        os.mkdir(cdir)
         logger.debug(f"created ~~~{dirname}")
 
     group_id = os.stat(cdir).st_gid
