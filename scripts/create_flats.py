@@ -11,6 +11,19 @@ from astropy.io import fits
 from scipy.signal import fftconvolve
 
 
+def convert_to_raw_adu(
+    normalized_obs, peak_adu=30000.0, dark_pedestal=40.0, read_noise_std=3.0
+):
+    """Scales unitless observation (0 to ~1) into raw 16-bit integer camera ADU."""
+    photoelectrons = normalized_obs * peak_adu
+    noisy_signal = np.random.poisson(photoelectrons).astype(np.float64)
+    read_noise = np.random.normal(
+        loc=0.0, scale=read_noise_std, size=normalized_obs.shape
+    )
+    raw_signal = noisy_signal + dark_pedestal + read_noise
+    return np.clip(np.round(raw_signal), 0, 65535).astype(np.uint16)
+
+
 def generate_quadrant_flats(
     quadrant="all",
     ny=2160,
@@ -88,7 +101,12 @@ def generate_quadrant_flats(
 
 
 def create_flats(
-    start_datetime: datetime.datetime, exptime: float, numflats: int, kll_flag: bool
+    start_datetime: datetime.datetime,
+    exptime: float,
+    numflats: int,
+    kll_flag: bool,
+    peak_adu: float = 30000.0,
+    dark_pedestal: float = 40.0,
 ):
     """
     saves flats to fits files, mimicking real data
@@ -103,7 +121,7 @@ def create_flats(
         print(f"creating {numflats} non-KLL flat(s)")
 
     # prep a primary header for fits files generated
-    path = "/hao/mlso25/Data/ChroMag/raw.synthetic/"
+    path = "/hao/mlso25/Data/ChroMag/raw.synthetic-dfarrell/"
     subdir = start_datetime.strftime("%Y%m%d")
     files = glob.glob(path + subdir + "/" + "*fits")
     with fits.open(files[0]) as f:
@@ -117,40 +135,17 @@ def create_flats(
     for i in range(numflats):
         observations, true_flat, offsets = generate_quadrant_flats(quad)
 
-        # if kll, four flats will be generated with the above function call
-        if kll_flag:
-            known_offsets = ["upper right", "upper left", "lower left", "lower right"]
-            for j in range(4):
+        target_indices = range(4) if kll_flag else [0]
 
-                # flat should have something in the header about if kll and offset?
-                primary_header["OFFSET"] = "True"
+        for j in target_indices:
 
-                new_dt = (
-                    start_datetime + datetime.timedelta(seconds=5 * idx)
-                ).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
-                new_fn = (
-                    start_datetime + datetime.timedelta(seconds=5 * idx)
-                ).strftime("%Y%m%dT%H%M%S.%f")[:-3] + "Z"
-                primary_header["DATE-OBS"] = new_dt
-                primary_hdu = fits.PrimaryHDU(
-                    data=observations[j], header=primary_header
-                )
-                hdu1 = fits.ImageHDU(true_flat, name="true flat")
-                hdu2 = fits.ImageHDU(offsets[j], name="offset")
-                hdul = fits.HDUList([primary_hdu, hdu1, hdu2])
+            raw_adu_frame = convert_to_raw_adu(
+                observations[j], peak_adu=peak_adu, dark_pedestal=dark_pedestal
+            )
 
-                # filename = datetime in utc including ms
-                outdir = path + new_dt[:10].replace("-", "") + "/"
-                if not os.path.exists(outdir):
-                    os.makedirs(outdir)
-                filename = new_fn + ".fits"
-                hdul.writeto(outdir + filename, overwrite=True)
-                print(f"saving {outdir+filename}")
-                idx += 1
-
-        else:
-            # flat should have something in the header specifying it isn't kll
             primary_header["OFFSET"] = "False"
+            if kll_flag:
+                primary_header["OFFSET"] = "True"
 
             new_dt = (start_datetime + datetime.timedelta(seconds=5 * idx)).strftime(
                 "%Y-%m-%dT%H:%M:%S.%f"
@@ -159,9 +154,9 @@ def create_flats(
                 "%Y%m%dT%H%M%S.%f"
             )[:-3] + "Z"
             primary_header["DATE-OBS"] = new_dt
-            primary_hdu = fits.PrimaryHDU(data=observations[0], header=primary_header)
+            primary_hdu = fits.PrimaryHDU(data=raw_adu_frame, header=primary_header)
             hdu1 = fits.ImageHDU(true_flat, name="true flat")
-            hdu2 = fits.ImageHDU(offsets[0], name="offset")
+            hdu2 = fits.ImageHDU(offsets[j], name="offset")
             hdul = fits.HDUList([primary_hdu, hdu1, hdu2])
 
             # filename = datetime in utc including ms

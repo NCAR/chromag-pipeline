@@ -49,7 +49,7 @@ def create_dir(cdir: str, /, *, basepath: str = None):
     group_id = os.stat(cdir).st_gid
     cordyn_id = grp.getgrnam("cordyn").gr_gid
     if group_id != cordyn_id:
-        os.chown(dir, -1, cordyn_id)
+        os.chown(cdir, -1, cordyn_id)
         logger.debug(f"changed group ID from {group_id} to {cordyn_id}")
 
 
