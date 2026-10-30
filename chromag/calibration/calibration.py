@@ -7,7 +7,7 @@ import datetime
 import os
 import glob
 from typing import Tuple, Optional
-from scipy.ndimage import center_of_mass, shift
+from scipy.ndimage import center_of_mass, shift, gaussian_filter
 
 from netCDF4 import Dataset
 import numpy as np
@@ -19,56 +19,84 @@ from .kll_routine import kll_routine
 from ..config import get_option
 
 
-def align_and_divide_kll_final(
+def create_full_frame_flat(
     non_kll_flat: np.ndarray,
     kll_object: np.ndarray,
-    inner_radius_fraction: float = 0.82,
+    kll_ref_flat: np.ndarray,
+    transition_width_px: float = 30.0,
 ) -> np.ndarray:
-    """Aligns KLL object and produces a nan-masked master flat field."""
+    """Derives a flat field valid to the edges of the detector by combining
 
-    # finds center of the kll object and non-kll flat so we can align
-    core_mask_non_kll = non_kll_flat > (0.50 * np.nanmax(non_kll_flat))
-    core_mask_kll_obj = kll_object > (0.50 * np.nanmax(kll_object))
+    log-subtracted solar data inside the disk with reference KLL gain outside.
+    """
+    ny, nx = non_kll_flat.shape
 
-    cy_non_kll, cx_non_kll = center_of_mass(core_mask_non_kll)
-    cy_kll_obj, cx_kll_obj = center_of_mass(core_mask_kll_obj)
+    # begin with aligning the centered flat and kll object in case of offset
+    core_non_kll = non_kll_flat > (0.50 * np.nanmax(non_kll_flat))
+    core_kll_obj = kll_object > (0.50 * np.nanmax(kll_object))
+
+    cy_non_kll, cx_non_kll = center_of_mass(core_non_kll)
+    cy_kll_obj, cx_kll_obj = center_of_mass(core_kll_obj)
 
     dy = cy_non_kll - cy_kll_obj
     dx = cx_non_kll - cx_kll_obj
 
-    # shift kll to match center of the non-kll
-    aligned_kll = shift(kll_object, shift=(dy, dx), mode="constant", cval=0.0)
+    aligned_kll_object = shift(kll_object, shift=(dy, dx), mode="constant", cval=0.0)
 
-    # determine horizontal solar raidus
-    ny, nx = non_kll_flat.shape
-    y_indices, x_indices = np.ogrid[:ny, :nx]
-    dist_from_center = np.sqrt(
-        (x_indices - cx_non_kll) ** 2 + (y_indices - cy_non_kll) ** 2
-    )
+    # adjust for difference in radius
+    y_idx, x_idx = np.ogrid[:ny, :nx]
+    dist_map = np.sqrt((x_idx - cx_non_kll) ** 2 + (y_idx - cy_non_kll) ** 2)
+
+    # detect horizontal disk radius
     center_row = int(cy_non_kll)
-    horiz_profile = non_kll_flat[center_row, int(cx_non_kll) :]
-    radius_idx = np.where(horiz_profile < 0.20 * np.nanmax(horiz_profile))[0]
-    solar_radius = float(radius_idx[0]) if len(radius_idx) > 0 else 0.45 * min(ny, nx)
-
-    # mask inner disk
-    valid_radius = inner_radius_fraction * solar_radius
-    inner_disk_mask = dist_from_center <= valid_radius
-
-    # normalize kll
-    scale_factor = np.median(non_kll_flat[inner_disk_mask]) / np.median(
-        aligned_kll[inner_disk_mask]
+    profile = non_kll_flat[center_row, int(cx_non_kll) :]
+    radius_candidates = np.where(profile < 0.20 * np.nanmax(profile))[0]
+    solar_radius = (
+        float(radius_candidates[0])
+        if len(radius_candidates) > 0
+        else 0.45 * min(ny, nx)
     )
-    scaled_kll = aligned_kll * scale_factor
 
-    # flat = non-kll / kll object
-    master_flat = np.full_like(non_kll_flat, fill_value=np.nan)
-    safe_kll = np.where(scaled_kll > 1e-4, scaled_kll, np.nan)
-    divided_data = non_kll_flat[inner_disk_mask] / safe_kll[inner_disk_mask]
+    # define inner boundary (100% updated data) and outer boundary (100% KLL reference)
+    r_inner = solar_radius - transition_width_px
+    r_outer = solar_radius
 
-    # normalize median flat response to exactly 1.0
-    master_flat[inner_disk_mask] = divided_data / np.nanmedian(divided_data)
+    # define valid interior - strictly positive masks for log space
+    valid_interior = (
+        (dist_map <= r_outer) & (non_kll_flat > 0) & (aligned_kll_object > 0)
+    )
 
-    return master_flat
+    # gain scaling inside the clear core
+    core_mask = dist_map <= (0.75 * solar_radius)
+    flux_ratio = np.median(non_kll_flat[core_mask]) / np.median(
+        aligned_kll_object[core_mask]
+    )
+    scaled_kll_obj = aligned_kll_object * flux_ratio
+
+    # log subtraction on solar disk
+    # ln(Gain) = ln(Image) - ln(Object) -> Gain = exp(ln(Image) - ln(Object))
+    interior_flat = np.ones_like(non_kll_flat)
+    interior_flat[valid_interior] = np.exp(
+        np.log(non_kll_flat[valid_interior]) - np.log(scaled_kll_obj[valid_interior])
+    )
+    # normalize interior flat to median = 1.0 - or should use mean?
+    interior_flat /= np.median(interior_flat[core_mask])
+
+    # normalize external reference KLL flat - or should use mean?
+    normalized_kll_ref = kll_ref_flat / np.median(kll_ref_flat[core_mask])
+
+    # smooth radial alpha-blending accross limb, may need modification
+    # alpha = 1.0 at center, fades to 0.0 at outer edge of transition zone
+    alpha = np.clip((r_outer - dist_map) / (r_outer - r_inner), 0.0, 1.0)
+    alpha = gaussian_filter(alpha, sigma=2.0)
+
+    # master flat combines today's interior flat with edge reference flat
+    full_frame_flat = alpha * interior_flat + (1.0 - alpha) * normalized_kll_ref
+
+    # final overall normalization
+    full_frame_flat /= np.median(full_frame_flat)
+
+    return full_frame_flat
 
 
 class Calibration:
@@ -277,9 +305,9 @@ class Calibration:
 
             if kll_ref_flat is not None:
 
-                # Step 6: correct non-KLL flat with matching KLL object
-                corrected_flat = align_and_divide_kll_final(
-                    raw_mean_flat, kll_ref_object
+                # Step 6: correct non-KLL flat with matching KLL object & flat
+                corrected_flat = create_full_frame_flat(
+                    raw_mean_flat, kll_ref_object, kll_ref_flat
                 )
                 self.flat_images[i, :, :] = corrected_flat
                 logger.info(f"Group {u}: Modified non-KLL flat using KLL ref")
